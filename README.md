@@ -1,2 +1,2 @@
-# atlas
-The product of all our research cartography
+# Research Atlas
+The product of all our research cartography. 
