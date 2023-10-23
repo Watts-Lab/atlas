@@ -13,7 +13,7 @@ const handleStyle = { left: 10 };
 const options = [
   {
     value: "multiple",
-    label: "Multiple outputs",
+    label: "Multiple (List)",
   },
   {
     value: "freetext",
@@ -37,7 +37,6 @@ function Select({ value }: SelectType) {
   const onChange = (evt) => {
     const { nodeInternals } = store.getState();
     setSelected(evt.target.value);
-
   };
 
   return (
@@ -53,7 +52,7 @@ function Select({ value }: SelectType) {
         value={selected}
       >
         <option disabled value="default">
-          Pick one
+          Output type
         </option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -65,37 +64,89 @@ function Select({ value }: SelectType) {
   );
 }
 
-function PromptNode({ data }) {
+interface PromptNodeProps {
+  data: { selects: { [key: string]: string }; text: string };
+}
+
+function PromptNode({ data }: PromptNodeProps) {
   const [running, setRunning] = useState(false);
+  const [response, setResponse] = useState(null);
+
+  const [inputText, setInputText] = useState(data.text); 
+  const [selectedOutputType, setSelectedOutputType] = useState("default"); 
 
   const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
+    setInputText(evt.target.value); 
   }, []);
 
+  /**
+   * Runs the prompt when the user clicks the "Run" button.
+   * Sends an API request with the input text and selected output type.
+   * Handles the API response data and sets the response if needed.
+   * @returns void
+   */
   const onRunPrompt = useCallback(() => {
-    console.log("running prompt");
-    running ? setRunning(false) : setRunning(true);
-  }, [running]);
+    if (!running) {
+      // Construct your API request here
+      // Use inputText and selectedOutputType to send the appropriate data to the API
+
+      // For example, you can use the fetch API to send a POST request
+      fetch("http://localhost:8080/api/home", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: inputText,
+          outputType: selectedOutputType,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Handle the API response data
+          console.log("API Response:", data);
+          setResponse(data.message); // Store the response if needed
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+        })
+        .finally(() => {
+          setRunning(false);
+        });
+
+      setRunning(true);
+    }
+  }, [running, inputText, selectedOutputType]);
 
   return (
     <div className="card w-60 bg-base-100 shadow-xl">
-      {Object.keys(data.selects).map((handleId) => (
+      <Handle type="target" position={Position.Top} />
+      {/* {Object.keys(data.selects).map((handleId) => (
         <Select key={handleId} value={data.selects[handleId]} />
-      ))}
+      ))} */}
+      <Select
+        value={selectedOutputType}
+        onChange={(value) => setSelectedOutputType(value)} // Update the selected output type
+      />
       <div className="card-body items-center text-center p-4">
         <div className="card-actions">
           <textarea
             placeholder="Prompt text"
-            className="textarea textarea-bordered textarea-sm w-full max-w-xs"
+            className="textarea textarea-bordered textarea-xs w-full max-w-xs nodrag"
+            rows={5}
+            value={data.text}
+            onChange={onChange} // Update the input text
           ></textarea>
           <button
             onClick={onRunPrompt}
-            className="btn btn-sm btn-block"
+            className="btn btn-xs btn-block"
             disabled={running}
           >
             {running ? (
               <>
-                Running<span className="loading loading-spinner"></span>
+                Running
+                <span className="loading loading-spinner text-xs"></span>
               </>
             ) : (
               "Run prompt"
@@ -103,8 +154,7 @@ function PromptNode({ data }) {
           </button>
         </div>
       </div>
-
-      <Handle type="target" position={Position.Bottom} />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }
