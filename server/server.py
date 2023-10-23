@@ -1,18 +1,37 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import argparse
+import time
 
 app = Flask(__name__)
 CORS(app)
 
 
 # /api/home
-@app.route("/api/home", methods=["GET"])
+@app.route("/api/home", methods=["GET", "POST"])
 def return_home():
-    response_data = {"message": "Hello, World!"}
-    response = make_response(jsonify(response_data))
-    response.status_code = 200
-    return response
+    if request.method == "GET":
+        response_data = {"message": "Hello, World!"}
+        response = make_response(jsonify(response_data))
+        response.status_code = 200
+        return response
+    elif request.method == "POST":
+        print(request.data)
+        request_data = request.get_json(silent=True)
+        time.sleep(2)
+        response_data = {
+            "message": f"type, {request_data['outputType']} and prompt is {request_data['text']}!"
+        }
+        response = make_response(jsonify(response_data))
+        response.status_code = 200
+        return response
+
+@app.route("/api/markdown", methods=["GET"])
+def get_markdown_content():
+    # Read the Markdown file and return its content as plain text
+    with open("./files/sample_paper/A_19_2022_DoHonestyNudges.mmd", "r", encoding="utf-8") as markdown_file:
+        content = markdown_file.read()
+    return jsonify({"content": content})
 
 
 if __name__ == "__main__":
