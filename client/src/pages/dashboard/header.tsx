@@ -18,7 +18,7 @@ const Header = ({ fileName }: HeaderProps) => {
                     <a>Open PDF</a>
                   </li>
                   <li>
-                    <a>Open Markdown</a>
+                    <a href="/files">Open Markdown</a>
                   </li>
                 </ul>
               </details>
@@ -31,7 +31,7 @@ const Header = ({ fileName }: HeaderProps) => {
                     <a>Save prompt template</a>
                   </li>
                   <li>
-                    <a>Load template</a>
+                    <a href="/dashboard">Load template</a>
                   </li>
                   <li>
                     <a>Export template</a>

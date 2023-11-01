@@ -1,14 +1,19 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import ReactFlow, {
+  ReactFlowProvider,
   MiniMap,
   Controls,
   Background,
   useNodesState,
   useEdgesState,
+  Node,
+  Edge,
   applyEdgeChanges,
   applyNodeChanges,
   addEdge,
 } from "reactflow";
+
+import Sidebar from "./sidebar";
 
 import PromptNode from "./promptnode";
 
@@ -32,13 +37,19 @@ const initialNodes = [
   },
 ];
 
-const initialEdges = [];
+const initialEdges: Edge[] = [];
 
 const nodeTypes = { PromptNode: PromptNode };
 
+let id = 0;
+const getId = () => `dndnode_${id++}`;
+
 function Flow() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+
+  const reactFlowWrapper = useRef(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -60,7 +71,7 @@ function Flow() {
         ...prevNodes,
         {
           id: "2",
-          type: "PromptNode",
+          type: "default",
           position: { x: -150, y: 300 },
           data: {
             selects: {
@@ -70,7 +81,7 @@ function Flow() {
         },
         {
           id: "3",
-          type: "PromptNode",
+          type: "default",
           position: { x: 150, y: 300 },
           data: {
             selects: {
@@ -110,6 +121,39 @@ function Flow() {
     };
   }, []);
 
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+      const type = event.dataTransfer.getData("application/reactflow");
+
+      // check if the dropped element is valid
+      if (typeof type === "undefined" || !type) {
+        return;
+      }
+
+      const position = reactFlowInstance.project({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      });
+      const newNode = {
+        id: getId(),
+        type,
+        position,
+        data: { label: `${type} node` },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [reactFlowInstance]
+  );
+
   return (
     <div style={{ width: "100vw", height: "100vh", zIndex: -1 }}>
       <ReactFlow
@@ -126,6 +170,12 @@ function Flow() {
         {/* <MiniMap /> */}
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
+      {/* <ReactFlowProvider>
+        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+         
+        </div>
+        <Sidebar />
+      </ReactFlowProvider> */}
     </div>
   );
 }

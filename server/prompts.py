@@ -63,7 +63,8 @@ class Prompt:
         )
 
 
-behavior_description = """Use the following pieces of context to answer the question at the end according to \
+behavior_description = """
+Use the following pieces of context to answer the question at the end according to \
 the format of the answer provided. If you don't know the answer, just say that \
 you don't know, don't try to make up an answer. Keep the answer as concise as possible.\n\
 Here is the context: \n\n {input} \n\n\
@@ -106,7 +107,7 @@ from langchain.chains import RetrievalQA
 
 
 # Initialize the language model
-llm = ChatOpenAI(temperature=0.9)
+llm = ChatOpenAI(temperature=0)
 
 # Initialize a prompt. This prompt takes in a variable called product asks the
 # LLM to generate the best name to describe a company that makes that product.
@@ -132,3 +133,6 @@ qa_chain = RetrievalQA.from_chain_type(
 question = "What are major topics for this class?"
 result = qa_chain({"query": question})
 result["result"]
+
+
+/Users/amir/Documents/projects/atlas/server/files/sample_paper/A_19_2022_DoHonestyNudges.mmd

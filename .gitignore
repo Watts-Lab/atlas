@@ -274,3 +274,6 @@ dist
 markdown_articles/
 original_pdf_articles/
 sample_paper/
+notebooks/behavior_level.csv
+notebooks/experimental_level.csv
+notebooks/MasterDB_Full.csv
