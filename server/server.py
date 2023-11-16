@@ -15,16 +15,17 @@ def return_home():
         response = make_response(jsonify(response_data))
         response.status_code = 200
         return response
-    elif request.method == "POST":
-        print(request.data)
-        request_data = request.get_json(silent=True)
-        time.sleep(2)
-        response_data = {
-            "message": f"type, {request_data['outputType']} and prompt is {request_data['text']}!"
-        }
-        response = make_response(jsonify(response_data))
-        response.status_code = 200
-        return response
+
+@app.route("/api/runprompt", methods=["POST"])
+def run_prompt():
+    request_data = request.get_json(silent=True)
+    time.sleep(2)
+    response_data = {
+        "message": f"type, {request_data['outputType']} and prompt is {request_data['text']}!"
+    }
+    response = make_response(jsonify(response_data))
+    response.status_code = 200
+    return response
 
 @app.route("/api/markdown", methods=["GET"])
 def get_markdown_content():

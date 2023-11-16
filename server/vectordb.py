@@ -1,13 +1,13 @@
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import MarkdownHeaderTextSplitter
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain.embeddings.openai import OpenAIEmbeddings
-import dotenv
 import os
 from pathlib import Path
 from time import time
 
+import dotenv
+from langchain.document_loaders import TextLoader
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.text_splitter import (MarkdownHeaderTextSplitter,
+                                     RecursiveCharacterTextSplitter)
+from langchain.vectorstores import Chroma
 
 dotenv.load_dotenv()
 

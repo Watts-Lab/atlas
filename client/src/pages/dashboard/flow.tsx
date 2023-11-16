@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import ReactFlow, {
   ReactFlowProvider,
+  useReactFlow,
   MiniMap,
   Controls,
   Background,
+  Panel,
   useNodesState,
   useEdgesState,
   Node,
@@ -12,6 +14,8 @@ import ReactFlow, {
   applyNodeChanges,
   addEdge,
 } from "reactflow";
+
+import dagre from "dagre";
 
 import Sidebar from "./sidebar";
 
@@ -44,6 +48,49 @@ const nodeTypes = { PromptNode: PromptNode };
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const nodeWidth = 300;
+const nodeHeight = 500;
+
+const getLayoutedElements = (nodes, edges, direction = "TB") => {
+  const isHorizontal = direction === "LR";
+  dagreGraph.setGraph({ rankdir: direction });
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  nodes.forEach((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    node.targetPosition = isHorizontal ? "left" : "top";
+    node.sourcePosition = isHorizontal ? "right" : "bottom";
+
+    // We are shifting the dagre node position (anchor=center center) to the top left
+    // so it matches the React Flow node anchor point (top left).
+    node.position = {
+      x: nodeWithPosition.x - nodeWidth / 2,
+      y: nodeWithPosition.y - nodeHeight / 2,
+    };
+
+    return node;
+  });
+
+  return { nodes, edges };
+};
+
+const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+  initialNodes,
+  initialEdges
+);
+
 function Flow() {
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
@@ -64,62 +111,16 @@ function Flow() {
     [setEdges]
   );
 
-  useEffect(() => {
-    // Add nodes 2 and 3 after a 5-second delay
-    const nodesTimer = setTimeout(() => {
-      setNodes((prevNodes) => [
-        ...prevNodes,
-        {
-          id: "2",
-          type: "default",
-          position: { x: -150, y: 300 },
-          data: {
-            selects: {
-              "handle-0": "default",
-            },
-          },
-        },
-        {
-          id: "3",
-          type: "default",
-          position: { x: 150, y: 300 },
-          data: {
-            selects: {
-              "handle-0": "default",
-            },
-          },
-        },
-      ]);
-    }, 5000);
+  const onLayout = useCallback(
+    (direction) => {
+      const { nodes: layoutedNodes, edges: layoutedEdges } =
+        getLayoutedElements(nodes, edges, direction);
 
-    // Add the edge after a 5-second delay
-    const edgesTimer = setTimeout(() => {
-      setEdges((prevEdges) => [
-        ...prevEdges,
-        {
-          id: "1-2",
-          source: "1",
-          target: "2",
-          label: "Edge 1-2",
-          animated: true,
-          labelBgStyle: { fill: "#dedede", fillOpacity: 0.5 },
-        },
-        {
-          id: "1-3",
-          source: "1",
-          target: "3",
-          label: "Edge 1-3",
-          animated: true,
-          labelBgStyle: { fill: "#dedede", fillOpacity: 0.5 },
-        },
-      ]);
-    }, 5000);
-
-    return () => {
-      clearTimeout(nodesTimer);
-      clearTimeout(edgesTimer);
-    };
-  }, []);
+      setNodes([...layoutedNodes]);
+      setEdges([...layoutedEdges]);
+    },
+    [nodes, edges]
+  );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -167,8 +168,17 @@ function Flow() {
         style={rfStyle}
       >
         <Controls />
-        {/* <MiniMap /> */}
         <Background variant="dots" gap={12} size={1} />
+        <Panel position="top-right">
+          <div className="join join-vertical">
+            <button className="btn btn-xs join-item" onClick={() => onLayout("TB")}>
+              vertical layout
+            </button>
+            <button className="btn btn-xs join-item" onClick={() => onLayout("LR")}>
+              horizontal layout
+            </button>
+          </div>
+        </Panel>
       </ReactFlow>
       {/* <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>

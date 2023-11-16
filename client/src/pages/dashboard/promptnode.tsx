@@ -72,12 +72,17 @@ function PromptNode({ data }: PromptNodeProps) {
   const [running, setRunning] = useState(false);
   const [response, setResponse] = useState(null);
 
-  const [inputText, setInputText] = useState(data.text); 
-  const [selectedOutputType, setSelectedOutputType] = useState("default"); 
+  const [inputText, setInputText] = useState(data.text);
+  const [selectedOutputType, setSelectedOutputType] = useState("default");
 
   const onChange = useCallback((evt) => {
-    setInputText(evt.target.value); 
+    setInputText(evt.target.value);
   }, []);
+
+  const { addNodes, addEdges } = useReactFlow();
+  const store = useStoreApi();
+
+  const [childNodes, setChildNodes] = useState([]);
 
   /**
    * Runs the prompt when the user clicks the "Run" button.
@@ -87,11 +92,7 @@ function PromptNode({ data }: PromptNodeProps) {
    */
   const onRunPrompt = useCallback(() => {
     if (!running) {
-      // Construct your API request here
-      // Use inputText and selectedOutputType to send the appropriate data to the API
-
-      // For example, you can use the fetch API to send a POST request
-      fetch("http://localhost:8080/api/home", {
+      fetch("http://localhost:8080/api/runprompt", {
         method: "POST",
         mode: "cors",
         headers: {
@@ -104,9 +105,28 @@ function PromptNode({ data }: PromptNodeProps) {
       })
         .then((response) => response.json())
         .then((data) => {
-          // Handle the API response data
-          console.log("API Response:", data);
-          setResponse(data.message); // Store the response if needed
+          setResponse(data.message);
+
+          const { nodeInternals } = store.getState();
+
+          const previousNodes = Array.from(nodeInternals.values());
+          const maxId = Math.max(
+            ...previousNodes.map((node) => parseInt(node.id, 10)),
+            0
+          );
+
+          addNodes([
+            {
+              id: (maxId + 1).toString(),
+              type: "default",
+              position: { x: -150, y: 300 },
+              data: {
+                selects: {
+                  "handle-0": "default",
+                },
+              },
+            },
+          ]);
         })
         .catch((error) => {
           console.error("API Error:", error);
