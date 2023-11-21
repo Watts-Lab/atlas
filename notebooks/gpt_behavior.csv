@@ -1,0 +1,1379 @@
+Paper_Exp_ID,Behavior,Variable,Human Answer,GPT Answer,GPT Cost,Model
+A_55,change in address,behavior_priority,secondary,none,0.0557699999999999,gpt-4
+A_55,change in address,behavior_focal,not,Vaccination uptake/focal,0.04512,gpt-4
+A_55,change in address,behavior_focal_estimate,Exact,Estimate,0.04503,gpt-4
+A_55,change in address,behavior_metric,categorical,"The text does not provide information on the variable ""change in address.""",0.04767,gpt-4
+A_55,change in address,behavior_selfreport,N,N,0.04305,gpt-4
+A_55,change in address,financial_reqt,No,No,0.03591,gpt-4
+A_55,change in address,travel_reqt,No,No,0.02766,gpt-4
+A_55,change in address,planning_reqt,No,No,0.04116,gpt-4
+A_55,change in address,location_reqt,No,No,0.02904,gpt-4
+A_55,change in address,timing_reqt,No,No,0.0622799999999999,gpt-4
+A_55,change in address,prosociality,No,Unclear,0.03978,gpt-4
+A_55,change in address,delay,Unclear,Yes,0.03933,gpt-4
+A_55,change in address,authority,No,Unclear,0.0234599999999999,gpt-4
+A_55,lodgment,behavior_priority,primary,none,0.05574,gpt-4
+A_55,lodgment,behavior_focal,focal,Behavior 1/focal,0.04503,gpt-4
+A_55,lodgment,behavior_focal_estimate,Exact,Exact,0.0449399999999999,gpt-4
+A_55,lodgment,behavior_metric,categorical,The text does not provide information on a behavioral outcome named lodgment.,0.04764,gpt-4
+A_55,lodgment,behavior_selfreport,N,N,0.0430199999999999,gpt-4
+A_55,lodgment,financial_reqt,Yes,No,0.0358799999999999,gpt-4
+A_55,lodgment,travel_reqt,No,No,0.02763,gpt-4
+A_55,lodgment,planning_reqt,Yes,No,0.0422399999999999,gpt-4
+A_55,lodgment,location_reqt,No,Unclear,0.0290699999999999,gpt-4
+A_55,lodgment,timing_reqt,Yes,Yes,0.0622499999999999,gpt-4
+A_55,lodgment,prosociality,Yes,Unclear,0.03975,gpt-4
+A_55,lodgment,delay,Unclear,Unclear,0.03936,gpt-4
+A_55,lodgment,authority,Yes,Unclear,0.02343,gpt-4
+A_55,myGov registration,behavior_priority,secondary,none,0.0557699999999999,gpt-4
+A_55,myGov registration,behavior_focal,not,Vaccination uptake/focal,0.04512,gpt-4
+A_55,myGov registration,behavior_focal_estimate,Exact,Estimate,0.04503,gpt-4
+A_55,myGov registration,behavior_metric,categorical,categorical,0.04692,gpt-4
+A_55,myGov registration,behavior_selfreport,N,N,0.04305,gpt-4
+A_55,myGov registration,financial_reqt,No,Unclear,0.03597,gpt-4
+A_55,myGov registration,travel_reqt,No,No,0.02766,gpt-4
+A_55,myGov registration,planning_reqt,Unclear,No,0.0422699999999999,gpt-4
+A_55,myGov registration,location_reqt,No,Unclear,0.0290999999999999,gpt-4
+A_55,myGov registration,timing_reqt,No,No,0.0622799999999999,gpt-4
+A_55,myGov registration,prosociality,No,Unclear,0.04671,gpt-4
+A_55,myGov registration,delay,Unclear,Unclear,0.03939,gpt-4
+A_55,myGov registration,authority,No,Unclear,0.0234599999999999,gpt-4
+A_55,number of days to lodgement,behavior_priority,secondary,none,0.05586,gpt-4
+A_55,number of days to lodgement,behavior_focal,not,Vaccination uptake/focal,0.04521,gpt-4
+A_55,number of days to lodgement,behavior_focal_estimate,Exact,Estimate,0.04512,gpt-4
+A_55,number of days to lodgement,behavior_metric,continuous,continuous,0.0469499999999999,gpt-4
+A_55,number of days to lodgement,behavior_selfreport,N,N,0.0431399999999999,gpt-4
+A_55,number of days to lodgement,financial_reqt,Yes,Unclear,0.03606,gpt-4
+A_55,number of days to lodgement,travel_reqt,No,Unclear,0.0278099999999999,gpt-4
+A_55,number of days to lodgement,planning_reqt,Yes,Unclear,0.04242,gpt-4
+A_55,number of days to lodgement,location_reqt,No,Unclear,0.0291899999999999,gpt-4
+A_55,number of days to lodgement,timing_reqt,Yes,Yes,0.0623699999999999,gpt-4
+A_55,number of days to lodgement,prosociality,Yes,Unclear,0.03987,gpt-4
+A_55,number of days to lodgement,delay,Unclear,Unclear,0.03948,gpt-4
+A_55,number of days to lodgement,authority,Yes,Unclear,0.0235499999999999,gpt-4
+A_55,number of inbound calls,behavior_priority,secondary,none,0.0557999999999999,gpt-4
+A_55,number of inbound calls,behavior_focal,not,Behavior 1/focal,0.04509,gpt-4
+A_55,number of inbound calls,behavior_focal_estimate,Exact,Estimate,0.04506,gpt-4
+A_55,number of inbound calls,behavior_metric,continuous,continuous,0.0468899999999999,gpt-4
+A_55,number of inbound calls,behavior_selfreport,N,N,0.0430799999999999,gpt-4
+A_55,number of inbound calls,financial_reqt,No,Unclear,0.036,gpt-4
+A_55,number of inbound calls,travel_reqt,No,No,0.02769,gpt-4
+A_55,number of inbound calls,planning_reqt,No,Unclear,0.0423599999999999,gpt-4
+A_55,number of inbound calls,location_reqt,No,No,0.02907,gpt-4
+A_55,number of inbound calls,timing_reqt,No,No,0.06231,gpt-4
+A_55,number of inbound calls,prosociality,No,Unclear,0.03981,gpt-4
+A_55,number of inbound calls,delay,Unclear,Unclear,0.03942,gpt-4
+A_55,number of inbound calls,authority,No,Unclear,0.0234899999999999,gpt-4
+A_55,use of MyTax,behavior_priority,secondary,none,0.0557999999999999,gpt-4
+A_55,use of MyTax,behavior_focal,not,Vaccination uptake/focal,0.04515,gpt-4
+A_55,use of MyTax,behavior_focal_estimate,Exact,Estimate,0.04506,gpt-4
+A_55,use of MyTax,behavior_metric,categorical,continuous,0.0468899999999999,gpt-4
+A_55,use of MyTax,behavior_selfreport,N,N,0.0430799999999999,gpt-4
+A_55,use of MyTax,financial_reqt,No,Unclear,0.036,gpt-4
+A_55,use of MyTax,travel_reqt,No,No,0.02769,gpt-4
+A_55,use of MyTax,planning_reqt,Yes,Unclear,0.0423599999999999,gpt-4
+A_55,use of MyTax,location_reqt,No,No,0.02907,gpt-4
+A_55,use of MyTax,timing_reqt,No,Yes,0.06231,gpt-4
+A_55,use of MyTax,prosociality,No,Unclear,0.04674,gpt-4
+A_55,use of MyTax,delay,Unclear,Unclear,0.03942,gpt-4
+A_55,use of MyTax,authority,No,Unclear,0.0234899999999999,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_priority,secondary,none,0.05622,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_focal,not,Behavior 1/focal,0.0455099999999999,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_focal_estimate,Estimate,Estimate,0.04548,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_metric,continuous,continuous,0.04731,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_selfreport,N,N,0.0435,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,financial_reqt,Yes,Unclear,0.03018,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,travel_reqt,No,No,0.02136,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,planning_reqt,Yes,Unclear,0.03666,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,location_reqt,No,No,0.02949,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,timing_reqt,No,No,0.06273,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,prosociality,No,Unclear,0.05571,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,delay,Yes,Yes,0.0486,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,authority,No,Unclear,0.0239099999999999,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_priority,secondary,none,0.05622,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_focal,not,Behavior 1/focal,0.0455099999999999,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_focal_estimate,Estimate,Estimate,0.04548,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_metric,continuous,continuous,0.04731,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_selfreport,N,No,0.0435,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,financial_reqt,Yes,Unclear,0.03018,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,travel_reqt,No,No,0.02136,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,planning_reqt,Yes,Unclear,0.03666,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,location_reqt,No,No,0.02949,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,timing_reqt,No,No,0.06273,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,prosociality,No,Unclear,0.05571,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,delay,Yes,Yes,0.0486,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,authority,No,Unclear,0.0239099999999999,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_priority,secondary,none,0.05622,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_focal,not,Behavior 1/focal,0.0455099999999999,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_focal_estimate,Estimate,Estimate,0.04548,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_metric,continuous,continuous,0.04731,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_selfreport,N,N,0.0435,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,financial_reqt,Yes,Unclear,0.03018,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,travel_reqt,No,No,0.02136,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,planning_reqt,Yes,Unclear,0.03666,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,location_reqt,No,No,0.02949,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,timing_reqt,No,No,0.06273,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,prosociality,No,Unclear,0.05571,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,delay,Yes,Yes,0.0486,gpt-4
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,authority,No,Unclear,0.0239099999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_priority,secondary,none,0.05619,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_focal,not,Behavior 1/focal,0.04548,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_focal_estimate,Estimate,Estimate,0.04545,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_metric,categorical,"The text does not provide information on the nature of the behavioral variable ""Automatic transaction at t<U+202F>=<U+202F>13 weeks.""",0.04917,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_selfreport,N,N,0.0434699999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,financial_reqt,Yes,Unclear,0.0301499999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,travel_reqt,No,No,0.02133,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,planning_reqt,Yes,Unclear,0.03663,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,location_reqt,No,Unclear,0.0295199999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,timing_reqt,No,Unclear,0.06276,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,prosociality,No,Unclear,0.05568,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,delay,Yes,Unclear,0.04863,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,authority,No,Unclear,0.02388,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_priority,secondary,"The text does not provide information on the behavioral outcome labeled as ""Automatic transaction at t<U+202F>=<U+202F>38 weeks.""",0.05799,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_focal,not,Intention 1/ focal,0.04554,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_focal_estimate,Estimate,Estimate,0.04545,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_metric,categorical,continuous,0.0472799999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_selfreport,N,N,0.0434699999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,financial_reqt,Yes,Unclear,0.0301499999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,travel_reqt,No,No,0.02133,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,planning_reqt,Yes,Unclear,0.03663,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,location_reqt,No,Unclear,0.0295199999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,timing_reqt,No,Unclear,0.06276,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,prosociality,No,Unclear,0.05568,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,delay,Yes,Unclear,0.04863,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,authority,No,Unclear,0.02388,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_priority,secondary,none,0.05619,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_focal,not,Behavior 1/focal,0.04548,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_focal_estimate,Estimate,Estimate,0.04545,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_metric,categorical,"The text does not provide information on whether the behavioral outcome ""Automatic transaction at t<U+202F>=<U+202F>4 weeks"" is categorical or continuous.",0.04935,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_selfreport,N,N,0.0434699999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,financial_reqt,Yes,Unclear,0.0301499999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,travel_reqt,No,No,0.02133,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,planning_reqt,Yes,Unclear,0.03663,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,location_reqt,No,Unclear,0.0295199999999999,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,timing_reqt,No,Unclear,0.06276,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,prosociality,No,Unclear,0.05568,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,delay,Yes,Unclear,0.04863,gpt-4
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,authority,No,Unclear,0.02388,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_priority,primary,none,0.05622,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_focal,not,Behavior 1/focal,0.0455099999999999,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_focal_estimate,Estimate,Estimate,0.04548,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_metric,continuous,continuous,0.04734,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_selfreport,N,N,0.0435,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,financial_reqt,Yes,Unclear,0.03018,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,travel_reqt,No,No,0.02136,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,planning_reqt,Yes,Unclear,0.03666,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,location_reqt,No,No,0.02949,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,timing_reqt,No,No,0.06273,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,prosociality,No,Unclear,0.05571,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,delay,Yes,Yes,0.0486,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,authority,No,Unclear,0.0239099999999999,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_priority,primary,none,0.05622,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_focal,not,Behavior 1/focal,0.0455099999999999,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_focal_estimate,Estimate,Estimate,0.04548,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_metric,continuous,continuous,0.04731,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_selfreport,N,N,0.0435,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,financial_reqt,Yes,Unclear,0.03018,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,travel_reqt,No,No,0.02136,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,planning_reqt,Yes,Unclear,0.03666,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,location_reqt,No,No,0.02949,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,timing_reqt,No,No,0.06273,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,prosociality,No,Unclear,0.05571,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,delay,Yes,Yes,0.0486,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,authority,No,Unclear,0.0239099999999999,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_priority,primary,none,0.05622,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_focal,focal,Behavior 1/focal,0.0455099999999999,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_focal_estimate,Estimate,Estimate,0.04548,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_metric,continuous,"The text does not provide information on the nature of the behavioral variable ""Total buffer savings at t<U+202F>=<U+202F>4 weeks.""",0.04926,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_selfreport,N,N,0.0435,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,financial_reqt,Yes,Unclear,0.03018,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,travel_reqt,No,No,0.02136,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,planning_reqt,Yes,Unclear,0.03666,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,location_reqt,No,No,0.02949,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,timing_reqt,No,No,0.06273,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,prosociality,No,Unclear,0.05571,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,delay,Yes,Yes,0.0486,gpt-4
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,authority,No,Unclear,0.0239099999999999,gpt-4
+A_62,click rate - email opt out,behavior_priority,secondary,none,0.05586,gpt-4
+A_62,click rate - email opt out,behavior_focal,not,Behavior 1/focal,0.04515,gpt-4
+A_62,click rate - email opt out,behavior_focal_estimate,Estimate,Estimate,0.04512,gpt-4
+A_62,click rate - email opt out,behavior_metric,categorical,categorical,0.0470099999999999,gpt-4
+A_62,click rate - email opt out,behavior_selfreport,N,N,0.0431399999999999,gpt-4
+A_62,click rate - email opt out,financial_reqt,No,Unclear,0.0298199999999999,gpt-4
+A_62,click rate - email opt out,travel_reqt,No,No,0.0209999999999999,gpt-4
+A_62,click rate - email opt out,planning_reqt,No,No,0.0362399999999999,gpt-4
+A_62,click rate - email opt out,location_reqt,No,No,0.02913,gpt-4
+A_62,click rate - email opt out,timing_reqt,No,No,0.0623699999999999,gpt-4
+A_62,click rate - email opt out,prosociality,No,Unclear,0.0553499999999999,gpt-4
+A_62,click rate - email opt out,delay,No,Unclear,0.0483,gpt-4
+A_62,click rate - email opt out,authority,No,Unclear,0.0235499999999999,gpt-4
+A_62,click rate - personalized website,behavior_priority,secondary,secondary,0.05583,gpt-4
+A_62,click rate - personalized website,behavior_focal,not,"Vaccination uptake, focal",0.04518,gpt-4
+A_62,click rate - personalized website,behavior_focal_estimate,Estimate,Estimate,0.04509,gpt-4
+A_62,click rate - personalized website,behavior_metric,categorical,continuous,0.0469199999999999,gpt-4
+A_62,click rate - personalized website,behavior_selfreport,N,N,0.0431099999999999,gpt-4
+A_62,click rate - personalized website,financial_reqt,No,Unclear,0.0297899999999999,gpt-4
+A_62,click rate - personalized website,travel_reqt,No,No,0.02097,gpt-4
+A_62,click rate - personalized website,planning_reqt,No,No,0.03621,gpt-4
+A_62,click rate - personalized website,location_reqt,No,No,0.0290999999999999,gpt-4
+A_62,click rate - personalized website,timing_reqt,No,No,0.06234,gpt-4
+A_62,click rate - personalized website,prosociality,No,Unclear,0.05532,gpt-4
+A_62,click rate - personalized website,delay,No,Unclear,0.04827,gpt-4
+A_62,click rate - personalized website,authority,No,Unclear,0.02352,gpt-4
+A_87,Appointment link click,behavior_priority,secondary,secondary,0.0622799999999999,gpt-4
+A_87,Appointment link click,behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0665999999999999,gpt-4
+A_87,Appointment link click,behavior_focal_estimate,Estimate,Estimate,0.04065,gpt-4
+A_87,Appointment link click,behavior_metric,categorical,categorical,0.06141,gpt-4
+A_87,Appointment link click,behavior_selfreport,N,N,0.0446399999999999,gpt-4
+A_87,Appointment link click,financial_reqt,No,No,0.0352799999999999,gpt-4
+A_87,Appointment link click,travel_reqt,No,No,0.0211799999999999,gpt-4
+A_87,Appointment link click,planning_reqt,No,No,0.0417599999999999,gpt-4
+A_87,Appointment link click,location_reqt,No,No,0.02067,gpt-4
+A_87,Appointment link click,timing_reqt,Yes,No,0.0522899999999999,gpt-4
+A_87,Appointment link click,prosociality,No,Yes,0.0523799999999999,gpt-4
+A_87,Appointment link click,delay,Yes,Unclear,0.04467,gpt-4
+A_87,Appointment link click,authority,No,Unclear,0.04764,gpt-4
+A_87,Days to vaccination,behavior_priority,secondary,secondary,0.0622799999999999,gpt-4
+A_87,Days to vaccination,behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0665999999999999,gpt-4
+A_87,Days to vaccination,behavior_focal_estimate,Estimate,Estimate,0.04065,gpt-4
+A_87,Days to vaccination,behavior_metric,continuous,continuous,0.06135,gpt-4
+A_87,Days to vaccination,behavior_selfreport,N,N,0.0446399999999999,gpt-4
+A_87,Days to vaccination,financial_reqt,No,No,0.0352799999999999,gpt-4
+A_87,Days to vaccination,travel_reqt,Yes,Unclear,0.0212399999999999,gpt-4
+A_87,Days to vaccination,planning_reqt,Yes,Unclear,0.0418199999999999,gpt-4
+A_87,Days to vaccination,location_reqt,Yes,Unclear,0.02073,gpt-4
+A_87,Days to vaccination,timing_reqt,Yes,No,0.0522899999999999,gpt-4
+A_87,Days to vaccination,prosociality,Yes,Yes,0.0523799999999999,gpt-4
+A_87,Days to vaccination,delay,Yes,"The text does not provide information on the behavioral outcome named ""Days to vaccination.""",0.04551,gpt-4
+A_87,Days to vaccination,authority,No,Unclear,0.04764,gpt-4
+A_87,Vaccination rate within 30 days,behavior_priority,primary,primary,0.0623999999999999,gpt-4
+A_87,Vaccination rate within 30 days,behavior_focal,focal,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06672,gpt-4
+A_87,Vaccination rate within 30 days,behavior_focal_estimate,Exact,Exact,0.0407099999999999,gpt-4
+A_87,Vaccination rate within 30 days,behavior_metric,categorical,continuous,0.06147,gpt-4
+A_87,Vaccination rate within 30 days,behavior_selfreport,N,N,0.0447599999999999,gpt-4
+A_87,Vaccination rate within 30 days,financial_reqt,No,No,0.0353999999999999,gpt-4
+A_87,Vaccination rate within 30 days,travel_reqt,Yes,No,0.0213,gpt-4
+A_87,Vaccination rate within 30 days,planning_reqt,Yes,No,0.0418799999999999,gpt-4
+A_87,Vaccination rate within 30 days,location_reqt,Yes,Unclear,0.0208499999999999,gpt-4
+A_87,Vaccination rate within 30 days,timing_reqt,Yes,Yes,0.05241,gpt-4
+A_87,Vaccination rate within 30 days,prosociality,Yes,Yes,0.0525,gpt-4
+A_87,Vaccination rate within 30 days,delay,Yes,Unclear,0.04479,gpt-4
+A_87,Vaccination rate within 30 days,authority,No,Unclear,0.04776,gpt-4
+A_30,"change in BMI, baseline to 12 mo",behavior_priority,secondary,none,0.0624599999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669,gpt-4
+A_30,"change in BMI, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04083,gpt-4
+A_30,"change in BMI, baseline to 12 mo",behavior_metric,continuous,continuous,0.0615299999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",behavior_selfreport,N,N,0.04482,gpt-4
+A_30,"change in BMI, baseline to 12 mo",financial_reqt,No,Unclear,0.0355199999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",travel_reqt,No,No,0.02136,gpt-4
+A_30,"change in BMI, baseline to 12 mo",planning_reqt,No,No,0.0419399999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",location_reqt,No,Unclear,0.0209099999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",timing_reqt,No,No,0.0579299999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",prosociality,No,Unclear,0.05262,gpt-4
+A_30,"change in BMI, baseline to 12 mo",delay,Yes,Yes,0.0447899999999999,gpt-4
+A_30,"change in BMI, baseline to 12 mo",authority,No,No,0.02421,gpt-4
+A_30,"change in BMI, baseline to 24 mo",behavior_priority,secondary,none,0.0624599999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669,gpt-4
+A_30,"change in BMI, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04083,gpt-4
+A_30,"change in BMI, baseline to 24 mo",behavior_metric,continuous,continuous,0.0615299999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",behavior_selfreport,N,N,0.04482,gpt-4
+A_30,"change in BMI, baseline to 24 mo",financial_reqt,No,No,0.0354599999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",travel_reqt,No,No,0.02136,gpt-4
+A_30,"change in BMI, baseline to 24 mo",planning_reqt,No,Unclear,0.0419999999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",location_reqt,No,Unclear,0.0209099999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",timing_reqt,No,No,0.0579299999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",prosociality,No,Unclear,0.05262,gpt-4
+A_30,"change in BMI, baseline to 24 mo",delay,Yes,Yes,0.0447899999999999,gpt-4
+A_30,"change in BMI, baseline to 24 mo",authority,No,No,0.02421,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_priority,secondary,"The text does not provide information on a behavioral outcome named ""change in HDL cholesterol, baseline to 12 mo.""",0.0639,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669599999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04089,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_metric,continuous,continuous,0.06159,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_selfreport,N,N,0.0448799999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",financial_reqt,No,Unclear,0.03558,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",travel_reqt,No,No,0.0214199999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",planning_reqt,No,Unclear,0.04206,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",location_reqt,No,Unclear,0.0209699999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",timing_reqt,No,No,0.05799,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",prosociality,No,Unclear,0.05268,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",delay,Yes,Yes,0.04485,gpt-4
+A_30,"change in HDL cholesterol, baseline to 12 mo",authority,No,Unclear,0.02433,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_priority,secondary,none,0.0625199999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669599999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04089,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_metric,continuous,continuous,0.06159,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_selfreport,N,N,0.0448799999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",financial_reqt,No,Unclear,0.03558,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",travel_reqt,No,No,0.0214199999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",planning_reqt,No,Unclear,0.04206,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",location_reqt,No,Unclear,0.0209699999999999,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",timing_reqt,No,No,0.05799,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",prosociality,No,Unclear,0.05268,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",delay,Yes,Yes,0.04485,gpt-4
+A_30,"change in HDL cholesterol, baseline to 24 mo",authority,No,Unclear,0.02433,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_priority,secondary,"The behavioral outcome ""change in LDL cholesterol, baseline to 12 mo"" is not mentioned in the provided context.",0.06381,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669299999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04086,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_metric,continuous,continuous,0.0615599999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_selfreport,N,N,0.04485,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",financial_reqt,No,Unclear,0.03555,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",travel_reqt,No,No,0.02139,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",planning_reqt,No,Unclear,0.04203,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",location_reqt,No,Unclear,0.0209399999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",timing_reqt,No,No,0.0579599999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",prosociality,No,Unclear,0.0526499999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",delay,Yes,Yes,0.04482,gpt-4
+A_30,"change in LDL cholesterol, baseline to 12 mo",authority,No,Unclear,0.0243,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_priority,secondary,none,0.06249,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669299999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04086,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_metric,continuous,continuous,0.0615599999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_selfreport,N,N,0.04485,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",financial_reqt,No,Unclear,0.03555,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",travel_reqt,No,No,0.02139,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",planning_reqt,No,Unclear,0.04203,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",location_reqt,No,Unclear,0.0209399999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",timing_reqt,No,No,0.0579599999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",prosociality,No,Unclear,0.0526499999999999,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",delay,Yes,Yes,0.04482,gpt-4
+A_30,"change in LDL cholesterol, baseline to 24 mo",authority,No,Unclear,0.0243,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_priority,secondary,none,0.06264,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0669599999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04101,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_metric,continuous,continuous,0.06171,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_selfreport,N,N,0.045,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",financial_reqt,No,No,0.0356399999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",travel_reqt,No,No,0.02154,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",planning_reqt,No,No,0.0421199999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",location_reqt,Yes,No,0.02103,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",timing_reqt,No,No,0.0581099999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",prosociality,No,Yes,0.0527399999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",delay,Yes,Yes,0.0449699999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",authority,No,No,0.02439,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_priority,secondary,none,0.06264,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0669599999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04101,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_metric,continuous,continuous,0.06171,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_selfreport,N,N,0.045,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",financial_reqt,No,No,0.0356399999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",travel_reqt,No,No,0.02154,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",planning_reqt,No,No,0.0421199999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",location_reqt,Yes,No,0.02103,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",timing_reqt,No,No,0.0581099999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",prosociality,No,Yes,0.0527399999999999,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",delay,Yes,Unclear,0.04503,gpt-4
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",authority,No,No,0.02439,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_priority,secondary,none,0.06264,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0669599999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04101,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_metric,continuous,continuous,0.06171,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_selfreport,N,N,0.045,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",financial_reqt,No,No,0.0356399999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",travel_reqt,No,No,0.02154,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",planning_reqt,No,No,0.0421199999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",location_reqt,Yes,No,0.02103,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",timing_reqt,No,No,0.0581099999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",prosociality,No,Unclear,0.0528,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",delay,Yes,Yes,0.0449699999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",authority,No,No,0.02439,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_priority,secondary,none,0.06264,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0669599999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04101,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_metric,continuous,continuous,0.06171,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_selfreport,N,N,0.045,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",financial_reqt,No,No,0.0356399999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",travel_reqt,No,No,0.02154,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",planning_reqt,No,Unclear,0.0421799999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",location_reqt,Yes,No,0.02103,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",timing_reqt,No,No,0.0581099999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",prosociality,No,Yes,0.0527399999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",delay,Yes,Yes,0.0449699999999999,gpt-4
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",authority,No,No,0.02439,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_priority,secondary,none,0.06264,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.0669599999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04101,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_metric,continuous,continuous,0.06171,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_selfreport,N,N,0.045,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",financial_reqt,No,No,0.0356399999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",travel_reqt,No,No,0.02154,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",planning_reqt,No,No,0.0421199999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",location_reqt,Yes,No,0.02103,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",timing_reqt,No,No,0.0581099999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",prosociality,No,Unclear,0.0528,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",delay,Yes,Yes,0.0449699999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",authority,No,No,0.02439,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_priority,secondary,none,0.06264,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0670799999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04101,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_metric,continuous,continuous,0.06171,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_selfreport,N,N,0.045,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",financial_reqt,No,Unclear,0.0356999999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",travel_reqt,No,No,0.02154,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",planning_reqt,No,No,0.0421199999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",location_reqt,Yes,No,0.02103,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",timing_reqt,No,No,0.0581099999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",prosociality,No,Unclear,0.0528,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",delay,Yes,Yes,0.0449699999999999,gpt-4
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",authority,No,No,0.02439,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",behavior_priority,secondary,"The text does not provide information on a behavioral outcome named ""change in avg A1c, baseline to 12 mo.""",0.06399,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.06699,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04092,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",behavior_metric,continuous,continuous,0.0616199999999999,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",behavior_selfreport,N,N,0.04491,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",financial_reqt,No,Unclear,0.03561,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",travel_reqt,No,No,0.02145,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",planning_reqt,No,Unclear,0.04209,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",location_reqt,No,Unclear,0.0209999999999999,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",timing_reqt,No,No,0.0580199999999999,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",prosociality,No,Unclear,0.05271,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",delay,Yes,Unclear,0.04494,gpt-4
+A_30,"change in avg A1c, baseline to 12 mo",authority,No,No,0.0243,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",behavior_priority,secondary,"The text does not provide information on a behavioral outcome named ""change in avg A1c, baseline to 24 mo.""",0.06399,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06687,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04092,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",behavior_metric,continuous,continuous,0.0616199999999999,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",behavior_selfreport,N,N,0.04491,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",financial_reqt,No,Unclear,0.03561,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",travel_reqt,No,No,0.02145,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",planning_reqt,No,Unclear,0.04209,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",location_reqt,No,Unclear,0.0209999999999999,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",timing_reqt,No,No,0.0580199999999999,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",prosociality,No,Unclear,0.05271,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",delay,Yes,Yes,0.0448799999999999,gpt-4
+A_30,"change in avg A1c, baseline to 24 mo",authority,No,Unclear,0.02436,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_priority,secondary,"The text does not provide information on a behavioral outcome named ""change in calories purchased per day, baseline to 12 mo.""",0.06399,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06687,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04092,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_metric,continuous,continuous,0.0616199999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_selfreport,N,N,0.04491,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",financial_reqt,No,No,0.03555,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",travel_reqt,No,No,0.02145,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",planning_reqt,No,No,0.04203,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",location_reqt,Yes,No,0.02094,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",timing_reqt,No,No,0.0580199999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",prosociality,No,Yes,0.0526499999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",delay,Yes,Yes,0.0448799999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 12 mo",authority,No,No,0.0243,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_priority,secondary,"The text does not provide information on a behavioral outcome named ""change in calories purchased per day, baseline to 24 mo.""",0.06399,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06687,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04092,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_metric,continuous,continuous,0.0616199999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_selfreport,N,N,0.04491,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",financial_reqt,No,No,0.03555,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",travel_reqt,No,No,0.02145,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",planning_reqt,No,No,0.04203,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",location_reqt,Yes,No,0.02094,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",timing_reqt,No,No,0.0580199999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",prosociality,No,Yes,0.0526499999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",delay,Yes,Yes,0.0448799999999999,gpt-4
+A_30,"change in calories purchased per day, baseline to 24 mo",authority,No,No,0.0243,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_priority,secondary,none,0.06255,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06687,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04092,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_metric,continuous,continuous,0.0616199999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_selfreport,N,N,0.04491,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",financial_reqt,No,Unclear,0.03561,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",travel_reqt,No,No,0.02145,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",planning_reqt,No,Unclear,0.04209,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",location_reqt,No,Unclear,0.0209999999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",timing_reqt,No,No,0.0580199999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",prosociality,No,Unclear,0.05271,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",delay,Yes,Yes,0.0448799999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 12 mo",authority,No,Unclear,0.02436,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_priority,secondary,none,0.06255,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06687,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04092,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_metric,continuous,continuous,0.0616199999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_selfreport,N,N,0.04491,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",financial_reqt,No,Unclear,0.03561,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",travel_reqt,No,No,0.02145,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",planning_reqt,No,Unclear,0.04209,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",location_reqt,No,Unclear,0.0209999999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",timing_reqt,No,No,0.0580199999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",prosociality,No,Unclear,0.05271,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",delay,Yes,Yes,0.0448799999999999,gpt-4
+A_30,"change in diastolic BP, baseline to 24 mo",authority,No,Unclear,0.02436,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_priority,secondary,none,0.0627,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_focal,not,"Behavior 1 (main outcome measure for behavior): Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her? (0/1), focal",0.0676799999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04107,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_metric,continuous,continuous,0.0617699999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_selfreport,Y,N,0.0450599999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",financial_reqt,No,No,0.0356999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",travel_reqt,No,No,0.0215999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",planning_reqt,No,No,0.0421799999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",location_reqt,No,No,0.0210899999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",timing_reqt,No,No,0.05817,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",prosociality,No,Yes,0.0527999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",delay,Yes,Yes,0.04503,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",authority,No,No,0.02445,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_priority,secondary,none,0.0627,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_focal,not,"Behavior 1 (main outcome measure for behavior): Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her? (0/1), focal",0.0676799999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04107,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_metric,continuous,continuous,0.0617699999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_selfreport,Y,N,0.0450599999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",financial_reqt,No,No,0.0356999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",travel_reqt,No,No,0.0215999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",planning_reqt,No,No,0.0421799999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",location_reqt,No,Unclear,0.0211499999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",timing_reqt,No,No,0.05817,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",prosociality,No,Yes,0.0527999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",delay,Yes,Yes,0.04503,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",authority,No,No,0.02445,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_priority,secondary,none,0.0627,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_focal,not,"Behavior 1 (main outcome measure for behavior): Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her? (0/1), focal",0.0676799999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_focal_estimate,Exact,Estimate,0.04107,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_metric,continuous,continuous,0.0617699999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_selfreport,Y,N,0.0450599999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",financial_reqt,No,No,0.0356999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",travel_reqt,No,No,0.0215999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",planning_reqt,No,No,0.0421799999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",location_reqt,No,No,0.0210899999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",timing_reqt,No,No,0.05817,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",prosociality,No,Yes,0.0527999999999999,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",delay,Yes,Yes,0.04503,gpt-4
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",authority,No,No,0.02445,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_priority,secondary,none,0.06261,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06693,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04098,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_metric,continuous,continuous,0.0616799999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_selfreport,N,N,0.0449699999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",financial_reqt,No,No,0.0356099999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",travel_reqt,No,No,0.0215099999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",planning_reqt,No,No,0.0420899999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",location_reqt,Yes,No,0.0209999999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",timing_reqt,No,No,0.0580799999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",prosociality,No,Yes,0.0527099999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",delay,Yes,Yes,0.0449399999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",authority,No,No,0.02436,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_priority,secondary,"The behavioral outcome ""change in healthy purchasing score (avg %), baseline to 24 mo"" is not mentioned in the provided text.",0.0641699999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.06705,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04098,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_metric,continuous,continuous,0.0616799999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_selfreport,N,N,0.0449699999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",financial_reqt,No,No,0.0356099999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",travel_reqt,No,No,0.0215099999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",planning_reqt,No,Unclear,0.04215,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",location_reqt,Yes,No,0.0209999999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",timing_reqt,No,No,0.0580799999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",prosociality,No,Yes,0.0527099999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",delay,Yes,Yes,0.0449399999999999,gpt-4
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",authority,No,No,0.02436,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",behavior_priority,secondary,none,0.0625199999999999,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06684,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04089,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",behavior_metric,continuous,continuous,0.06159,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",behavior_selfreport,N,N,0.0448799999999999,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",financial_reqt,No,Unclear,0.03558,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",travel_reqt,No,No,0.0214199999999999,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",planning_reqt,No,Unclear,0.04206,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",location_reqt,No,Unclear,0.0209699999999999,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",timing_reqt,No,No,0.05799,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",prosociality,No,Unclear,0.05268,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",delay,Yes,Yes,0.04485,gpt-4
+A_30,"change in systolic BP, baseline to 12 mo",authority,No,No,0.02427,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",behavior_priority,secondary,none,0.0625199999999999,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669599999999999,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04089,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",behavior_metric,continuous,continuous,0.06159,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",behavior_selfreport,N,N,0.0448799999999999,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",financial_reqt,No,Unclear,0.03558,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",travel_reqt,No,No,0.0214199999999999,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",planning_reqt,No,Unclear,0.04206,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",location_reqt,No,Unclear,0.0209699999999999,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",timing_reqt,No,No,0.05799,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",prosociality,No,Unclear,0.05268,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",delay,Yes,Yes,0.04485,gpt-4
+A_30,"change in systolic BP, baseline to 24 mo",authority,No,No,0.02427,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_priority,secondary,none,0.06249,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669299999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04086,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_metric,continuous,continuous,0.0615599999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_selfreport,N,N,0.04485,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",financial_reqt,No,Unclear,0.03555,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",travel_reqt,No,No,0.02139,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",planning_reqt,No,Unclear,0.04203,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",location_reqt,No,Unclear,0.0209399999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",timing_reqt,No,No,0.0579599999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",prosociality,No,Unclear,0.0526499999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",delay,Yes,Yes,0.04482,gpt-4
+A_30,"change in total cholesterol, baseline to 12 mo",authority,No,No,0.02424,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_priority,secondary,none,0.06249,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669299999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04086,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_metric,continuous,continuous,0.0615599999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_selfreport,N,N,0.04485,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",financial_reqt,No,Unclear,0.03555,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",travel_reqt,No,No,0.02139,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",planning_reqt,No,Unclear,0.04203,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",location_reqt,No,Unclear,0.0209399999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",timing_reqt,No,No,0.0579599999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",prosociality,No,Unclear,0.0526499999999999,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",delay,Yes,Yes,0.04482,gpt-4
+A_30,"change in total cholesterol, baseline to 24 mo",authority,No,Unclear,0.0243,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",behavior_priority,secondary,none,0.0625199999999999,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669599999999999,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04089,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",behavior_metric,continuous,continuous,0.06159,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",behavior_selfreport,N,N,0.0448799999999999,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",financial_reqt,No,Unclear,0.03558,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",travel_reqt,No,No,0.0214199999999999,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",planning_reqt,No,Unclear,0.04206,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",location_reqt,No,Unclear,0.0209699999999999,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",timing_reqt,No,No,0.05799,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",prosociality,No,Unclear,0.05268,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",delay,Yes,Yes,0.04485,gpt-4
+A_30,"change in triglycerides, baseline to 12 mo",authority,No,Unclear,0.02433,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",behavior_priority,secondary,none,0.0625199999999999,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669599999999999,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04089,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",behavior_metric,continuous,continuous,0.06159,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",behavior_selfreport,N,N,0.0448799999999999,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",financial_reqt,No,No,0.0355199999999999,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",travel_reqt,No,No,0.0214199999999999,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",planning_reqt,No,Unclear,0.04206,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",location_reqt,No,Unclear,0.0209699999999999,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",timing_reqt,No,No,0.05799,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",prosociality,No,Unclear,0.05268,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",delay,Yes,Yes,0.04485,gpt-4
+A_30,"change in triglycerides, baseline to 24 mo",authority,No,Unclear,0.02433,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",behavior_priority,secondary,none,0.06249,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06681,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04086,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",behavior_metric,continuous,continuous,0.0615599999999999,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",behavior_selfreport,N,N,0.04485,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",financial_reqt,No,Unclear,0.03555,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",travel_reqt,No,No,0.02139,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",planning_reqt,No,Unclear,0.04203,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",location_reqt,No,Unclear,0.0209399999999999,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",timing_reqt,No,No,0.0579599999999999,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",prosociality,No,Unclear,0.0526499999999999,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",delay,Yes,Yes,0.04482,gpt-4
+A_30,"change in waist circumference, baseline to 12 mo",authority,No,No,0.02424,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",behavior_priority,secondary,none,0.06249,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",behavior_focal,not,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669299999999999,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04086,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",behavior_metric,continuous,continuous,0.0615599999999999,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",behavior_selfreport,N,N,0.04485,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",financial_reqt,No,Unclear,0.03555,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",travel_reqt,No,No,0.02139,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",planning_reqt,No,Unclear,0.04203,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",location_reqt,No,Unclear,0.0209399999999999,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",timing_reqt,No,No,0.0579599999999999,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",prosociality,No,Unclear,0.0526499999999999,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",delay,Yes,Yes,0.04482,gpt-4
+A_30,"change in waist circumference, baseline to 24 mo",authority,No,No,0.02424,gpt-4
+A_30,"change in weight, baseline to 12 mo",behavior_priority,primary,none,0.0624599999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",behavior_focal,focal,Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?)/focal,0.0669,gpt-4
+A_30,"change in weight, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.04083,gpt-4
+A_30,"change in weight, baseline to 12 mo",behavior_metric,continuous,continuous,0.0615299999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",behavior_selfreport,N,N,0.04482,gpt-4
+A_30,"change in weight, baseline to 12 mo",financial_reqt,No,No,0.0354599999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",travel_reqt,No,No,0.02136,gpt-4
+A_30,"change in weight, baseline to 12 mo",planning_reqt,No,Unclear,0.0419999999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",location_reqt,No,No,0.0208499999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",timing_reqt,No,No,0.0579299999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",prosociality,No,Unclear,0.05262,gpt-4
+A_30,"change in weight, baseline to 12 mo",delay,Yes,Yes,0.0447899999999999,gpt-4
+A_30,"change in weight, baseline to 12 mo",authority,No,No,0.02421,gpt-4
+A_30,"change in weight, baseline to 24 mo",behavior_priority,primary,none,0.0624599999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",behavior_focal,not,"Behavior 1 (Did the participant get a first shot of a COVID-19 vaccine within the first month after the vaccine became available to him/her?), focal",0.06678,gpt-4
+A_30,"change in weight, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.04083,gpt-4
+A_30,"change in weight, baseline to 24 mo",behavior_metric,continuous,continuous,0.0615299999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",behavior_selfreport,N,N,0.04482,gpt-4
+A_30,"change in weight, baseline to 24 mo",financial_reqt,No,Unclear,0.0355199999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",travel_reqt,No,No,0.02136,gpt-4
+A_30,"change in weight, baseline to 24 mo",planning_reqt,No,No,0.0419399999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",location_reqt,No,Unclear,0.0209099999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",timing_reqt,No,No,0.0579299999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",prosociality,No,Yes,0.0525599999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",delay,Yes,Yes,0.0447899999999999,gpt-4
+A_30,"change in weight, baseline to 24 mo",authority,No,No,0.02421,gpt-4
+A_55,change in address,behavior_priority,secondary,secondary,0.08113,gpt-4-1106-preview
+A_55,change in address,behavior_focal,not,lodgment/focal,0.07905,gpt-4-1106-preview
+A_55,change in address,behavior_focal_estimate,Exact,Exact,0.07881,gpt-4-1106-preview
+A_55,change in address,behavior_metric,categorical,categorical,0.06952,gpt-4-1106-preview
+A_55,change in address,behavior_selfreport,N,N,0.06028000000000001,gpt-4-1106-preview
+A_55,change in address,financial_reqt,No,No,0.07394,gpt-4-1106-preview
+A_55,change in address,travel_reqt,No,No,0.09567,gpt-4-1106-preview
+A_55,change in address,planning_reqt,No,No,0.07393,gpt-4-1106-preview
+A_55,change in address,location_reqt,No,No,0.07233,gpt-4-1106-preview
+A_55,change in address,timing_reqt,No,No,0.07322000000000001,gpt-4-1106-preview
+A_55,change in address,prosociality,No,No,0.07405,gpt-4-1106-preview
+A_55,change in address,delay,Unclear,No,0.0752,gpt-4-1106-preview
+A_55,change in address,authority,No,Yes,0.07393,gpt-4-1106-preview
+A_55,lodgment,behavior_priority,primary,primary,0.08112,gpt-4-1106-preview
+A_55,lodgment,behavior_focal,focal,lodgment/focal,0.07904,gpt-4-1106-preview
+A_55,lodgment,behavior_focal_estimate,Exact,Exact,0.0788,gpt-4-1106-preview
+A_55,lodgment,behavior_metric,categorical,categorical,0.06951,gpt-4-1106-preview
+A_55,lodgment,behavior_selfreport,N,N,0.060270000000000004,gpt-4-1106-preview
+A_55,lodgment,financial_reqt,Yes,No,0.07393,gpt-4-1106-preview
+A_55,lodgment,travel_reqt,No,No,0.09566000000000001,gpt-4-1106-preview
+A_55,lodgment,planning_reqt,Yes,Yes,0.07392,gpt-4-1106-preview
+A_55,lodgment,location_reqt,No,No,0.07232000000000001,gpt-4-1106-preview
+A_55,lodgment,timing_reqt,Yes,Yes,0.07321,gpt-4-1106-preview
+A_55,lodgment,prosociality,Yes,Yes,0.07404000000000001,gpt-4-1106-preview
+A_55,lodgment,delay,Unclear,No,0.07519,gpt-4-1106-preview
+A_55,lodgment,authority,Yes,Yes,0.07392,gpt-4-1106-preview
+A_55,myGov registration,behavior_priority,secondary,secondary,0.08113,gpt-4-1106-preview
+A_55,myGov registration,behavior_focal,not,lodgment/focal,0.07905,gpt-4-1106-preview
+A_55,myGov registration,behavior_focal_estimate,Exact,Exact,0.07881,gpt-4-1106-preview
+A_55,myGov registration,behavior_metric,categorical,categorical,0.06952,gpt-4-1106-preview
+A_55,myGov registration,behavior_selfreport,N,N,0.06028000000000001,gpt-4-1106-preview
+A_55,myGov registration,financial_reqt,No,No,0.07394,gpt-4-1106-preview
+A_55,myGov registration,travel_reqt,No,No,0.09567,gpt-4-1106-preview
+A_55,myGov registration,planning_reqt,Unclear,No,0.07393,gpt-4-1106-preview
+A_55,myGov registration,location_reqt,No,No,0.07233,gpt-4-1106-preview
+A_55,myGov registration,timing_reqt,No,No,0.07322000000000001,gpt-4-1106-preview
+A_55,myGov registration,prosociality,No,Yes,0.07405,gpt-4-1106-preview
+A_55,myGov registration,delay,Unclear,Unclear,0.07523,gpt-4-1106-preview
+A_55,myGov registration,authority,No,No,0.07393,gpt-4-1106-preview
+A_55,number of days to lodgement,behavior_priority,secondary,secondary,0.08116,gpt-4-1106-preview
+A_55,number of days to lodgement,behavior_focal,not,lodgment/focal,0.07908,gpt-4-1106-preview
+A_55,number of days to lodgement,behavior_focal_estimate,Exact,Exact,0.07884000000000001,gpt-4-1106-preview
+A_55,number of days to lodgement,behavior_metric,continuous,continuous,0.06952,gpt-4-1106-preview
+A_55,number of days to lodgement,behavior_selfreport,N,N,0.06031,gpt-4-1106-preview
+A_55,number of days to lodgement,financial_reqt,Yes,No,0.07397000000000001,gpt-4-1106-preview
+A_55,number of days to lodgement,travel_reqt,No,No,0.09570000000000001,gpt-4-1106-preview
+A_55,number of days to lodgement,planning_reqt,Yes,Yes,0.07396,gpt-4-1106-preview
+A_55,number of days to lodgement,location_reqt,No,No,0.07236,gpt-4-1106-preview
+A_55,number of days to lodgement,timing_reqt,Yes,Yes,0.07325000000000001,gpt-4-1106-preview
+A_55,number of days to lodgement,prosociality,Yes,No,0.07408000000000001,gpt-4-1106-preview
+A_55,number of days to lodgement,delay,Unclear,No,0.07523,gpt-4-1106-preview
+A_55,number of days to lodgement,authority,Yes,Yes,0.07396,gpt-4-1106-preview
+A_55,number of inbound calls,behavior_priority,secondary,secondary,0.08114,gpt-4-1106-preview
+A_55,number of inbound calls,behavior_focal,not,lodgment/not,0.07903,gpt-4-1106-preview
+A_55,number of inbound calls,behavior_focal_estimate,Exact,Exact,0.07882,gpt-4-1106-preview
+A_55,number of inbound calls,behavior_metric,continuous,continuous,0.0695,gpt-4-1106-preview
+A_55,number of inbound calls,behavior_selfreport,N,N,0.06029,gpt-4-1106-preview
+A_55,number of inbound calls,financial_reqt,No,No,0.07395,gpt-4-1106-preview
+A_55,number of inbound calls,travel_reqt,No,No,0.09568,gpt-4-1106-preview
+A_55,number of inbound calls,planning_reqt,No,No,0.07394,gpt-4-1106-preview
+A_55,number of inbound calls,location_reqt,No,No,0.07234,gpt-4-1106-preview
+A_55,number of inbound calls,timing_reqt,No,No,0.07323,gpt-4-1106-preview
+A_55,number of inbound calls,prosociality,No,No,0.07406,gpt-4-1106-preview
+A_55,number of inbound calls,delay,Unclear,No,0.07521,gpt-4-1106-preview
+A_55,number of inbound calls,authority,No,No,0.07394,gpt-4-1106-preview
+A_55,use of MyTax,behavior_priority,secondary,secondary,0.08114,gpt-4-1106-preview
+A_55,use of MyTax,behavior_focal,not,lodgment/focal,0.07905999999999999,gpt-4-1106-preview
+A_55,use of MyTax,behavior_focal_estimate,Exact,Exact,0.07882,gpt-4-1106-preview
+A_55,use of MyTax,behavior_metric,categorical,categorical,0.06953000000000001,gpt-4-1106-preview
+A_55,use of MyTax,behavior_selfreport,N,N,0.06029,gpt-4-1106-preview
+A_55,use of MyTax,financial_reqt,No,No,0.07395,gpt-4-1106-preview
+A_55,use of MyTax,travel_reqt,No,No,0.09568,gpt-4-1106-preview
+A_55,use of MyTax,planning_reqt,Yes,No,0.07394,gpt-4-1106-preview
+A_55,use of MyTax,location_reqt,No,No,0.07234,gpt-4-1106-preview
+A_55,use of MyTax,timing_reqt,No,Yes,0.07323,gpt-4-1106-preview
+A_55,use of MyTax,prosociality,No,Yes,0.07406,gpt-4-1106-preview
+A_55,use of MyTax,delay,Unclear,No,0.07521,gpt-4-1106-preview
+A_55,use of MyTax,authority,No,Yes,0.07394,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_priority,secondary,none,0.01719,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_focal,not,lodgment indicator/focal,0.01947,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_focal_estimate,Estimate,Estimate,0.027280000000000002,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_metric,continuous,continuous,0.03111,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,behavior_selfreport,N,N,0.02325,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,financial_reqt,Yes,No,0.07254000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,travel_reqt,No,No,0.038380000000000004,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,planning_reqt,Yes,Unclear,0.03839,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,location_reqt,No,No,0.039580000000000004,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,timing_reqt,No,No,0.07804000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,prosociality,No,Yes,0.04167,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,delay,Yes,Yes,0.04118000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>13 weeks,authority,No,No,0.08101000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_priority,secondary,none,0.01719,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_focal,not,focal,0.01938,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_focal_estimate,Estimate,Exact,0.02725,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_metric,continuous,continuous,0.03111,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,behavior_selfreport,N,N,0.02325,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,financial_reqt,Yes,Unclear,0.07257000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,travel_reqt,No,No,0.038380000000000004,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,planning_reqt,Yes,Unclear,0.03839,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,location_reqt,No,No,0.039580000000000004,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,timing_reqt,No,No,0.07804000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,prosociality,No,Yes,0.04167,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,delay,Yes,Yes,0.04118000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>38 weeks,authority,No,No,0.08101000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_priority,secondary,none,0.01719,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_focal,not,lodgment indicator/focal,0.01947,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_focal_estimate,Estimate,Exact,0.02725,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_metric,continuous,continuous,0.03111,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,behavior_selfreport,N,N,0.02325,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,financial_reqt,Yes,Unclear,0.07257000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,travel_reqt,No,No,0.038380000000000004,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,planning_reqt,Yes,Unclear,0.03839,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,location_reqt,No,No,0.039580000000000004,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,timing_reqt,No,No,0.07804000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,prosociality,No,Yes,0.04167,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,delay,Yes,Yes,0.04118000000000001,gpt-4-1106-preview
+A_62,Amount automatically saved at t<U+202F>=<U+202F>4 weeks,authority,No,No,0.08101000000000001,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_priority,secondary,none,0.01718,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_focal,not,focal/lodgment,0.01946,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_focal_estimate,Estimate,Estimate,0.027270000000000003,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_metric,categorical,categorical,0.031130000000000005,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,behavior_selfreport,N,N,0.02324,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,financial_reqt,Yes,Unclear,0.07256,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,travel_reqt,No,No,0.03837,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,planning_reqt,Yes,Unclear,0.03838,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,location_reqt,No,Unclear,0.0396,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,timing_reqt,No,No,0.07803,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,prosociality,No,Yes,0.04166,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,delay,Yes,Yes,0.041170000000000005,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>13 weeks,authority,No,No,0.081,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_priority,secondary,none,0.01718,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_focal,not,lodgment/not,0.0194,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_focal_estimate,Estimate,Estimate,0.027270000000000003,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_metric,categorical,categorical,0.031130000000000005,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,behavior_selfreport,N,N,0.02324,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,financial_reqt,Yes,Unclear,0.07256,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,travel_reqt,No,No,0.03837,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,planning_reqt,Yes,Unclear,0.03838,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,location_reqt,No,Unclear,0.0396,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,timing_reqt,No,No,0.07803,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,prosociality,No,Yes,0.04166,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,delay,Yes,Yes,0.041170000000000005,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>38 weeks,authority,No,No,0.081,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_priority,secondary,primary,0.01718,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_focal,not,focal/lodgment indicator,0.01949,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_focal_estimate,Estimate,Estimate,0.027270000000000003,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_metric,categorical,categorical,0.031130000000000005,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,behavior_selfreport,N,N,0.02324,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,financial_reqt,Yes,No,0.07253,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,travel_reqt,No,No,0.03837,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,planning_reqt,Yes,Yes,0.03835,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,location_reqt,No,Unclear,0.0396,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,timing_reqt,No,No,0.07803,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,prosociality,No,Yes,0.04166,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,delay,Yes,Yes,0.041170000000000005,gpt-4-1106-preview
+A_62,Automatic transaction at t<U+202F>=<U+202F>4 weeks,authority,No,No,0.081,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_priority,primary,none,0.01719,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_focal,not,lodgment indicator/focal,0.01947,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_focal_estimate,Estimate,Exact,0.02725,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_metric,continuous,continuous,0.03111,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,behavior_selfreport,N,N,0.02325,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,financial_reqt,Yes,No,0.07254000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,travel_reqt,No,No,0.038380000000000004,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,planning_reqt,Yes,Yes,0.038360000000000005,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,location_reqt,No,Unclear,0.03961,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,timing_reqt,No,No,0.07804000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,prosociality,No,Yes,0.04167,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,delay,Yes,Yes,0.04118000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>13 weeks,authority,No,No,0.08101000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_priority,primary,none,0.01719,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_focal,not,lodgment/not,0.01941,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_focal_estimate,Estimate,Estimate,0.027280000000000002,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_metric,continuous,continuous,0.03111,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,behavior_selfreport,N,N,0.02325,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,financial_reqt,Yes,Unclear,0.07257000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,travel_reqt,No,No,0.038380000000000004,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,planning_reqt,Yes,Unclear,0.03839,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,location_reqt,No,No,0.039580000000000004,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,timing_reqt,No,No,0.07804000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,prosociality,No,Yes,0.04167,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,delay,Yes,Yes,0.04118000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>38 weeks,authority,No,No,0.08101000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_priority,primary,none,0.01719,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_focal,focal,focal,0.01938,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_focal_estimate,Estimate,Estimate,0.027280000000000002,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_metric,continuous,continuous,0.03111,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,behavior_selfreport,N,N,0.02325,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,financial_reqt,Yes,Unclear,0.07257000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,travel_reqt,No,No,0.038380000000000004,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,planning_reqt,Yes,Unclear,0.03839,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,location_reqt,No,Unclear,0.03961,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,timing_reqt,No,No,0.07804000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,prosociality,No,Yes,0.04167,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,delay,Yes,Yes,0.04118000000000001,gpt-4-1106-preview
+A_62,Total buffer savings at t<U+202F>=<U+202F>4 weeks,authority,No,No,0.08101000000000001,gpt-4-1106-preview
+A_62,click rate - email opt out,behavior_priority,secondary,none,0.01707,gpt-4-1106-preview
+A_62,click rate - email opt out,behavior_focal,not,focal/lodgment,0.01935,gpt-4-1106-preview
+A_62,click rate - email opt out,behavior_focal_estimate,Estimate,Estimate,0.02716,gpt-4-1106-preview
+A_62,click rate - email opt out,behavior_metric,categorical,categorical,0.031020000000000002,gpt-4-1106-preview
+A_62,click rate - email opt out,behavior_selfreport,N,N,0.02313,gpt-4-1106-preview
+A_62,click rate - email opt out,financial_reqt,No,No,0.07242,gpt-4-1106-preview
+A_62,click rate - email opt out,travel_reqt,No,No,0.03826,gpt-4-1106-preview
+A_62,click rate - email opt out,planning_reqt,No,No,0.03824,gpt-4-1106-preview
+A_62,click rate - email opt out,location_reqt,No,No,0.03946,gpt-4-1106-preview
+A_62,click rate - email opt out,timing_reqt,No,No,0.07792,gpt-4-1106-preview
+A_62,click rate - email opt out,prosociality,No,No,0.041550000000000004,gpt-4-1106-preview
+A_62,click rate - email opt out,delay,No,No,0.04106,gpt-4-1106-preview
+A_62,click rate - email opt out,authority,No,No,0.08089,gpt-4-1106-preview
+A_62,click rate - personalized website,behavior_priority,secondary,primary,0.01706,gpt-4-1106-preview
+A_62,click rate - personalized website,behavior_focal,not,focal/lodgment indicator,0.019370000000000002,gpt-4-1106-preview
+A_62,click rate - personalized website,behavior_focal_estimate,Estimate,Estimate,0.027150000000000004,gpt-4-1106-preview
+A_62,click rate - personalized website,behavior_metric,categorical,categorical,0.031010000000000003,gpt-4-1106-preview
+A_62,click rate - personalized website,behavior_selfreport,N,N,0.02312,gpt-4-1106-preview
+A_62,click rate - personalized website,financial_reqt,No,Unclear,0.07244,gpt-4-1106-preview
+A_62,click rate - personalized website,travel_reqt,No,No,0.038250000000000006,gpt-4-1106-preview
+A_62,click rate - personalized website,planning_reqt,No,No,0.03823,gpt-4-1106-preview
+A_62,click rate - personalized website,location_reqt,No,No,0.039450000000000006,gpt-4-1106-preview
+A_62,click rate - personalized website,timing_reqt,No,No,0.07791000000000001,gpt-4-1106-preview
+A_62,click rate - personalized website,prosociality,No,Yes,0.04154,gpt-4-1106-preview
+A_62,click rate - personalized website,delay,No,Yes,0.04105,gpt-4-1106-preview
+A_62,click rate - personalized website,authority,No,No,0.08088000000000001,gpt-4-1106-preview
+A_87,Appointment link click,behavior_priority,secondary,secondary,0.022430000000000002,gpt-4-1106-preview
+A_87,Appointment link click,behavior_focal,not,focal,0.02366,gpt-4-1106-preview
+A_87,Appointment link click,behavior_focal_estimate,Estimate,Estimate,0.02261,gpt-4-1106-preview
+A_87,Appointment link click,behavior_metric,categorical,categorical,0.0394,gpt-4-1106-preview
+A_87,Appointment link click,behavior_selfreport,N,N,0.00763,gpt-4-1106-preview
+A_87,Appointment link click,financial_reqt,No,No,0.03989,gpt-4-1106-preview
+A_87,Appointment link click,travel_reqt,No,No,0.01405,gpt-4-1106-preview
+A_87,Appointment link click,planning_reqt,No,Answer: Unclear,0.0066500000000000005,gpt-4-1106-preview
+A_87,Appointment link click,location_reqt,No,No,0.022,gpt-4-1106-preview
+A_87,Appointment link click,timing_reqt,Yes,No,0.09465,gpt-4-1106-preview
+A_87,Appointment link click,prosociality,No,Yes,0.0439,gpt-4-1106-preview
+A_87,Appointment link click,delay,Yes,No,0.03432,gpt-4-1106-preview
+A_87,Appointment link click,authority,No,No,0.08086,gpt-4-1106-preview
+A_87,Days to vaccination,behavior_priority,secondary,secondary,0.022430000000000002,gpt-4-1106-preview
+A_87,Days to vaccination,behavior_focal,not,focal,0.02366,gpt-4-1106-preview
+A_87,Days to vaccination,behavior_focal_estimate,Estimate,Estimate,0.02261,gpt-4-1106-preview
+A_87,Days to vaccination,behavior_metric,continuous,continuous,0.03937,gpt-4-1106-preview
+A_87,Days to vaccination,behavior_selfreport,N,N,0.00763,gpt-4-1106-preview
+A_87,Days to vaccination,financial_reqt,No,No,0.03989,gpt-4-1106-preview
+A_87,Days to vaccination,travel_reqt,Yes,No,0.01405,gpt-4-1106-preview
+A_87,Days to vaccination,planning_reqt,Yes,Unclear,0.00659,gpt-4-1106-preview
+A_87,Days to vaccination,location_reqt,Yes,No,0.022,gpt-4-1106-preview
+A_87,Days to vaccination,timing_reqt,Yes,No,0.09465,gpt-4-1106-preview
+A_87,Days to vaccination,prosociality,Yes,Yes,0.0439,gpt-4-1106-preview
+A_87,Days to vaccination,delay,Yes,Yes,0.03432,gpt-4-1106-preview
+A_87,Days to vaccination,authority,No,No,0.08086,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,behavior_priority,primary,secondary,0.02247,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,behavior_focal,focal,focal,0.0237,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,behavior_focal_estimate,Exact,Estimate,0.02265,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,behavior_metric,categorical,continuous,0.03941000000000001,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,behavior_selfreport,N,N,0.00767,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,financial_reqt,No,No,0.03993000000000001,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,travel_reqt,Yes,No,0.01409,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,planning_reqt,Yes,Unclear,0.0066300000000000005,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,location_reqt,Yes,Yes,0.02204,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,timing_reqt,Yes,Yes,0.09469,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,prosociality,Yes,Yes,0.04394,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,delay,Yes,No,0.03436,gpt-4-1106-preview
+A_87,Vaccination rate within 30 days,authority,No,No,0.0809,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",behavior_priority,secondary,secondary,0.052050000000000006,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",behavior_focal,not,I don't know.,0.02687,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.0172,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",behavior_metric,continuous,continuous,0.04122,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",behavior_selfreport,N,N,0.026899999999999997,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",financial_reqt,No,No,0.039950000000000006,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",travel_reqt,No,No,0.0064399999999999995,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",planning_reqt,No,Unclear,0.004580000000000001,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",location_reqt,No,No,0.04186,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",timing_reqt,No,No,0.07795,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",prosociality,No,No,0.06786,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",delay,Yes,Unclear,0.024640000000000002,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 12 mo",authority,No,No,0.08092,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",behavior_priority,secondary,secondary,0.052050000000000006,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",behavior_focal,not,I don't know.,0.02687,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.0172,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",behavior_metric,continuous,continuous,0.04122,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",behavior_selfreport,N,N,0.026899999999999997,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",financial_reqt,No,No,0.039950000000000006,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",travel_reqt,No,No,0.0064399999999999995,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",planning_reqt,No,Unclear,0.004580000000000001,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",location_reqt,No,No,0.04186,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",timing_reqt,No,No,0.07795,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",prosociality,No,No,0.06786,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",delay,Yes,No,0.02461,gpt-4-1106-preview
+A_30,"change in BMI, baseline to 24 mo",authority,No,No,0.08092,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_priority,secondary,secondary,0.05207,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_focal,not,I don't know.,0.02689,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017220000000000003,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_metric,continuous,continuous,0.041240000000000006,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",behavior_selfreport,N,N,0.02692,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",financial_reqt,No,No,0.039970000000000006,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",travel_reqt,No,No,0.00646,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",planning_reqt,No,Answer: Unclear,0.004660000000000001,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",location_reqt,No,No,0.04188,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",timing_reqt,No,No,0.07797,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",prosociality,No,No,0.06788000000000001,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",delay,Yes,Unclear,0.02466,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 12 mo",authority,No,No,0.08094,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_priority,secondary,secondary,0.05207,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_focal,not,I don't know.,0.02689,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017220000000000003,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_metric,continuous,continuous,0.041240000000000006,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",behavior_selfreport,N,N,0.02692,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",financial_reqt,No,No,0.039970000000000006,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",travel_reqt,No,No,0.00646,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",planning_reqt,No,Unclear,0.004600000000000001,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",location_reqt,No,No,0.04188,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",timing_reqt,No,No,0.07797,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",prosociality,No,No,0.06788000000000001,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",delay,Yes,Unclear,0.02466,gpt-4-1106-preview
+A_30,"change in HDL cholesterol, baseline to 24 mo",authority,No,No,0.08094,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_priority,secondary,secondary,0.05206000000000001,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_focal,not,"focal/not, Not provided in the context.",0.027030000000000002,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017210000000000003,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_metric,continuous,continuous,0.04123,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",behavior_selfreport,N,N,0.02691,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",financial_reqt,No,No,0.03996,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",travel_reqt,No,No,0.00645,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",planning_reqt,No,Answer: Unclear,0.0046500000000000005,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",location_reqt,No,No,0.041870000000000004,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",timing_reqt,No,No,0.07796,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",prosociality,No,No,0.06787,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",delay,Yes,Unclear,0.024650000000000002,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 12 mo",authority,No,No,0.08093,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_priority,secondary,secondary,0.05206000000000001,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_focal,not,I don't know.,0.02688,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017210000000000003,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_metric,continuous,continuous,0.04123,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",behavior_selfreport,N,N,0.02691,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",financial_reqt,No,No,0.03996,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",travel_reqt,No,No,0.00645,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",planning_reqt,No,Unclear,0.00459,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",location_reqt,No,No,0.041870000000000004,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",timing_reqt,No,No,0.07796,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",prosociality,No,No,0.06787,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",delay,Yes,No,0.02462,gpt-4-1106-preview
+A_30,"change in LDL cholesterol, baseline to 24 mo",authority,No,No,0.08093,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_priority,secondary,secondary,0.052110000000000004,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_focal,not,I don't know.,0.02693,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.01726,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_metric,continuous,continuous,0.041280000000000004,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",behavior_selfreport,N,N,0.02696,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",financial_reqt,No,No,0.040010000000000004,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",travel_reqt,No,No,0.0065,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",planning_reqt,No,"Unclear,",0.00467,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",location_reqt,Yes,Yes,0.041920000000000006,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",timing_reqt,No,No,0.07801000000000001,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",prosociality,No,No,0.06792,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",delay,Yes,Unclear,0.0247,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 12 mo",authority,No,No,0.08098000000000001,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_priority,secondary,secondary,0.052110000000000004,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_focal,not,I don't know.,0.02693,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.01726,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_metric,continuous,continuous,0.041280000000000004,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",behavior_selfreport,N,N,0.02696,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",financial_reqt,No,No,0.040010000000000004,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",travel_reqt,No,No,0.0065,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",planning_reqt,No,Unclear,0.00464,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",location_reqt,Yes,Yes,0.041920000000000006,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",timing_reqt,No,No,0.07801000000000001,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",prosociality,No,No,0.06792,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",delay,Yes,Unclear,0.0247,gpt-4-1106-preview
+A_30,"change in avg % of green labeled items purchased, baseline to 24 mo",authority,No,No,0.08098000000000001,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_priority,secondary,secondary,0.052110000000000004,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_focal,not,I don't know.,0.02693,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.01726,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_metric,continuous,continuous,0.041280000000000004,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",behavior_selfreport,N,N,0.02696,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",financial_reqt,No,No,0.040010000000000004,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",travel_reqt,No,No,0.0065,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",planning_reqt,No,No,0.0046099999999999995,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",location_reqt,Yes,Yes,0.041920000000000006,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",timing_reqt,No,No,0.07801000000000001,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",prosociality,No,Unclear,0.06795,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",delay,Yes,Unclear,0.0247,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 12 mo",authority,No,No,0.08098000000000001,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_priority,secondary,secondary,0.052110000000000004,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_focal,not,I don't know.,0.02693,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.01726,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_metric,continuous,continuous,0.041280000000000004,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",behavior_selfreport,N,N,0.02696,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",financial_reqt,No,No,0.040010000000000004,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",travel_reqt,No,No,0.0065,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",planning_reqt,No,Unclear,0.00464,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",location_reqt,Yes,Yes,0.041920000000000006,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",timing_reqt,No,No,0.07801000000000001,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",prosociality,No,Unclear,0.06795,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",delay,Yes,Unclear,0.0247,gpt-4-1106-preview
+A_30,"change in avg % of red labeled items purchased, baseline to 24 mo",authority,No,No,0.08098000000000001,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_priority,secondary,secondary,0.052110000000000004,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_focal,not,I don't know.,0.02693,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.01726,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_metric,continuous,continuous,0.041280000000000004,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",behavior_selfreport,N,N,0.02696,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",financial_reqt,No,Unclear,0.04004,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",travel_reqt,No,No,0.0065,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",planning_reqt,No,Unclear,0.00464,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",location_reqt,Yes,Yes,0.041920000000000006,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",timing_reqt,No,No,0.07801000000000001,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",prosociality,No,Unclear,0.06795,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",delay,Yes,Unclear,0.0247,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 12 mo",authority,No,No,0.08098000000000001,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_priority,secondary,secondary,0.052110000000000004,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_focal,not,I don't know.,0.02693,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.01726,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_metric,continuous,continuous,0.041280000000000004,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",behavior_selfreport,N,N,0.02696,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",financial_reqt,No,No,0.040010000000000004,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",travel_reqt,No,No,0.0065,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",planning_reqt,No,Answer: Unclear,0.0047,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",location_reqt,Yes,Yes,0.041920000000000006,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",timing_reqt,No,No,0.07801000000000001,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",prosociality,No,Unclear,0.06795,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",delay,Yes,Unclear,0.0247,gpt-4-1106-preview
+A_30,"change in avg % of yellow labeled items purchased, baseline to 24 mo",authority,No,No,0.08098000000000001,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",behavior_priority,secondary,secondary,0.05208,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",behavior_focal,not,focal: Vaccination take-up,0.026959999999999998,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017230000000000002,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",behavior_metric,continuous,continuous,0.04125,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",behavior_selfreport,N,N,0.02693,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",financial_reqt,No,No,0.03998,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",travel_reqt,No,No,0.00647,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",planning_reqt,No,Answer: Unclear,0.0046700000000000005,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",location_reqt,No,No,0.041890000000000004,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",timing_reqt,No,No,0.07798000000000001,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",prosociality,No,No,0.06789,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",delay,Yes,Unclear,0.02467,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 12 mo",authority,No,No,0.08095000000000001,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",behavior_priority,secondary,secondary,0.05208,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",behavior_focal,not,I don't know.,0.0269,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017230000000000002,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",behavior_metric,continuous,continuous,0.04125,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",behavior_selfreport,N,N,0.02693,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",financial_reqt,No,No,0.03998,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",travel_reqt,No,No,0.00647,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",planning_reqt,No,Answer: Unclear,0.0046700000000000005,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",location_reqt,No,No,0.041890000000000004,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",timing_reqt,No,No,0.07798000000000001,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",prosociality,No,Unclear,0.06792000000000001,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",delay,Yes,Unclear,0.02467,gpt-4-1106-preview
+A_30,"change in avg A1c, baseline to 24 mo",authority,No,No,0.08095000000000001,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_priority,secondary,secondary,0.05208,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_focal,not,I don't know.,0.0269,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017230000000000002,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_metric,continuous,continuous,0.04125,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",behavior_selfreport,N,N,0.02693,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",financial_reqt,No,No,0.03998,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",travel_reqt,No,No,0.00647,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",planning_reqt,No,Answer: Unclear,0.0046700000000000005,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",location_reqt,Yes,No,0.041890000000000004,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",timing_reqt,No,No,0.07798000000000001,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",prosociality,No,Unclear,0.06792000000000001,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",delay,Yes,Unclear,0.02467,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 12 mo",authority,No,No,0.08095000000000001,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_priority,secondary,secondary,0.05208,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_focal,not,I don't know.,0.0269,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017230000000000002,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_metric,continuous,continuous,0.04125,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",behavior_selfreport,N,N,0.02693,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",financial_reqt,No,No,0.03998,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",travel_reqt,No,No,0.00647,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",planning_reqt,No,Answer: Unclear,0.0046700000000000005,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",location_reqt,Yes,Yes,0.041890000000000004,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",timing_reqt,No,No,0.07798000000000001,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",prosociality,No,No,0.06789,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",delay,Yes,No,0.02464,gpt-4-1106-preview
+A_30,"change in calories purchased per day, baseline to 24 mo",authority,No,No,0.08095000000000001,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_priority,secondary,secondary,0.05208,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_focal,not,I don't know.,0.0269,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017230000000000002,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_metric,continuous,continuous,0.04125,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",behavior_selfreport,N,N,0.02693,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",financial_reqt,No,No,0.03998,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",travel_reqt,No,No,0.00647,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",planning_reqt,No,Unclear,0.00461,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",location_reqt,No,No,0.041890000000000004,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",timing_reqt,No,No,0.07798000000000001,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",prosociality,No,Unclear,0.06792000000000001,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",delay,Yes,No,0.02464,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 12 mo",authority,No,No,0.08095000000000001,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_priority,secondary,secondary,0.05208,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_focal,not,I don't know.,0.0269,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017230000000000002,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_metric,continuous,continuous,0.04125,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",behavior_selfreport,N,N,0.02693,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",financial_reqt,No,No,0.03998,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",travel_reqt,No,No,0.00647,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",planning_reqt,No,Unclear,0.00461,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",location_reqt,No,No,0.041890000000000004,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",timing_reqt,No,No,0.07798000000000001,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",prosociality,No,No,0.06789,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",delay,Yes,Unclear,0.02467,gpt-4-1106-preview
+A_30,"change in diastolic BP, baseline to 24 mo",authority,No,No,0.08095000000000001,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_priority,secondary,secondary,0.05213,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_focal,not,I don't know.,0.02695,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.01728,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_metric,continuous,continuous,0.0413,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",behavior_selfreport,Y,N,0.026979999999999997,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",financial_reqt,No,Unclear,0.04006,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",travel_reqt,No,No,0.00652,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",planning_reqt,No,Unclear,0.00466,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",location_reqt,No,No,0.04194,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",timing_reqt,No,No,0.07803,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",prosociality,No,No,0.06794000000000001,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",delay,Yes,No,0.02469,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 12 mo",authority,No,No,0.081,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_priority,secondary,secondary,0.05213,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_focal,not,I don't know.,0.02695,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.01728,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_metric,continuous,I don't know.,0.04142,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",behavior_selfreport,Y,N,0.026979999999999997,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",financial_reqt,No,Unclear,0.04006,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",travel_reqt,No,No,0.00652,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",planning_reqt,No,Unclear,0.00466,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",location_reqt,No,No,0.04194,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",timing_reqt,No,No,0.07803,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",prosociality,No,No,0.06794000000000001,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",delay,Yes,Yes,0.02469,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 24 mo",authority,No,No,0.081,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_priority,secondary,secondary,0.05213,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_focal,not,I don't know.,0.02695,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_focal_estimate,Exact,Estimate,0.01728,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_metric,continuous,continuous,0.0413,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",behavior_selfreport,Y,N,0.026979999999999997,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",financial_reqt,No,Unclear,0.04006,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",travel_reqt,No,No,0.00652,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",planning_reqt,No,Unclear,0.00466,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",location_reqt,No,No,0.04194,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",timing_reqt,No,No,0.07803,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",prosociality,No,No,0.06794000000000001,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",delay,Yes,Unclear,0.024720000000000002,gpt-4-1106-preview
+A_30,"change in diet quality (Healthy Eating Index 2015), baseline to 6 mo",authority,No,No,0.081,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_priority,secondary,secondary,0.0521,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_focal,not,I don't know.,0.026920000000000003,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.01725,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_metric,continuous,continuous,0.04127,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",behavior_selfreport,N,N,0.02695,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",financial_reqt,No,No,0.04,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",travel_reqt,No,No,0.00649,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",planning_reqt,No,Unclear,0.0046300000000000004,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",location_reqt,Yes,Yes,0.04191,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",timing_reqt,No,No,0.078,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",prosociality,No,No,0.06791000000000001,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",delay,Yes,Unclear,0.024690000000000004,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 12 mo",authority,No,No,0.08097,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_priority,secondary,secondary,0.0521,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_focal,not,I don't know.,0.026920000000000003,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.01725,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_metric,continuous,continuous,0.04127,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",behavior_selfreport,N,N,0.02695,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",financial_reqt,No,No,0.04,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",travel_reqt,No,No,0.00649,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",planning_reqt,No,Unclear,0.0046300000000000004,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",location_reqt,Yes,Yes,0.04191,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",timing_reqt,No,No,0.078,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",prosociality,No,Unclear,0.06794000000000001,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",delay,Yes,Unclear,0.024690000000000004,gpt-4-1106-preview
+A_30,"change in healthy purchasing score (avg %), baseline to 24 mo",authority,No,No,0.08097,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",behavior_priority,secondary,secondary,0.05207,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",behavior_focal,not,I don't know.,0.02689,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017220000000000003,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",behavior_metric,continuous,continuous,0.041240000000000006,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",behavior_selfreport,N,N,0.02692,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",financial_reqt,No,No,0.039970000000000006,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",travel_reqt,No,No,0.00646,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",planning_reqt,No,Unclear,0.004600000000000001,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",location_reqt,No,No,0.04188,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",timing_reqt,No,No,0.07797,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",prosociality,No,No,0.06788000000000001,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",delay,Yes,Unclear,0.02466,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 12 mo",authority,No,No,0.08094,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",behavior_priority,secondary,secondary,0.05207,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",behavior_focal,not,I don't know.,0.02689,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017220000000000003,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",behavior_metric,continuous,continuous,0.041240000000000006,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",behavior_selfreport,N,N,0.02692,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",financial_reqt,No,No,0.039970000000000006,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",travel_reqt,No,No,0.00646,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",planning_reqt,No,Answer: Unclear,0.004660000000000001,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",location_reqt,No,No,0.04188,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",timing_reqt,No,No,0.07797,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",prosociality,No,No,0.06788000000000001,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",delay,Yes,Unclear,0.02466,gpt-4-1106-preview
+A_30,"change in systolic BP, baseline to 24 mo",authority,No,No,0.08094,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_priority,secondary,secondary,0.05206000000000001,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_focal,not,I don't know.,0.02688,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017210000000000003,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_metric,continuous,continuous,0.04123,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",behavior_selfreport,N,N,0.02691,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",financial_reqt,No,No,0.03996,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",travel_reqt,No,No,0.00645,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",planning_reqt,No,Answer: Unclear,0.0046500000000000005,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",location_reqt,No,No,0.041870000000000004,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",timing_reqt,No,No,0.07796,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",prosociality,No,No,0.06787,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",delay,Yes,No,0.02462,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 12 mo",authority,No,No,0.08093,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_priority,secondary,secondary,0.05206000000000001,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_focal,not,I don't know.,0.02688,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017210000000000003,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_metric,continuous,continuous,0.04123,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",behavior_selfreport,N,N,0.02691,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",financial_reqt,No,No,0.03996,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",travel_reqt,No,No,0.00645,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",planning_reqt,No,Unclear,0.00459,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",location_reqt,No,No,0.041870000000000004,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",timing_reqt,No,No,0.07796,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",prosociality,No,No,0.06787,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",delay,Yes,Unclear,0.024650000000000002,gpt-4-1106-preview
+A_30,"change in total cholesterol, baseline to 24 mo",authority,No,No,0.08093,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",behavior_priority,secondary,secondary,0.05207,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",behavior_focal,not,I don't know.,0.02689,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017220000000000003,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",behavior_metric,continuous,I don't know.,0.04136,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",behavior_selfreport,N,N,0.02692,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",financial_reqt,No,No,0.039970000000000006,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",travel_reqt,No,No,0.00646,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",planning_reqt,No,Unclear,0.004600000000000001,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",location_reqt,No,No,0.04188,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",timing_reqt,No,No,0.07797,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",prosociality,No,No,0.06788000000000001,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",delay,Yes,Unclear,0.02466,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 12 mo",authority,No,No,0.08094,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",behavior_priority,secondary,secondary,0.05207,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",behavior_focal,not,I don't know.,0.02689,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017220000000000003,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",behavior_metric,continuous,continuous,0.041240000000000006,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",behavior_selfreport,N,N,0.02692,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",financial_reqt,No,No,0.039970000000000006,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",travel_reqt,No,No,0.00646,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",planning_reqt,No,Unclear,0.004600000000000001,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",location_reqt,No,No,0.04188,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",timing_reqt,No,No,0.07797,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",prosociality,No,No,0.06788000000000001,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",delay,Yes,Unclear,0.02466,gpt-4-1106-preview
+A_30,"change in triglycerides, baseline to 24 mo",authority,No,No,0.08094,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",behavior_priority,secondary,secondary,0.05206000000000001,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",behavior_focal,not,I don't know.,0.02688,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.017210000000000003,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",behavior_metric,continuous,continuous,0.04123,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",behavior_selfreport,N,N,0.02691,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",financial_reqt,No,No,0.03996,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",travel_reqt,No,No,0.00645,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",planning_reqt,No,Unclear,0.00459,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",location_reqt,No,No,0.041870000000000004,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",timing_reqt,No,No,0.07796,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",prosociality,No,No,0.06787,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",delay,Yes,No,0.02462,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 12 mo",authority,No,No,0.08093,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",behavior_priority,secondary,secondary,0.05206000000000001,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",behavior_focal,not,I don't know.,0.02688,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.017210000000000003,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",behavior_metric,continuous,continuous,0.04123,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",behavior_selfreport,N,N,0.02691,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",financial_reqt,No,No,0.03996,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",travel_reqt,No,No,0.00645,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",planning_reqt,No,Unclear,0.00459,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",location_reqt,No,No,0.041870000000000004,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",timing_reqt,No,No,0.07796,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",prosociality,No,No,0.06787,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",delay,Yes,No,0.02462,gpt-4-1106-preview
+A_30,"change in waist circumference, baseline to 24 mo",authority,No,No,0.08093,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",behavior_priority,primary,primary,0.052050000000000006,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",behavior_focal,focal,I don't know.,0.02687,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",behavior_focal_estimate,Exact,Estimate,0.0172,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",behavior_metric,continuous,continuous,0.04122,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",behavior_selfreport,N,N,0.026899999999999997,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",financial_reqt,No,No,0.039950000000000006,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",travel_reqt,No,No,0.0064399999999999995,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",planning_reqt,No,Unclear,0.004580000000000001,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",location_reqt,No,No,0.04186,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",timing_reqt,No,No,0.07795,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",prosociality,No,No,0.06786,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",delay,Yes,Unclear,0.024640000000000002,gpt-4-1106-preview
+A_30,"change in weight, baseline to 12 mo",authority,No,No,0.08092,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",behavior_priority,primary,secondary,0.052050000000000006,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",behavior_focal,not,I don't know.,0.02687,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",behavior_focal_estimate,Exact,Estimate,0.0172,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",behavior_metric,continuous,continuous,0.04122,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",behavior_selfreport,N,N,0.026899999999999997,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",financial_reqt,No,No,0.039950000000000006,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",travel_reqt,No,No,0.0064399999999999995,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",planning_reqt,No,Unclear,0.004580000000000001,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",location_reqt,No,No,0.04186,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",timing_reqt,No,No,0.07795,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",prosociality,No,No,0.06786,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",delay,Yes,Unclear,0.024640000000000002,gpt-4-1106-preview
+A_30,"change in weight, baseline to 24 mo",authority,No,No,0.08092,gpt-4-1106-preview

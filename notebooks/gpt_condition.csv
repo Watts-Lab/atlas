@@ -1,157 +1,313 @@
-,Paper_Exp_ID,Condition,Variable,Human Answer,GPT Answer,GPT Cost
-0,A_55,BAU letter,condition_financial,N,N,0.06849000000000001
-1,A_55,BAU letter,condition_educational,N,N,0.04371
-2,A_55,BAU letter,condition_forbid,N,N,0.04712999999999999
-3,A_55,BAU letter,condition_channel_snailmail,Y,N,0.040229999999999995
-4,A_55,BAU letter,condition_channel_email,N,Y,0.03222
-5,A_55,BAU letter,condition_channel_paperlive,N,N,0.032549999999999996
-6,A_55,BAU letter,condition_channel_inperson,N,N,0.04760999999999999
-7,A_55,BAU letter,condition_channel_mobileapp,N,N,0.04584
-8,A_55,BAU letter,condition_channel_online,N,Y,0.04287
-9,A_55,BAU letter,condition_channel_sms,N,N,0.044039999999999996
-10,A_55,BAU letter,condition_channel_phone,N,N,0.032249999999999994
-11,A_55,BAU letter,condition_channel_nothing,N,No,0.04961999999999999
-12,A_55,No letter,condition_financial,N,N,0.06846
-13,A_55,No letter,condition_educational,N,N,0.04368
-14,A_55,No letter,condition_forbid,N,N,0.047099999999999996
-15,A_55,No letter,condition_channel_snailmail,N,N,0.0402
-16,A_55,No letter,condition_channel_email,N,Y,0.032189999999999996
-17,A_55,No letter,condition_channel_paperlive,N,N,0.03252
-18,A_55,No letter,condition_channel_inperson,N,N,0.04758
-19,A_55,No letter,condition_channel_mobileapp,N,N,0.04104
-20,A_55,No letter,condition_channel_online,N,Y,0.042839999999999996
-21,A_55,No letter,condition_channel_sms,N,N,0.04401
-22,A_55,No letter,condition_channel_phone,N,N,0.03222
-23,A_55,No letter,condition_channel_nothing,Y,N,0.049589999999999995
-24,A_55,Welcome letter,condition_financial,N,N,0.06846
-25,A_55,Welcome letter,condition_educational,N,N,0.04368
-26,A_55,Welcome letter,condition_forbid,N,N,0.047099999999999996
-27,A_55,Welcome letter,condition_channel_snailmail,Y,N,0.0402
-28,A_55,Welcome letter,condition_channel_email,N,Y,0.032189999999999996
-29,A_55,Welcome letter,condition_channel_paperlive,N,N,0.03252
-30,A_55,Welcome letter,condition_channel_inperson,N,N,0.04758
-31,A_55,Welcome letter,condition_channel_mobileapp,N,N,0.04581
-32,A_55,Welcome letter,condition_channel_online,N,Y,0.042839999999999996
-33,A_55,Welcome letter,condition_channel_sms,N,N,0.04401
-34,A_55,Welcome letter,condition_channel_phone,N,N,0.03222
-35,A_55,Welcome letter,condition_channel_nothing,N,No,0.049589999999999995
-36,A_62,control,condition_financial,N,N,0.06843
-37,A_62,control,condition_educational,N,N,0.04365
-38,A_62,control,condition_forbid,N,N,0.047069999999999994
-39,A_62,control,condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition.,0.031529999999999996
-40,A_62,control,condition_channel_email,Y,Y,0.03216
-41,A_62,control,condition_channel_paperlive,N,N,0.03192
-42,A_62,control,condition_channel_inperson,N,N,0.047549999999999995
-43,A_62,control,condition_channel_mobileapp,N,N,0.04101
-44,A_62,control,condition_channel_online,N,Y,0.042809999999999994
-45,A_62,control,condition_channel_sms,N,N,0.04398
-46,A_62,control,condition_channel_phone,N,No,0.032189999999999996
-47,A_62,control,condition_channel_nothing,N,N,0.04955999999999999
-48,A_62,social norm,condition_financial,N,N,0.06846
-49,A_62,social norm,condition_educational,N,N,0.04368
-50,A_62,social norm,condition_forbid,N,N,0.047099999999999996
-51,A_62,social norm,condition_channel_snailmail,N,Y,0.030780000000000002
-52,A_62,social norm,condition_channel_email,Y,Y,0.032189999999999996
-53,A_62,social norm,condition_channel_paperlive,N,N,0.03194999999999999
-54,A_62,social norm,condition_channel_inperson,N,N,0.04758
-55,A_62,social norm,condition_channel_mobileapp,N,N,0.04581
-56,A_62,social norm,condition_channel_online,N,Y,0.042839999999999996
-57,A_62,social norm,condition_channel_sms,N,N,0.04401
-58,A_62,social norm,condition_channel_phone,N,N,0.03222
-59,A_62,social norm,condition_channel_nothing,N,N,0.049589999999999995
-60,A_87,Arguments,condition_financial,N,N,0.056339999999999994
-61,A_87,Arguments,condition_educational,N,N,0.04185
-62,A_87,Arguments,condition_forbid,N,N,0.03992999999999999
-63,A_87,Arguments,condition_channel_snailmail,N,Y,0.030749999999999996
-64,A_87,Arguments,condition_channel_email,Y,Y,0.03216
-65,A_87,Arguments,condition_channel_paperlive,N,N,0.03768
-66,A_87,Arguments,condition_channel_inperson,N,N,0.04196999999999999
-67,A_87,Arguments,condition_channel_mobileapp,N,N,0.04101
-68,A_87,Arguments,condition_channel_online,Y,Y,0.042809999999999994
-69,A_87,Arguments,condition_channel_sms,N,N,0.04398
-70,A_87,Arguments,condition_channel_phone,N,N,0.032189999999999996
-71,A_87,Arguments,condition_channel_nothing,N,N,0.04917
-72,A_87,Control (no reminders),condition_financial,N,N,0.056429999999999994
-73,A_87,Control (no reminders),condition_educational,N,N,0.04193999999999999
-74,A_87,Control (no reminders),condition_forbid,N,N,0.04002
-75,A_87,Control (no reminders),condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition.,0.031619999999999995
-76,A_87,Control (no reminders),condition_channel_email,N,Y,0.032249999999999994
-77,A_87,Control (no reminders),condition_channel_paperlive,N,N,0.03776999999999999
-78,A_87,Control (no reminders),condition_channel_inperson,N,N,0.04205999999999999
-79,A_87,Control (no reminders),condition_channel_mobileapp,N,N,0.045869999999999994
-80,A_87,Control (no reminders),condition_channel_online,Y,Y,0.042899999999999994
-81,A_87,Control (no reminders),condition_channel_sms,N,N,0.04407
-82,A_87,Control (no reminders),condition_channel_phone,N,N,0.032279999999999996
-83,A_87,Control (no reminders),condition_channel_nothing,N,No,0.04925999999999999
-84,A_87,Control (reminders),condition_financial,N,N,0.056429999999999994
-85,A_87,Control (reminders),condition_educational,N,N,0.04193999999999999
-86,A_87,Control (reminders),condition_forbid,N,N,0.04002
-87,A_87,Control (reminders),condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition.,0.031619999999999995
-88,A_87,Control (reminders),condition_channel_email,Y,Y,0.032249999999999994
-89,A_87,Control (reminders),condition_channel_paperlive,N,N,0.03776999999999999
-90,A_87,Control (reminders),condition_channel_inperson,N,N,0.04205999999999999
-91,A_87,Control (reminders),condition_channel_mobileapp,N,N,0.0411
-92,A_87,Control (reminders),condition_channel_online,Y,Y,0.042899999999999994
-93,A_87,Control (reminders),condition_channel_sms,N,N,0.04407
-94,A_87,Control (reminders),condition_channel_phone,N,N,0.032279999999999996
-95,A_87,Control (reminders),condition_channel_nothing,N,N,0.05342999999999999
-96,A_87,Incentives,condition_financial,Y,Y,0.05639999999999999
-97,A_87,Incentives,condition_educational,N,N,0.041909999999999996
-98,A_87,Incentives,condition_forbid,N,N,0.03999
-99,A_87,Incentives,condition_channel_snailmail,N,Y,0.030809999999999997
-100,A_87,Incentives,condition_channel_email,Y,Y,0.03222
-101,A_87,Incentives,condition_channel_paperlive,N,N,0.037739999999999996
-102,A_87,Incentives,condition_channel_inperson,N,N,0.04203
-103,A_87,Incentives,condition_channel_mobileapp,N,N,0.041069999999999995
-104,A_87,Incentives,condition_channel_online,Y,Y,0.04287
-105,A_87,Incentives,condition_channel_sms,N,N,0.044039999999999996
-106,A_87,Incentives,condition_channel_phone,N,N,0.038459999999999994
-107,A_87,Incentives,condition_channel_nothing,N,N,0.049229999999999996
-108,A_87,Information,condition_financial,N,N,0.056339999999999994
-109,A_87,Information,condition_educational,N,N,0.04185
-110,A_87,Information,condition_forbid,N,N,0.03992999999999999
-111,A_87,Information,condition_channel_snailmail,N,Y,0.030749999999999996
-112,A_87,Information,condition_channel_email,Y,Y,0.03216
-113,A_87,Information,condition_channel_paperlive,N,N,0.03768
-114,A_87,Information,condition_channel_inperson,N,N,0.04196999999999999
-115,A_87,Information,condition_channel_mobileapp,N,N,0.04101
-116,A_87,Information,condition_channel_online,Y,Y,0.042809999999999994
-117,A_87,Information,condition_channel_sms,N,N,0.04398
-118,A_87,Information,condition_channel_phone,N,N,0.032189999999999996
-119,A_87,Information,condition_channel_nothing,N,N,0.04917
-120,A_87,Social Impact,condition_financial,N,N,0.056369999999999996
-121,A_87,Social Impact,condition_educational,N,N,0.041879999999999994
-122,A_87,Social Impact,condition_forbid,N,N,0.039959999999999996
-123,A_87,Social Impact,condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition named Social Impact.,0.031740000000000004
-124,A_87,Social Impact,condition_channel_email,Y,Y,0.032189999999999996
-125,A_87,Social Impact,condition_channel_paperlive,N,N,0.037709999999999994
-126,A_87,Social Impact,condition_channel_inperson,N,N,0.041999999999999996
-127,A_87,Social Impact,condition_channel_mobileapp,N,N,0.04581
-128,A_87,Social Impact,condition_channel_online,Y,Y,0.042839999999999996
-129,A_87,Social Impact,condition_channel_sms,N,N,0.04401
-130,A_87,Social Impact,condition_channel_phone,N,N,0.03222
-131,A_87,Social Impact,condition_channel_nothing,N,N,0.049199999999999994
-132,A_30,control,condition_financial,Y,N,0.056339999999999994
-133,A_30,control,condition_educational,N,N,0.04365
-134,A_30,control,condition_forbid,N,N,0.03992999999999999
-135,A_30,control,condition_channel_snailmail,Y,Y,0.030749999999999996
-136,A_30,control,condition_channel_email,N,Y,0.02415
-137,A_30,control,condition_channel_paperlive,N,N,0.03768
-138,A_30,control,condition_channel_inperson,N,N,0.04824
-139,A_30,control,condition_channel_mobileapp,N,N,0.04899
-140,A_30,control,condition_channel_online,N,Y,0.03483
-141,A_30,control,condition_channel_sms,N,N,0.04010999999999999
-142,A_30,control,condition_channel_phone,N,N,0.024120000000000003
-143,A_30,control,condition_channel_nothing,N,N,0.04917
-144,A_30,treatment,condition_financial,Y,Y,0.056339999999999994
-145,A_30,treatment,condition_educational,N,Y,0.04365
-146,A_30,treatment,condition_forbid,N,N,0.03992999999999999
-147,A_30,treatment,condition_channel_snailmail,Y,Y,0.030749999999999996
-148,A_30,treatment,condition_channel_email,Y,Y,0.02415
-149,A_30,treatment,condition_channel_paperlive,N,N,0.03768
-150,A_30,treatment,condition_channel_inperson,N,N,0.04824
-151,A_30,treatment,condition_channel_mobileapp,N,N,0.04899
-152,A_30,treatment,condition_channel_online,N,Y,0.03483
-153,A_30,treatment,condition_channel_sms,N,N,0.04010999999999999
-154,A_30,treatment,condition_channel_phone,N,N,0.024120000000000003
-155,A_30,treatment,condition_channel_nothing,N,N,0.04917
+Paper_Exp_ID,Condition,Variable,Human Answer,GPT Answer,GPT Cost,Model
+A_55,BAU letter,condition_financial,N,N,0.06849,gpt-4
+A_55,BAU letter,condition_educational,N,N,0.04371,gpt-4
+A_55,BAU letter,condition_forbid,N,N,0.0471299999999999,gpt-4
+A_55,BAU letter,condition_channel_snailmail,Y,N,0.0402299999999999,gpt-4
+A_55,BAU letter,condition_channel_email,N,Y,0.03222,gpt-4
+A_55,BAU letter,condition_channel_paperlive,N,N,0.0325499999999999,gpt-4
+A_55,BAU letter,condition_channel_inperson,N,N,0.0476099999999999,gpt-4
+A_55,BAU letter,condition_channel_mobileapp,N,N,0.04584,gpt-4
+A_55,BAU letter,condition_channel_online,N,Y,0.04287,gpt-4
+A_55,BAU letter,condition_channel_sms,N,N,0.0440399999999999,gpt-4
+A_55,BAU letter,condition_channel_phone,N,N,0.0322499999999999,gpt-4
+A_55,BAU letter,condition_channel_nothing,N,No,0.0496199999999999,gpt-4
+A_55,No letter,condition_financial,N,N,0.06846,gpt-4
+A_55,No letter,condition_educational,N,N,0.04368,gpt-4
+A_55,No letter,condition_forbid,N,N,0.0470999999999999,gpt-4
+A_55,No letter,condition_channel_snailmail,N,N,0.0402,gpt-4
+A_55,No letter,condition_channel_email,N,Y,0.0321899999999999,gpt-4
+A_55,No letter,condition_channel_paperlive,N,N,0.03252,gpt-4
+A_55,No letter,condition_channel_inperson,N,N,0.04758,gpt-4
+A_55,No letter,condition_channel_mobileapp,N,N,0.04104,gpt-4
+A_55,No letter,condition_channel_online,N,Y,0.0428399999999999,gpt-4
+A_55,No letter,condition_channel_sms,N,N,0.04401,gpt-4
+A_55,No letter,condition_channel_phone,N,N,0.03222,gpt-4
+A_55,No letter,condition_channel_nothing,Y,N,0.0495899999999999,gpt-4
+A_55,Welcome letter,condition_financial,N,N,0.06846,gpt-4
+A_55,Welcome letter,condition_educational,N,N,0.04368,gpt-4
+A_55,Welcome letter,condition_forbid,N,N,0.0470999999999999,gpt-4
+A_55,Welcome letter,condition_channel_snailmail,Y,N,0.0402,gpt-4
+A_55,Welcome letter,condition_channel_email,N,Y,0.0321899999999999,gpt-4
+A_55,Welcome letter,condition_channel_paperlive,N,N,0.03252,gpt-4
+A_55,Welcome letter,condition_channel_inperson,N,N,0.04758,gpt-4
+A_55,Welcome letter,condition_channel_mobileapp,N,N,0.04581,gpt-4
+A_55,Welcome letter,condition_channel_online,N,Y,0.0428399999999999,gpt-4
+A_55,Welcome letter,condition_channel_sms,N,N,0.04401,gpt-4
+A_55,Welcome letter,condition_channel_phone,N,N,0.03222,gpt-4
+A_55,Welcome letter,condition_channel_nothing,N,No,0.0495899999999999,gpt-4
+A_62,control,condition_financial,N,N,0.06843,gpt-4
+A_62,control,condition_educational,N,N,0.04365,gpt-4
+A_62,control,condition_forbid,N,N,0.0470699999999999,gpt-4
+A_62,control,condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition.,0.0315299999999999,gpt-4
+A_62,control,condition_channel_email,Y,Y,0.03216,gpt-4
+A_62,control,condition_channel_paperlive,N,N,0.03192,gpt-4
+A_62,control,condition_channel_inperson,N,N,0.0475499999999999,gpt-4
+A_62,control,condition_channel_mobileapp,N,N,0.04101,gpt-4
+A_62,control,condition_channel_online,N,Y,0.0428099999999999,gpt-4
+A_62,control,condition_channel_sms,N,N,0.04398,gpt-4
+A_62,control,condition_channel_phone,N,No,0.0321899999999999,gpt-4
+A_62,control,condition_channel_nothing,N,N,0.0495599999999999,gpt-4
+A_62,social norm,condition_financial,N,N,0.06846,gpt-4
+A_62,social norm,condition_educational,N,N,0.04368,gpt-4
+A_62,social norm,condition_forbid,N,N,0.0470999999999999,gpt-4
+A_62,social norm,condition_channel_snailmail,N,Y,0.03078,gpt-4
+A_62,social norm,condition_channel_email,Y,Y,0.0321899999999999,gpt-4
+A_62,social norm,condition_channel_paperlive,N,N,0.0319499999999999,gpt-4
+A_62,social norm,condition_channel_inperson,N,N,0.04758,gpt-4
+A_62,social norm,condition_channel_mobileapp,N,N,0.04581,gpt-4
+A_62,social norm,condition_channel_online,N,Y,0.0428399999999999,gpt-4
+A_62,social norm,condition_channel_sms,N,N,0.04401,gpt-4
+A_62,social norm,condition_channel_phone,N,N,0.03222,gpt-4
+A_62,social norm,condition_channel_nothing,N,N,0.0495899999999999,gpt-4
+A_87,Arguments,condition_financial,N,N,0.0563399999999999,gpt-4
+A_87,Arguments,condition_educational,N,N,0.04185,gpt-4
+A_87,Arguments,condition_forbid,N,N,0.0399299999999999,gpt-4
+A_87,Arguments,condition_channel_snailmail,N,Y,0.0307499999999999,gpt-4
+A_87,Arguments,condition_channel_email,Y,Y,0.03216,gpt-4
+A_87,Arguments,condition_channel_paperlive,N,N,0.03768,gpt-4
+A_87,Arguments,condition_channel_inperson,N,N,0.0419699999999999,gpt-4
+A_87,Arguments,condition_channel_mobileapp,N,N,0.04101,gpt-4
+A_87,Arguments,condition_channel_online,Y,Y,0.0428099999999999,gpt-4
+A_87,Arguments,condition_channel_sms,N,N,0.04398,gpt-4
+A_87,Arguments,condition_channel_phone,N,N,0.0321899999999999,gpt-4
+A_87,Arguments,condition_channel_nothing,N,N,0.04917,gpt-4
+A_87,Control (no reminders),condition_financial,N,N,0.0564299999999999,gpt-4
+A_87,Control (no reminders),condition_educational,N,N,0.0419399999999999,gpt-4
+A_87,Control (no reminders),condition_forbid,N,N,0.04002,gpt-4
+A_87,Control (no reminders),condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition.,0.0316199999999999,gpt-4
+A_87,Control (no reminders),condition_channel_email,N,Y,0.0322499999999999,gpt-4
+A_87,Control (no reminders),condition_channel_paperlive,N,N,0.0377699999999999,gpt-4
+A_87,Control (no reminders),condition_channel_inperson,N,N,0.0420599999999999,gpt-4
+A_87,Control (no reminders),condition_channel_mobileapp,N,N,0.0458699999999999,gpt-4
+A_87,Control (no reminders),condition_channel_online,Y,Y,0.0428999999999999,gpt-4
+A_87,Control (no reminders),condition_channel_sms,N,N,0.04407,gpt-4
+A_87,Control (no reminders),condition_channel_phone,N,N,0.0322799999999999,gpt-4
+A_87,Control (no reminders),condition_channel_nothing,N,No,0.0492599999999999,gpt-4
+A_87,Control (reminders),condition_financial,N,N,0.0564299999999999,gpt-4
+A_87,Control (reminders),condition_educational,N,N,0.0419399999999999,gpt-4
+A_87,Control (reminders),condition_forbid,N,N,0.04002,gpt-4
+A_87,Control (reminders),condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition.,0.0316199999999999,gpt-4
+A_87,Control (reminders),condition_channel_email,Y,Y,0.0322499999999999,gpt-4
+A_87,Control (reminders),condition_channel_paperlive,N,N,0.0377699999999999,gpt-4
+A_87,Control (reminders),condition_channel_inperson,N,N,0.0420599999999999,gpt-4
+A_87,Control (reminders),condition_channel_mobileapp,N,N,0.0411,gpt-4
+A_87,Control (reminders),condition_channel_online,Y,Y,0.0428999999999999,gpt-4
+A_87,Control (reminders),condition_channel_sms,N,N,0.04407,gpt-4
+A_87,Control (reminders),condition_channel_phone,N,N,0.0322799999999999,gpt-4
+A_87,Control (reminders),condition_channel_nothing,N,N,0.0534299999999999,gpt-4
+A_87,Incentives,condition_financial,Y,Y,0.0563999999999999,gpt-4
+A_87,Incentives,condition_educational,N,N,0.0419099999999999,gpt-4
+A_87,Incentives,condition_forbid,N,N,0.03999,gpt-4
+A_87,Incentives,condition_channel_snailmail,N,Y,0.0308099999999999,gpt-4
+A_87,Incentives,condition_channel_email,Y,Y,0.03222,gpt-4
+A_87,Incentives,condition_channel_paperlive,N,N,0.0377399999999999,gpt-4
+A_87,Incentives,condition_channel_inperson,N,N,0.04203,gpt-4
+A_87,Incentives,condition_channel_mobileapp,N,N,0.0410699999999999,gpt-4
+A_87,Incentives,condition_channel_online,Y,Y,0.04287,gpt-4
+A_87,Incentives,condition_channel_sms,N,N,0.0440399999999999,gpt-4
+A_87,Incentives,condition_channel_phone,N,N,0.0384599999999999,gpt-4
+A_87,Incentives,condition_channel_nothing,N,N,0.0492299999999999,gpt-4
+A_87,Information,condition_financial,N,N,0.0563399999999999,gpt-4
+A_87,Information,condition_educational,N,N,0.04185,gpt-4
+A_87,Information,condition_forbid,N,N,0.0399299999999999,gpt-4
+A_87,Information,condition_channel_snailmail,N,Y,0.0307499999999999,gpt-4
+A_87,Information,condition_channel_email,Y,Y,0.03216,gpt-4
+A_87,Information,condition_channel_paperlive,N,N,0.03768,gpt-4
+A_87,Information,condition_channel_inperson,N,N,0.0419699999999999,gpt-4
+A_87,Information,condition_channel_mobileapp,N,N,0.04101,gpt-4
+A_87,Information,condition_channel_online,Y,Y,0.0428099999999999,gpt-4
+A_87,Information,condition_channel_sms,N,N,0.04398,gpt-4
+A_87,Information,condition_channel_phone,N,N,0.0321899999999999,gpt-4
+A_87,Information,condition_channel_nothing,N,N,0.04917,gpt-4
+A_87,Social Impact,condition_financial,N,N,0.0563699999999999,gpt-4
+A_87,Social Impact,condition_educational,N,N,0.0418799999999999,gpt-4
+A_87,Social Impact,condition_forbid,N,N,0.0399599999999999,gpt-4
+A_87,Social Impact,condition_channel_snailmail,N,The text does not provide information on the delivery mechanism of the condition named Social Impact.,0.03174,gpt-4
+A_87,Social Impact,condition_channel_email,Y,Y,0.0321899999999999,gpt-4
+A_87,Social Impact,condition_channel_paperlive,N,N,0.0377099999999999,gpt-4
+A_87,Social Impact,condition_channel_inperson,N,N,0.0419999999999999,gpt-4
+A_87,Social Impact,condition_channel_mobileapp,N,N,0.04581,gpt-4
+A_87,Social Impact,condition_channel_online,Y,Y,0.0428399999999999,gpt-4
+A_87,Social Impact,condition_channel_sms,N,N,0.04401,gpt-4
+A_87,Social Impact,condition_channel_phone,N,N,0.03222,gpt-4
+A_87,Social Impact,condition_channel_nothing,N,N,0.0491999999999999,gpt-4
+A_30,control,condition_financial,Y,N,0.0563399999999999,gpt-4
+A_30,control,condition_educational,N,N,0.04365,gpt-4
+A_30,control,condition_forbid,N,N,0.0399299999999999,gpt-4
+A_30,control,condition_channel_snailmail,Y,Y,0.0307499999999999,gpt-4
+A_30,control,condition_channel_email,N,Y,0.02415,gpt-4
+A_30,control,condition_channel_paperlive,N,N,0.03768,gpt-4
+A_30,control,condition_channel_inperson,N,N,0.04824,gpt-4
+A_30,control,condition_channel_mobileapp,N,N,0.04899,gpt-4
+A_30,control,condition_channel_online,N,Y,0.03483,gpt-4
+A_30,control,condition_channel_sms,N,N,0.0401099999999999,gpt-4
+A_30,control,condition_channel_phone,N,N,0.02412,gpt-4
+A_30,control,condition_channel_nothing,N,N,0.04917,gpt-4
+A_30,treatment,condition_financial,Y,Y,0.0563399999999999,gpt-4
+A_30,treatment,condition_educational,N,Y,0.04365,gpt-4
+A_30,treatment,condition_forbid,N,N,0.0399299999999999,gpt-4
+A_30,treatment,condition_channel_snailmail,Y,Y,0.0307499999999999,gpt-4
+A_30,treatment,condition_channel_email,Y,Y,0.02415,gpt-4
+A_30,treatment,condition_channel_paperlive,N,N,0.03768,gpt-4
+A_30,treatment,condition_channel_inperson,N,N,0.04824,gpt-4
+A_30,treatment,condition_channel_mobileapp,N,N,0.04899,gpt-4
+A_30,treatment,condition_channel_online,N,Y,0.03483,gpt-4
+A_30,treatment,condition_channel_sms,N,N,0.0401099999999999,gpt-4
+A_30,treatment,condition_channel_phone,N,N,0.02412,gpt-4
+A_30,treatment,condition_channel_nothing,N,N,0.04917,gpt-4
+A_55,BAU letter,condition_financial,N,N,0.07150000000000001,gpt-4-1106-preview
+A_55,BAU letter,condition_educational,N,N,0.0714,gpt-4-1106-preview
+A_55,BAU letter,condition_forbid,N,N,0.048060000000000005,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_snailmail,Y,Y,0.08804000000000001,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_email,N,N,0.08788,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_paperlive,N,N,0.07001,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_inperson,N,N,0.0943,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_mobileapp,N,N,0.058230000000000004,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_online,N,N,0.06015,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_sms,N,N,0.09848000000000001,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_phone,N,N,0.059090000000000004,gpt-4-1106-preview
+A_55,BAU letter,condition_channel_nothing,N,N,0.07073,gpt-4-1106-preview
+A_55,No letter,condition_financial,N,N,0.07149,gpt-4-1106-preview
+A_55,No letter,condition_educational,N,N,0.07139000000000001,gpt-4-1106-preview
+A_55,No letter,condition_forbid,N,N,0.04805,gpt-4-1106-preview
+A_55,No letter,condition_channel_snailmail,N,N,0.08803000000000001,gpt-4-1106-preview
+A_55,No letter,condition_channel_email,N,N,0.08787000000000002,gpt-4-1106-preview
+A_55,No letter,condition_channel_paperlive,N,I don't know.,0.07012,gpt-4-1106-preview
+A_55,No letter,condition_channel_inperson,N,N,0.0584,gpt-4-1106-preview
+A_55,No letter,condition_channel_mobileapp,N,"No, the condition is not delivered through a mobile app.",0.05855,gpt-4-1106-preview
+A_55,No letter,condition_channel_online,N,N,0.060140000000000006,gpt-4-1106-preview
+A_55,No letter,condition_channel_sms,N,N,0.09847,gpt-4-1106-preview
+A_55,No letter,condition_channel_phone,N,N,0.05908000000000001,gpt-4-1106-preview
+A_55,No letter,condition_channel_nothing,Y,Y,0.07072,gpt-4-1106-preview
+A_55,Welcome letter,condition_financial,N,N,0.07149,gpt-4-1106-preview
+A_55,Welcome letter,condition_educational,N,N,0.07139000000000001,gpt-4-1106-preview
+A_55,Welcome letter,condition_forbid,N,N,0.04805,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_snailmail,Y,Y,0.08803000000000001,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_email,N,N,0.08787000000000002,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_paperlive,N,N,0.07,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_inperson,N,N,0.09429000000000001,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_mobileapp,N,N,0.05822,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_online,N,N,0.060140000000000006,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_sms,N,N,0.09847,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_phone,N,N,0.05908000000000001,gpt-4-1106-preview
+A_55,Welcome letter,condition_channel_nothing,N,N,0.07072,gpt-4-1106-preview
+A_62,control,condition_financial,N,N,0.053680000000000005,gpt-4-1106-preview
+A_62,control,condition_educational,N,N,0.04553,gpt-4-1106-preview
+A_62,control,condition_forbid,N,N,0.047420000000000004,gpt-4-1106-preview
+A_62,control,condition_channel_snailmail,N,Y,0.049120000000000004,gpt-4-1106-preview
+A_62,control,condition_channel_email,Y,Y,0.04196,gpt-4-1106-preview
+A_62,control,condition_channel_paperlive,N,N,0.04532,gpt-4-1106-preview
+A_62,control,condition_channel_inperson,N,N,0.05656,gpt-4-1106-preview
+A_62,control,condition_channel_mobileapp,N,N,0.01777,gpt-4-1106-preview
+A_62,control,condition_channel_online,N,N,0.04605000000000001,gpt-4-1106-preview
+A_62,control,condition_channel_sms,N,N,0.057640000000000004,gpt-4-1106-preview
+A_62,control,condition_channel_phone,N,N,0.04003,gpt-4-1106-preview
+A_62,control,condition_channel_nothing,N,N,0.04240000000000001,gpt-4-1106-preview
+A_62,social norm,condition_financial,N,N,0.05369,gpt-4-1106-preview
+A_62,social norm,condition_educational,N,N,0.045540000000000004,gpt-4-1106-preview
+A_62,social norm,condition_forbid,N,N,0.04743000000000001,gpt-4-1106-preview
+A_62,social norm,condition_channel_snailmail,N,Y,0.04913000000000001,gpt-4-1106-preview
+A_62,social norm,condition_channel_email,Y,Y,0.04197,gpt-4-1106-preview
+A_62,social norm,condition_channel_paperlive,N,N,0.04533,gpt-4-1106-preview
+A_62,social norm,condition_channel_inperson,N,N,0.05657,gpt-4-1106-preview
+A_62,social norm,condition_channel_mobileapp,N,N,0.017779999999999997,gpt-4-1106-preview
+A_62,social norm,condition_channel_online,N,N,0.046060000000000004,gpt-4-1106-preview
+A_62,social norm,condition_channel_sms,N,N,0.05765,gpt-4-1106-preview
+A_62,social norm,condition_channel_phone,N,N,0.040040000000000006,gpt-4-1106-preview
+A_62,social norm,condition_channel_nothing,N,N,0.04241000000000001,gpt-4-1106-preview
+A_87,Arguments,condition_financial,N,N,0.07054,gpt-4-1106-preview
+A_87,Arguments,condition_educational,N,N,0.03597,gpt-4-1106-preview
+A_87,Arguments,condition_forbid,N,N,0.043550000000000005,gpt-4-1106-preview
+A_87,Arguments,condition_channel_snailmail,N,Y,0.08802,gpt-4-1106-preview
+A_87,Arguments,condition_channel_email,Y,Y,0.026510000000000002,gpt-4-1106-preview
+A_87,Arguments,condition_channel_paperlive,N,N,0.028069999999999998,gpt-4-1106-preview
+A_87,Arguments,condition_channel_inperson,N,N,0.00973,gpt-4-1106-preview
+A_87,Arguments,condition_channel_mobileapp,N,N,0.04241000000000001,gpt-4-1106-preview
+A_87,Arguments,condition_channel_online,Y,Y,0.050190000000000005,gpt-4-1106-preview
+A_87,Arguments,condition_channel_sms,N,N,0.032400000000000005,gpt-4-1106-preview
+A_87,Arguments,condition_channel_phone,N,N,0.034230000000000003,gpt-4-1106-preview
+A_87,Arguments,condition_channel_nothing,N,N,0.057260000000000005,gpt-4-1106-preview
+A_87,Control (no reminders),condition_financial,N,N,0.07057000000000001,gpt-4-1106-preview
+A_87,Control (no reminders),condition_educational,N,N,0.036000000000000004,gpt-4-1106-preview
+A_87,Control (no reminders),condition_forbid,N,N,0.04358000000000001,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_snailmail,N,N,0.08805,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_email,N,N,0.026539999999999998,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_paperlive,N,N,0.0281,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_inperson,N,N,0.009760000000000001,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_mobileapp,N,No,0.04244,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_online,Y,Y,0.05022000000000001,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_sms,N,N,0.03243000000000001,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_phone,N,N,0.034260000000000006,gpt-4-1106-preview
+A_87,Control (no reminders),condition_channel_nothing,N,N,0.05729,gpt-4-1106-preview
+A_87,Control (reminders),condition_financial,N,N,0.07057000000000001,gpt-4-1106-preview
+A_87,Control (reminders),condition_educational,N,N,0.036000000000000004,gpt-4-1106-preview
+A_87,Control (reminders),condition_forbid,N,N,0.04358000000000001,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_snailmail,N,N,0.08805,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_email,Y,Y,0.026539999999999998,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_paperlive,N,N,0.0281,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_inperson,N,N,0.009760000000000001,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_mobileapp,N,N,0.04244,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_online,Y,Y,0.05022000000000001,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_sms,N,N,0.03243000000000001,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_phone,N,N,0.034260000000000006,gpt-4-1106-preview
+A_87,Control (reminders),condition_channel_nothing,N,N,0.05729,gpt-4-1106-preview
+A_87,Incentives,condition_financial,Y,Y,0.07056,gpt-4-1106-preview
+A_87,Incentives,condition_educational,N,N,0.03599,gpt-4-1106-preview
+A_87,Incentives,condition_forbid,N,N,0.043570000000000005,gpt-4-1106-preview
+A_87,Incentives,condition_channel_snailmail,N,N,0.08804000000000001,gpt-4-1106-preview
+A_87,Incentives,condition_channel_email,Y,Y,0.026529999999999998,gpt-4-1106-preview
+A_87,Incentives,condition_channel_paperlive,N,N,0.02809,gpt-4-1106-preview
+A_87,Incentives,condition_channel_inperson,N,N,0.00975,gpt-4-1106-preview
+A_87,Incentives,condition_channel_mobileapp,N,N,0.04243,gpt-4-1106-preview
+A_87,Incentives,condition_channel_online,Y,Y,0.050210000000000005,gpt-4-1106-preview
+A_87,Incentives,condition_channel_sms,N,N,0.032420000000000004,gpt-4-1106-preview
+A_87,Incentives,condition_channel_phone,N,N,0.03425,gpt-4-1106-preview
+A_87,Incentives,condition_channel_nothing,N,N,0.05728,gpt-4-1106-preview
+A_87,Information,condition_financial,N,N,0.07054,gpt-4-1106-preview
+A_87,Information,condition_educational,N,N,0.03597,gpt-4-1106-preview
+A_87,Information,condition_forbid,N,N,0.043550000000000005,gpt-4-1106-preview
+A_87,Information,condition_channel_snailmail,N,Y,0.08802,gpt-4-1106-preview
+A_87,Information,condition_channel_email,Y,Y,0.026510000000000002,gpt-4-1106-preview
+A_87,Information,condition_channel_paperlive,N,N,0.028069999999999998,gpt-4-1106-preview
+A_87,Information,condition_channel_inperson,N,N,0.00973,gpt-4-1106-preview
+A_87,Information,condition_channel_mobileapp,N,N,0.04241000000000001,gpt-4-1106-preview
+A_87,Information,condition_channel_online,Y,Y,0.050190000000000005,gpt-4-1106-preview
+A_87,Information,condition_channel_sms,N,N,0.032400000000000005,gpt-4-1106-preview
+A_87,Information,condition_channel_phone,N,N,0.034230000000000003,gpt-4-1106-preview
+A_87,Information,condition_channel_nothing,N,N,0.057260000000000005,gpt-4-1106-preview
+A_87,Social Impact,condition_financial,N,N,0.07055,gpt-4-1106-preview
+A_87,Social Impact,condition_educational,N,N,0.035980000000000005,gpt-4-1106-preview
+A_87,Social Impact,condition_forbid,N,N,0.04356,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_snailmail,N,N,0.08803000000000001,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_email,Y,Y,0.02652,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_paperlive,N,N,0.02808,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_inperson,N,N,0.00974,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_mobileapp,N,N,0.04242,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_online,Y,Y,0.05020000000000001,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_sms,N,N,0.03241,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_phone,N,N,0.03424,gpt-4-1106-preview
+A_87,Social Impact,condition_channel_nothing,N,N,0.05727000000000001,gpt-4-1106-preview
+A_30,control,condition_financial,Y,N,0.04641,gpt-4-1106-preview
+A_30,control,condition_educational,N,N,0.12613,gpt-4-1106-preview
+A_30,control,condition_forbid,N,N,0.043550000000000005,gpt-4-1106-preview
+A_30,control,condition_channel_snailmail,Y,N,0.07793,gpt-4-1106-preview
+A_30,control,condition_channel_email,N,Y,0.04888,gpt-4-1106-preview
+A_30,control,condition_channel_paperlive,N,N,0.00919,gpt-4-1106-preview
+A_30,control,condition_channel_inperson,N,N,0.12882,gpt-4-1106-preview
+A_30,control,condition_channel_mobileapp,N,N,0.048010000000000004,gpt-4-1106-preview
+A_30,control,condition_channel_online,N,N,0.0487,gpt-4-1106-preview
+A_30,control,condition_channel_sms,N,N,0.032400000000000005,gpt-4-1106-preview
+A_30,control,condition_channel_phone,N,N,0.034230000000000003,gpt-4-1106-preview
+A_30,control,condition_channel_nothing,N,N,0.05251000000000001,gpt-4-1106-preview
+A_30,treatment,condition_financial,Y,Y,0.04641,gpt-4-1106-preview
+A_30,treatment,condition_educational,N,N,0.12613,gpt-4-1106-preview
+A_30,treatment,condition_forbid,N,N,0.043550000000000005,gpt-4-1106-preview
+A_30,treatment,condition_channel_snailmail,Y,N,0.07793,gpt-4-1106-preview
+A_30,treatment,condition_channel_email,Y,Y,0.04888,gpt-4-1106-preview
+A_30,treatment,condition_channel_paperlive,N,N,0.00919,gpt-4-1106-preview
+A_30,treatment,condition_channel_inperson,N,N,0.12882,gpt-4-1106-preview
+A_30,treatment,condition_channel_mobileapp,N,N,0.048010000000000004,gpt-4-1106-preview
+A_30,treatment,condition_channel_online,N,Y,0.0487,gpt-4-1106-preview
+A_30,treatment,condition_channel_sms,N,N,0.032400000000000005,gpt-4-1106-preview
+A_30,treatment,condition_channel_phone,N,N,0.034230000000000003,gpt-4-1106-preview
+A_30,treatment,condition_channel_nothing,N,N,0.05251000000000001,gpt-4-1106-preview
