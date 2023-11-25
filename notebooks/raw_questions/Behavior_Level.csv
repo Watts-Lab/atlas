@@ -1,0 +1,74 @@
+Step,Prefilled,,,,Describe the behavior,,,,,,Behavior - measurement details,,,,,,Behavior - broad attributes,,Behavior - experiment specific attributes,,,,,,,Notes
+Variable name,index_paper,index_experiment,index_behavior,index_level,behavior_description,macro_behavior,mezzo_behavior,behavior_priority,behavior_focal,behavior_focal_estimate,behavior_metric,behavior_selfreport,behavior_outcome,behavior_repeated_measures,behavior_measure_period_days,direction,frequency,timing_reqt,prosociality,delay,financial_reqt,travel_reqt,planning_reqt,location_reqt,authority,behavior_notes
+Explanation,ID of paper,ID of experiment,ID of behavioral outcome,"ID of level of behavioral outcome 
+
+Always put 1 if binary or continuous
+
+1, 2, 3, etc. if categorical with 3 or more levels - e.g., picking the low option, the medium option, or the high option = 1,2,3 levels, each of which is written out as a separate row","This is the most exact, specific behavioral description.
+
+Describe the behavioral outcome as specifically as possible to what is exactly being measured. (Include metrics -- e.g., Liters per minute -- or duration -- e.g., by August -- where relevant)
+
+Look at the background tab for tips on which behavior can correspond to which number; feel free to improve the wording here.","This is the highest level behavioral description - used for labeling figures where we don't have much space.
+
+Summarize the behavioral outcome in three words, in gerund form. When someone reads these, they should get the gist of the behavior and the target direction. Only capitalize the first word.
+
+E.g., if the measure was ""using water (liters/30m)"" in a school setting and the authors want to decrease it, then the macro_behavior might be ""Conserving water"".","This is somewhere in between behavior_description and macro_behavior.
+
+Summarize the behavioral outcome in a few more words than to the left, still in gerund form. This should better reflect the actual measure than ""macro_behavior"" does. That also means that when someone reads these, they should get the gist of the behavior and a little bit more detail. Only capitalize the first word.
+
+E.g., if the measure was ""using water (liters/30m)"" in a school setting -- even if the authors want to decrease it -- the mezzo_behavior might be ""Using water at school"".","Is the behavioral outcome labeled as primary, secondary, or given no label by the authors?
+
+If there is no label, but there is only one or a handful of behaviors, typically these are considered primary. 
+
+(By definition of our inclusion criteria, it should not be labeled exploratory.)","Select the ONE behavior that is focal for the authors. It should be a primary outcome.
+
+if you're not sure, read the abstract and discussion of the paper. Which variable to the authors highlight most? 
+
+If that is still unclear, which variable is closest to the real world action that the authors care about?","If you had to estimate which behavior was focal (i.e., it wasn't clear from the authors) indicate ""estimate"" below. 
+
+If the authors were clear as to which behavior was focal, then indicate ""exact"" below.","Is the each behavioral variable categorical/binary or continuous/discrete?
+
+Categorical would be measured as a percentage (e.g., % of people who did X) while continuous would be something like a count or a numeric value (e.g., dollars spent or time spent).","Is the behavior captured by self-reported data by the participants? 
+
+(This is in contrast to data that is more objectively measured by their choices, decisions, or behaviors -- as captured by the research process.)","Is the measure a BEHAVIOR or an OUTCOME?
+
+If fully in your control, even if long term = behavior (e.g., college enrollment), If just a unit translated from one to another, and you said the first was a behavior (E.g., $ savings v % savings that you put into your account) then it is a behavior. 
+
+If it's a performance on test, or a GPA, or solvings matrices etc. -- how you do = outcome
+
+BMI = outcome, but eating a vegetarian meal  = behavior
+
+water usage, electricity total consumption over a period by 1+ individuals = outcome","Within the context of this experiment:
+
+Does the measure include repeated behaviors by the same person, or is it one-time? 
+
+An outcome that requires multiple actions leading up to it is yes. If unsure, and it potentially could, say repeated.","If the behavior is repeated during the intervention measurement period, or is a measure over range of time (eg total deposited over x days, or did they do X behavior within X days), how long is the time period in days? 
+
+(if multiple, based on person, use max; if not repeated, not over a range of time for an individual, put 0)","Look at the hypothesis and general intent of the authors in this experiment.
+
+In which direction does the author hope this behavior to go, in the treatment group(s)? Up or down?","Think broadly about the context of the experiment, but beyond the time period measured by the experiment.
+
+Does doing the behavior well mean doing it regularly? And if yes, at what cadence?
+
+E.g., if an experiment is about paying monthly taxes and meaures the behavior for only one month, in the experiment it is only a one-time thing. But in genera, this should be a monthly behavior. So you would pick frequency = monthly.","Think broadly about the context of the experiment, but beyond the time period measured by the experiment. 
+
+Meaning, ignore the constraints of the experiment itself, where researchers needed to measure the behavior by a given date. (Otherwise the answer will be ""yes"" to everything.)
+
+Does the behavior have to be completed during a specific time frame or before a specific date?
+
+For example: Consider an experiment that nudges healthier eating or workout behaviors. There is no deadline (besides measuring in the experiment) to complete them. In contrast, filing your taxes on time has a naturally-occuring deadline (besides measuring in the experiment).","If the behavior goes in the direction the author wants (up or down), it benefits other individuals, organizations, or society in some way.","One of the main ways in which the individual may benefit from doing the behavior is delayed far into the future. 
+
+Here, do NOT consider ways in which the individual benefits that are the same as the ways in which society benefits. If you answered ""Yes"" to prosociality, the benefit to society you had in mind should be different than the benefit to the individual that you are considering here.
+
+This feature is trying to capture whether -- from a purely selfish angle only, not as part of a community -- a main benefit of doing the behavior is something the individual will have to wait to experience. It should be something the individual wants, but has to wait some time for. Doing the behavior then, is something that the individual is doing, at least in part, for their future self.
+
+For example: One of the main benefits of saving for retirement is very delayed into the future, for the individual. The same goes for dieting. In contrast, recycling behaviors that help the environment has a long-term benefit -- but it is the same for the individual and society.","Within the context of the experiment, doing the behavior successfully requires paying some financial cost.","Within the context of the experiment, doing the behavior successfully requires traveling from one location to another.","Within the context of the experiment, doing the behavior successfully requires advance planning or preparation.","Within the context of the experiment, the behavior must be completed at a specific physical location.","Within the context of the experiment, doing the behavior is required by a rule, law, regulation, or authority.",Any open questions or notes about the behavior? Document those here.
+Coding scheme,Number,Number,Number,Number,Free text,Free text,Free text,primary/secondary/none,focal/not,"Exact, Estimate",categorical/continuous,Y/N,"Behavior, Outcome","Repeated, One-time, Unclear",Number,"Up, Down, Unclear","No; Yes, annually; Yes, monthly; Yes, weekly; Yes, daily; Yes, occasionally (undefined)","Yes, No, Unclear","Yes, No, Unclear","Yes, No, Unclear","Yes, No, Unclear","Yes, No, Unclear","Yes, No, Unclear","Yes, No, Unclear","Yes, No, Unclear",Free text
+,,,1,Anushka Bhansali,EASY,MEDIUM/DIFFICULT,MEDIUM,EASY,EASY/MEDIUM,EASY,EASY,EASY,MEDIUM,EASY,MEDIUM,EASY,MEDIUM,EASY,EASY,MEDIUM,EASY,EASY,EASY,EASY,EASY,Consensus 
+,,,,Maatangi,easy,medium - find it tricky to word it right sometimes,medium,easy,"medium - if there is more than one, how to choose",-,medium - sometimes the description is tricky to understand,easy,medium,easy,medium,easy,medium - not always mentioned explicitly,easy,easy,medium,easy,easy,medium,Easy,Easy,
+,,,,Ana P,,,,,,,,,,,,,Medium,Easy-Medium ,Medium ,Easy,,,Medium,,"Depends on paper, but usually easy ",
+,,,,Anna L,medium,medium,medium,easy,depends on the paper - not always explicitly stated,depends on the paper - not always explicitly stated,easy,easy,tricky but got easier as i coded 300+ behaviors and recognized one vs. the other ,Easy,Difficult - often only provide month & year,easy,"easy to recognize if no vs. yes, sometimes hard to distinguish the cadence of a 'frequent' behavior ",easy,Medium ,medium,medium,easy,Medium,easy,easy,
+,,,,Aravika,,Difficult,Difficult,Eay,Depends on the paper,Easy,Easy,Easy,Easy,Difficult,Easy,Easy,Difficult,Easy,Easy,Difficult,Easy,Easy,Easy,Easy,Easy,
+,,,,Mia,Easy,Medium,Medium,Easy,Easy,Easy,Easy,Easy,Medium,Easy,Medium,easy,Medium,Easy,Easy,Medium,Easy,Easy,Easy,Easy,Easy,
+,,,,Yang,easy,difficult,medium,depends on the paper,easy,easy,easy,easy,medium,easy,medium,easy,medium -- easy if mentioned in paper,easy,easy,difficult,easy,easy,easy,easy,easy,
+,,,,Ricky,Easy,Difficult,Difficult,Easy,Could be difficult,Easy,Easy,Easy,Could be medium,Easy,Medium,easy,Easy,Easy,Easy,Medium,Easy,Easy,Easy,Easy,Easy,
