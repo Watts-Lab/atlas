@@ -1,11 +1,11 @@
 import { useState } from "react";
-import "./App.css";
+import Dashboard from "./components/Builder";
 
 function App() {
   return (
     <>
       <div>
-        <h1>Hello World!</h1>
+        <Dashboard />
       </div>
     </>
   );
