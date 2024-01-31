@@ -1,43 +1,86 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
   useNodesState,
   useEdgesState,
   Controls,
+  applyEdgeChanges,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import "./index.css";
 
 import Sidebar from "./Sidebar";
 
-import "./index.css";
+// custom nodes
+import {
+  PaperInputNode,
+  MultipleOutputNode,
+  SingleOutputNode,
+} from "./Nodes/index";
 
 const initialNodes = [
   {
-    id: "1",
-    type: "input",
-    data: { label: "input node" },
-    position: { x: 250, y: 5 },
+    id: "node-1",
+    type: "paperInput",
+    position: { x: 0, y: 0 },
+    data: { value: 123, label: "paper node" },
+  },
+  {
+    id: "node-2",
+    type: "multipleOutput",
+    position: { x: 100, y: 0 },
+    data: { value: 123, label: "paper node" },
+  },
+  {
+    id: "node-3",
+    type: "singleoutput",
+    position: { x: 300, y: 0 },
+    data: { value: 123, label: "paper node" },
   },
 ];
+
+const nodeTypes = {
+  paperInput: PaperInputNode,
+  multipleOutput: MultipleOutputNode,
+  singleoutput: SingleOutputNode,
+};
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
-const DnDFlow = () => {
+const Flow = () => {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedNode, setSelectedNode] = useState({
+    id: null,
+    type: null,
+    data: null,
+  });
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     []
   );
 
+  useEffect(() => {
+    console.log(edges);
+  }, [edges]);
+
   const onSelectionChange = useCallback((elements) => {
-    setSelectedNodeId(elements.nodes[0]?.id || null);
+    setSelectedNode(
+      {
+        id: elements.nodes[0]?.id,
+        type: elements.nodes[0]?.type,
+        data: elements.nodes[0]?.data,
+      } || {
+        id: null,
+        type: null,
+        data: null,
+      }
+    );
   }, []);
 
   const onDragOver = useCallback((event) => {
@@ -49,7 +92,9 @@ const DnDFlow = () => {
     (event) => {
       event.preventDefault();
 
-      const type = event.dataTransfer.getData("application/reactflow");
+      const type = event.dataTransfer.getData(
+        "application/reactflow"
+      ) as typeof nodeTypes;
 
       if (typeof type === "undefined" || !type) {
         return;
@@ -62,7 +107,6 @@ const DnDFlow = () => {
         id: getId(),
         type,
         position,
-        data: { label: `${type} node` },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -84,6 +128,7 @@ const DnDFlow = () => {
             onInit={setReactFlowInstance}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            nodeTypes={nodeTypes}
             fitView
           >
             <Controls />
@@ -92,11 +137,11 @@ const DnDFlow = () => {
         <Sidebar
           nodes={nodes}
           setNodes={setNodes}
-          selectedNode={selectedNodeId}
+          selectedNode={selectedNode}
         />
       </ReactFlowProvider>
     </div>
   );
 };
 
-export default DnDFlow;
+export default Flow;

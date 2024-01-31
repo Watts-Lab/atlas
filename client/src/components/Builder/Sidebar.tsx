@@ -1,5 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useStore } from "reactflow";
+import PaperInputNode from "./Nodes/PaperInput/PaperInputNode";
 
 const transformSelector = (state) => state.transform;
 
@@ -10,22 +11,14 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
-  const transform = useStore(transformSelector);
-
-  const selectAll = useCallback(() => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        node.selected = true;
-        return node;
-      })
-    );
-  }, [setNodes]);
-
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
-    console.log("dragstart on div: ", event);
   };
+
+  useEffect(() => {
+    console.log(selectedNode);
+  }, [selectedNode]);
 
   return (
     <aside className="lg:w-2/6 border-l border-gray-300 p-4 bg-white">
@@ -38,25 +31,25 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
 
       <div
         className="dndnode"
-        onDragStart={(event) => onDragStart(event, "Input")}
+        onDragStart={(event) => onDragStart(event, "paperInput")}
         draggable
       >
-        Passthrough Node
+        Paper Input Node
       </div>
       <div
         className="dndnode"
-        onDragStart={(event) => onDragStart(event, "Junction")}
+        onDragStart={(event) => onDragStart(event, "multipleOutput")}
         draggable
       >
-        Junction Node
+        Multiple Output Feature
       </div>
 
       <div
         className="dndnode "
-        onDragStart={(event) => onDragStart(event, "Answer")}
+        onDragStart={(event) => onDragStart(event, "singleoutput")}
         draggable
       >
-        Output Node
+        Single Output Feature
       </div>
       {/*       
       <div className="transform">
@@ -76,7 +69,9 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
         <>
           <div className="selected-node">
             <div className="title">Selected Node</div>
-            <div>ID: {selectedNode}</div>
+            <div>
+              ID: {selectedNode.id} - Type: {selectedNode.type}
+            </div>
           </div>
 
           <form className="space-y-4">
@@ -86,10 +81,12 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
                   How is this feature measured?
                 </span>
               </label>
-              <select id="measurement" className="select select-bordered">
-                <option disabled selected>
-                  Choose an option
-                </option>
+              <select
+                id="measurement"
+                className="select select-bordered"
+                defaultValue={"Choose an option"}
+              >
+                <option disabled>Choose an option</option>
                 <option>GPT-4</option>
                 <option>Amazon MTurk</option>
                 <option>Gemini-2</option>
@@ -113,10 +110,12 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
               <label className="label" htmlFor="featureQuality">
                 <span className="label-text">How good is the feature?</span>
               </label>
-              <select id="featureQuality" className="select select-bordered">
-                <option disabled selected>
-                  Choose an option
-                </option>
+              <select
+                id="featureQuality"
+                className="select select-bordered"
+                defaultValue={"Choose an option"}
+              >
+                <option disabled>Choose an option</option>
                 <option>Quality Metric 1</option>
                 <option>Quality Metric 2</option>
                 <option>Quality Metric 3</option>
