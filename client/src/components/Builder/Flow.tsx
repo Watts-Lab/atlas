@@ -65,10 +65,7 @@ const Flow = () => {
     []
   );
 
-  useEffect(() => {
-    console.log(edges);
-  }, [edges]);
-
+  
   const onSelectionChange = useCallback((elements) => {
     setSelectedNode(
       {

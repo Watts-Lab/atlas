@@ -1,9 +1,3 @@
-import React, { useCallback, useEffect } from "react";
-import { useStore } from "reactflow";
-import PaperInputNode from "./Nodes/PaperInput/PaperInputNode";
-
-const transformSelector = (state) => state.transform;
-
 type SidebarProps = {
   nodes: any;
   setNodes: any;
@@ -15,10 +9,6 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
-
-  useEffect(() => {
-    console.log(selectedNode);
-  }, [selectedNode]);
 
   return (
     <aside className="lg:w-2/6 border-l border-gray-300 p-4 bg-white">
@@ -51,18 +41,6 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
       >
         Single Output Feature
       </div>
-      {/*       
-      <div className="transform">
-        [{transform[0].toFixed(2)}, {transform[1].toFixed(2)},{" "}
-        {transform[2].toFixed(2)}]
-      </div>
-      <div className="title">Nodes</div>
-      {nodes.map((node) => (
-        <div key={node.id}>
-          Node {node.id} - x: {node.position.x.toFixed(2)}, y:{" "}
-          {node.position.y.toFixed(2)}
-        </div>
-      ))} */}
 
       {/* Display the selected node ID */}
       {selectedNode && (
