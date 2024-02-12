@@ -1,0 +1,11 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "server for atlas project",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "author": "A.Nakhaei",
+  "license": "ISC"
+}

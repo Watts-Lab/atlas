@@ -1,11 +1,14 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
   useNodesState,
   useEdgesState,
   Controls,
-  applyEdgeChanges,
+  Connection,
+  Edge,
+  useStore,
+  Panel,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./index.css";
@@ -17,33 +20,35 @@ import {
   PaperInputNode,
   MultipleOutputNode,
   SingleOutputNode,
+  MTurkOutputNode,
 } from "./Nodes/index";
 
 const initialNodes = [
   {
     id: "node-1",
-    type: "paperInput",
+    type: "PaperInputNode",
     position: { x: 0, y: 0 },
-    data: { value: 123, label: "paper node" },
+    data: { value: 123, label: "paper node", variable: "context" },
   },
   {
     id: "node-2",
-    type: "multipleOutput",
-    position: { x: 100, y: 0 },
-    data: { value: 123, label: "paper node" },
+    type: "MultipleOutputNode",
+    position: { x: 0, y: 200 },
+    data: { value: 123, label: "paper node", variable: "condition_name" },
   },
   {
     id: "node-3",
-    type: "singleoutput",
-    position: { x: 300, y: 0 },
-    data: { value: 123, label: "paper node" },
+    type: "SingleOutputNode",
+    position: { x: 300, y: 200 },
+    data: { value: 123, label: "paper node", variable: "condition_num" },
   },
 ];
 
 const nodeTypes = {
-  paperInput: PaperInputNode,
-  multipleOutput: MultipleOutputNode,
-  singleoutput: SingleOutputNode,
+  PaperInputNode,
+  SingleOutputNode,
+  MultipleOutputNode,
+  MTurkOutputNode,
 };
 
 let id = 0;
@@ -60,12 +65,29 @@ const Flow = () => {
     data: null,
   });
 
+  const onInit = useCallback((rfInstance) => {
+    setReactFlowInstance(rfInstance);
+  }, []);
+
+  const zoomLevel = useStore((state) => state.transform[2]);
+
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    []
+    (params: Edge | Connection) => {
+      const { source } = params;
+      const sourceNode = nodes.find((node) => node.id === source);
+      const label =
+        sourceNode?.data?.variable || sourceNode?.data?.variable || "";
+
+      const edgeWithLabel = {
+        ...params,
+        label,
+      };
+
+      setEdges((eds) => addEdge(edgeWithLabel, eds));
+    },
+    [nodes]
   );
 
-  
   const onSelectionChange = useCallback((elements) => {
     setSelectedNode(
       {
@@ -79,6 +101,10 @@ const Flow = () => {
       }
     );
   }, []);
+
+  useEffect(() => {
+    console.log("onConnect", edges);
+  }, [edges]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -96,10 +122,13 @@ const Flow = () => {
       if (typeof type === "undefined" || !type) {
         return;
       }
+
+      // adding some constant (75px) so when you release the node it's centers on your cursor
       const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
+        x: event.clientX - 75,
+        y: event.clientY - 75,
       });
+
       const newNode = {
         id: getId(),
         type,
@@ -122,7 +151,7 @@ const Flow = () => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onSelectionChange={onSelectionChange}
-            onInit={setReactFlowInstance}
+            onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
@@ -131,6 +160,7 @@ const Flow = () => {
             <Controls />
           </ReactFlow>
         </div>
+
         <Sidebar
           nodes={nodes}
           setNodes={setNodes}

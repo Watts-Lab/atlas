@@ -1,13 +1,10 @@
-import { useCallback } from "react";
 import { Handle, Position } from "reactflow";
 
-const handleStyle = { left: 10 };
+type PaperInputNodeProps = {
+  isConnectable: boolean | undefined;
+};
 
-function PaperInputNode({ data, isConnectable }) {
-  const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
-
+function PaperInputNode({ isConnectable }: PaperInputNodeProps) {
   return (
     <div className="paper-input-node">
       <div className="border-dashed border-2 border-gray-500 rotate-45 w-24 h-24 flex items-center justify-center">
@@ -32,4 +29,6 @@ function PaperInputNode({ data, isConnectable }) {
   );
 }
 
+export const displayGroup = "Providers";
+export const displayName = "Paper input node";
 export default PaperInputNode;
