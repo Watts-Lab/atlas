@@ -4,7 +4,7 @@ type MultipleOutputNodeProps = {
   isConnectable: boolean | undefined;
 };
 
-function MultipleOutputNode({ isConnectable }: MultipleOutputNodeProps) {
+function MTurkOutputNode({ isConnectable }: MultipleOutputNodeProps) {
   return (
     <div className="paper-input-node">
       <Handle
@@ -19,12 +19,11 @@ function MultipleOutputNode({ isConnectable }: MultipleOutputNodeProps) {
         }}
       />
 
-      <div className="border-2 border-gray-500 w-24 h-24 flex items-center justify-center bg-cyan-400">
-        <h1 className="text-center text-base font-bold">Multi Output</h1>
+      <div className="border-2 border-gray-500 w-24 h-24 flex rounded items-center justify-center bg-orange-300">
+        <h1 className="text-center text-base font-bold">MTurk Output</h1>
       </div>
 
       <Handle
-        className="!w-4 !rounded-none"
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
@@ -38,7 +37,7 @@ function MultipleOutputNode({ isConnectable }: MultipleOutputNodeProps) {
   );
 }
 
-export const displayGroup = "LLMs";
-export const displayName = "Multiple output feature";
+export const displayGroup = "Humans";
+export const displayName = "MTurk output node";
 
-export default MultipleOutputNode;
+export default MTurkOutputNode;

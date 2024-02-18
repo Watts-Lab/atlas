@@ -1,11 +1,9 @@
-import { useCallback } from "react";
 import { Handle, Position } from "reactflow";
 
-function SingleOutputNode({ data, isConnectable }) {
-  const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
-
+type SingleOutputNodeProps = {
+  isConnectable: boolean | undefined;
+};
+function SingleOutputNode({ isConnectable }: SingleOutputNodeProps) {
   return (
     <div className="paper-input-node">
       <Handle
@@ -38,5 +36,8 @@ function SingleOutputNode({ data, isConnectable }) {
     </div>
   );
 }
+
+export const displayGroup = "LLMs";
+export const displayName = "Single output feature";
 
 export default SingleOutputNode;

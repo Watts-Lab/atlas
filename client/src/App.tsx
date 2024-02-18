@@ -1,12 +1,17 @@
-import { useState } from "react";
 import Dashboard from "./components/Builder";
+import WorkflowProvider from "./components/WorkflowProvider";
+import { ReactFlowProvider } from "reactflow";
 
 function App() {
   return (
     <>
-      <div>
-        <Dashboard />
-      </div>
+      <ReactFlowProvider>
+        <WorkflowProvider>
+          <div>
+            <Dashboard />
+          </div>
+        </WorkflowProvider>
+      </ReactFlowProvider>
     </>
   );
 }

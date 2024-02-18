@@ -1,11 +1,14 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
   useNodesState,
   useEdgesState,
-  Controls,
-  applyEdgeChanges,
+  Connection,
+  Edge,
+  useStore,
+  Panel,
+  Node as ReactFlowNode,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./index.css";
@@ -17,33 +20,35 @@ import {
   PaperInputNode,
   MultipleOutputNode,
   SingleOutputNode,
+  MTurkOutputNode,
 } from "./Nodes/index";
 
 const initialNodes = [
   {
     id: "node-1",
-    type: "paperInput",
+    type: "PaperInputNode",
     position: { x: 0, y: 0 },
-    data: { value: 123, label: "paper node" },
+    data: { value: 123, label: "paper node", variable: "context" },
   },
   {
     id: "node-2",
-    type: "multipleOutput",
-    position: { x: 100, y: 0 },
-    data: { value: 123, label: "paper node" },
+    type: "MultipleOutputNode",
+    position: { x: 0, y: 200 },
+    data: { value: 123, label: "paper node", variable: "condition_name" },
   },
   {
     id: "node-3",
-    type: "singleoutput",
-    position: { x: 300, y: 0 },
-    data: { value: 123, label: "paper node" },
+    type: "SingleOutputNode",
+    position: { x: 300, y: 200 },
+    data: { value: 123, label: "paper node", variable: "condition_num" },
   },
 ];
 
 const nodeTypes = {
-  paperInput: PaperInputNode,
-  multipleOutput: MultipleOutputNode,
-  singleoutput: SingleOutputNode,
+  PaperInputNode,
+  SingleOutputNode,
+  MultipleOutputNode,
+  MTurkOutputNode,
 };
 
 let id = 0;
@@ -60,16 +65,28 @@ const Flow = () => {
     data: null,
   });
 
+  const onInit = useCallback((rfInstance: any) => {
+    setReactFlowInstance(rfInstance);
+  }, []);
+
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    []
+    (params: Edge | Connection) => {
+      const { source } = params;
+      const sourceNode = nodes.find((node) => node.id === source);
+      const label =
+        sourceNode?.data?.variable || sourceNode?.data?.variable || "";
+
+      const edgeWithLabel = {
+        ...params,
+        label,
+      };
+
+      setEdges((eds) => addEdge(edgeWithLabel, eds));
+    },
+    [nodes]
   );
 
-  useEffect(() => {
-    console.log(edges);
-  }, [edges]);
-
-  const onSelectionChange = useCallback((elements) => {
+  const onSelectionChange = useCallback((elements: any) => {
     setSelectedNode(
       {
         id: elements.nodes[0]?.id,
@@ -83,30 +100,42 @@ const Flow = () => {
     );
   }, []);
 
-  const onDragOver = useCallback((event) => {
+  useStore((state) => console.log(state.getNodes()));
+  useEffect(() => {
+    console.log("onConnect", edges);
+  }, [edges]);
+
+  const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
 
   const onDrop = useCallback(
-    (event) => {
+    (event: any) => {
       event.preventDefault();
 
-      const type = event.dataTransfer.getData(
-        "application/reactflow"
-      ) as typeof nodeTypes;
+      const type: string = event.dataTransfer.getData("application/reactflow");
 
-      if (typeof type === "undefined" || !type) {
+      if (typeof type === "undefined") {
         return;
       }
-      const position = reactFlowInstance.screenToFlowPosition({
+
+      // adding some constant (75px) so when you release the node it's centers on your cursor
+      const position = (reactFlowInstance as any).screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
-      const newNode = {
+
+      const newNode: ReactFlowNode = {
         id: getId(),
         type,
         position,
+        data: {
+          nullable: true,
+          label: "new node",
+          variable: "new variable",
+          value: 0,
+        },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -125,20 +154,26 @@ const Flow = () => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onSelectionChange={onSelectionChange}
-            onInit={setReactFlowInstance}
+            onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
             fitView
-          >
-            <Controls />
-          </ReactFlow>
+          ></ReactFlow>
         </div>
-        <Sidebar
-          nodes={nodes}
-          setNodes={setNodes}
-          selectedNode={selectedNode}
-        />
+
+        <Panel position="bottom-left">
+          <div className="flex flex-col gap-1 text-start">
+            <button className="btn btn-sm btn-wide join-item">Run all</button>
+            <button className="btn btn-sm btn-wide join-item">
+              Export data
+            </button>
+            <button className="btn btn-sm btn-wide join-item">
+              Export workflow
+            </button>
+          </div>
+        </Panel>
+        <Sidebar selectedNode={selectedNode} />
       </ReactFlowProvider>
     </div>
   );

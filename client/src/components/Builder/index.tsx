@@ -1,4 +1,3 @@
-import React from "react";
 import Flow from "./Flow";
 import Header from "./Header";
 

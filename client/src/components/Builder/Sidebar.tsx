@@ -1,23 +1,31 @@
-import React, { useCallback, useEffect } from "react";
-import { useStore } from "reactflow";
-import PaperInputNode from "./Nodes/PaperInput/PaperInputNode";
-
-const transformSelector = (state) => state.transform;
+import { DragEvent, useEffect, useState } from "react";
+import DetailRenderer from "./DetailRenderer";
+import { loadNodeTypes } from "./Nodes";
 
 type SidebarProps = {
-  nodes: any;
-  setNodes: any;
   selectedNode: any;
 };
 
-const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
-  const onDragStart = (event, nodeType) => {
+const Sidebar = ({ selectedNode }: SidebarProps) => {
+  const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
+  const [nodeType, setNodeType] = useState("");
+  const [availableNodeTypes, setAvailableNodeTypes] = useState<
+    { type: string; displayName: string; displayGroup: string }[]
+  >([]);
+
   useEffect(() => {
-    console.log(selectedNode);
+    const fetchData = async () => {
+      return await loadNodeTypes().then((data) => {
+        return setAvailableNodeTypes(data);
+      });
+    };
+
+    fetchData();
+    setNodeType(selectedNode?.type);
   }, [selectedNode]);
 
   return (
@@ -29,114 +37,64 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
         </p>
       </div>
 
-      <div
-        className="dndnode"
-        onDragStart={(event) => onDragStart(event, "paperInput")}
-        draggable
-      >
-        Paper Input Node
+      <div className="flex flex-col w-full">
+        <div className="divider !my-1">Providers</div>
       </div>
-      <div
-        className="dndnode"
-        onDragStart={(event) => onDragStart(event, "multipleOutput")}
-        draggable
-      >
-        Multiple Output Feature
-      </div>
+      {availableNodeTypes.map((node, _index) => {
+        if (node.displayGroup === "Providers") {
+          return (
+            <div
+              key={`${node.type}_${_index}`}
+              onDragStart={(event) => onDragStart(event, node.type)}
+              draggable
+              className="btn btn-xs w-full mb-2 no-animation"
+            >
+              {node.displayName}
+            </div>
+          );
+        }
+      })}
 
-      <div
-        className="dndnode "
-        onDragStart={(event) => onDragStart(event, "singleoutput")}
-        draggable
-      >
-        Single Output Feature
+      <div className="flex flex-col w-full">
+        <div className="divider !my-1">LLM extractors</div>
       </div>
-      {/*       
-      <div className="transform">
-        [{transform[0].toFixed(2)}, {transform[1].toFixed(2)},{" "}
-        {transform[2].toFixed(2)}]
+      {availableNodeTypes.map((node, _index) => {
+        if (node.displayGroup === "LLMs") {
+          return (
+            <div
+              key={`${node.type}_${_index}`}
+              onDragStart={(event) => onDragStart(event, node.type)}
+              draggable
+              className="btn btn-xs w-full mb-2 no-animation"
+            >
+              {node.displayName}
+            </div>
+          );
+        }
+      })}
+
+      <div className="flex flex-col w-full">
+        <div className="divider !my-1">Human extractors</div>
       </div>
-      <div className="title">Nodes</div>
-      {nodes.map((node) => (
-        <div key={node.id}>
-          Node {node.id} - x: {node.position.x.toFixed(2)}, y:{" "}
-          {node.position.y.toFixed(2)}
-        </div>
-      ))} */}
+      {availableNodeTypes.map((node, _index) => {
+        if (node.displayGroup === "Humans") {
+          return (
+            <div
+              key={`${node.type}_${_index}`}
+              onDragStart={(event) => onDragStart(event, node.type)}
+              draggable
+              className="btn btn-xs w-full mb-2 no-animation"
+            >
+              {node.displayName}
+            </div>
+          );
+        }
+      })}
 
       {/* Display the selected node ID */}
-      {selectedNode && (
+      {nodeType && (
         <>
-          <div className="selected-node">
-            <div className="title">Selected Node</div>
-            <div>
-              ID: {selectedNode.id} - Type: {selectedNode.type}
-            </div>
-          </div>
-
-          <form className="space-y-4">
-            <div className="form-control">
-              <label className="label" htmlFor="measurement">
-                <span className="label-text">
-                  How is this feature measured?
-                </span>
-              </label>
-              <select
-                id="measurement"
-                className="select select-bordered"
-                defaultValue={"Choose an option"}
-              >
-                <option disabled>Choose an option</option>
-                <option>GPT-4</option>
-                <option>Amazon MTurk</option>
-                <option>Gemini-2</option>
-              </select>
-            </div>
-
-            <div className="form-control">
-              <label className="label" htmlFor="dataAppearance">
-                <span className="label-text">
-                  What does the data look like?
-                </span>
-              </label>
-              <textarea
-                id="dataAppearance"
-                className="textarea textarea-bordered"
-                placeholder="Shows some values"
-              ></textarea>
-            </div>
-
-            <div className="form-control">
-              <label className="label" htmlFor="featureQuality">
-                <span className="label-text">How good is the feature?</span>
-              </label>
-              <select
-                id="featureQuality"
-                className="select select-bordered"
-                defaultValue={"Choose an option"}
-              >
-                <option disabled>Choose an option</option>
-                <option>Quality Metric 1</option>
-                <option>Quality Metric 2</option>
-                <option>Quality Metric 3</option>
-              </select>
-            </div>
-
-            <div className="form-control">
-              <label className="cursor-pointer label">
-                <span className="label-text mr-2">Is there ground truth?</span>
-                <input type="checkbox" className="toggle" />
-              </label>
-            </div>
-
-            {/* Dynamic form sections can be added based on the feature type selected */}
-
-            <div className="form-control mt-6">
-              <button type="submit" className="btn btn-primary">
-                Save Changes
-              </button>
-            </div>
-          </form>
+          <DetailRenderer nodeType={nodeType} />
         </>
       )}
     </aside>

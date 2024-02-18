@@ -1,10 +1,20 @@
-import React from "react";
+import { useContext } from "react";
+import { WorkflowContext } from "./workflow-context";
+import { useNodes, useEdges } from "reactflow";
 
 interface HeaderProps {
   fileName: string;
 }
 
 const Header = ({ fileName }: HeaderProps) => {
+  const { saveWorkflow } = useContext(WorkflowContext);
+
+  const handleSave = () => {
+    const nodes = useNodes();
+    const edges = useEdges();
+    saveWorkflow(nodes, edges);
+  };
+
   return (
     <div className="navbar bg-base-100">
       <div className="navbar-start z-10">
@@ -14,6 +24,9 @@ const Header = ({ fileName }: HeaderProps) => {
               <details className="dropdown">
                 <summary>File</summary>
                 <ul tabIndex={0} className="p-2 bg-base-100 z-[1]">
+                  <li>
+                    <a onClick={handleSave}>Save workflow</a>
+                  </li>
                   <li>
                     <a>Open PDF</a>
                   </li>

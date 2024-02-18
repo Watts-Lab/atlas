@@ -1,13 +1,14 @@
 {
   "name": "atlas",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
@@ -24,6 +25,7 @@
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "autoprefixer": "^10.4.16",
+    "cypress": "^13.6.4",
     "daisyui": "^4.6.0",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -32,5 +34,9 @@
     "tailwindcss": "^3.3.3",
     "typescript": "^5.0.2",
     "vite": "^4.5.2"
-  }
+  },
+  "description": "tool for exploring scientific litreture ",
+  "main": "postcss.config.js",
+  "author": "A.Nakhaei",
+  "license": "ISC"
 }
