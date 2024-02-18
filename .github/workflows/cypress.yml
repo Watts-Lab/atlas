@@ -18,6 +18,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
+          working-directory: client
           start: npm start
           wait-on: "http://localhost:5173"
           record: true
