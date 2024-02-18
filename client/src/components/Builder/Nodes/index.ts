@@ -11,13 +11,16 @@ export const loadNodeTypes = async () => {
 
   const nodes = await Promise.all(
     Object.keys(nodeModules).map(async (path) => {
-      const moduleName = path.split("/").pop().replace(".tsx", "");
-      const module = await nodeModules[path]();
+      const moduleName = (path.split("/").pop() || "").replace(".tsx", "");
+      const module = (await nodeModules[path]()) as {
+        displayName?: string;
+        displayGroup?: string;
+      };
       // Use the exported displayName or fallback to moduleName
       const displayName = module.displayName || moduleName;
       const displayGroup = module.displayGroup || "Uncategorized";
       return {
-        id: moduleName,
+        type: moduleName,
         displayName,
         displayGroup,
       };

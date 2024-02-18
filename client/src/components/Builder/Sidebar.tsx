@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
+import { DragEvent, useEffect, useState } from "react";
 import DetailRenderer from "./DetailRenderer";
 import { loadNodeTypes } from "./Nodes";
 
 type SidebarProps = {
-  nodes: any;
-  setNodes: any;
   selectedNode: any;
 };
 
-const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
-  const onDragStart = (event, nodeType) => {
+const Sidebar = ({ selectedNode }: SidebarProps) => {
+  const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
   const [nodeType, setNodeType] = useState("");
   const [availableNodeTypes, setAvailableNodeTypes] = useState<
-    { id: string; displayName: string; displayGroup: string }[]
+    { type: string; displayName: string; displayGroup: string }[]
   >([]);
 
   useEffect(() => {
@@ -46,8 +44,8 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
         if (node.displayGroup === "Providers") {
           return (
             <div
-              key={`${node.id}_${_index}`}
-              onDragStart={(event) => onDragStart(event, node.id)}
+              key={`${node.type}_${_index}`}
+              onDragStart={(event) => onDragStart(event, node.type)}
               draggable
               className="btn btn-xs w-full mb-2 no-animation"
             >
@@ -64,8 +62,8 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
         if (node.displayGroup === "LLMs") {
           return (
             <div
-              key={`${node.id}_${_index}`}
-              onDragStart={(event) => onDragStart(event, node.id)}
+              key={`${node.type}_${_index}`}
+              onDragStart={(event) => onDragStart(event, node.type)}
               draggable
               className="btn btn-xs w-full mb-2 no-animation"
             >
@@ -82,8 +80,8 @@ const Sidebar = ({ nodes, setNodes, selectedNode }: SidebarProps) => {
         if (node.displayGroup === "Humans") {
           return (
             <div
-              key={`${node.id}_${_index}`}
-              onDragStart={(event) => onDragStart(event, node.id)}
+              key={`${node.type}_${_index}`}
+              onDragStart={(event) => onDragStart(event, node.type)}
               draggable
               className="btn btn-xs w-full mb-2 no-animation"
             >
