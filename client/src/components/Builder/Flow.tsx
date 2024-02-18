@@ -100,11 +100,6 @@ const Flow = () => {
     );
   }, []);
 
-  useStore((state) => console.log(state.getNodes()));
-  useEffect(() => {
-    console.log("onConnect", edges);
-  }, [edges]);
-
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";

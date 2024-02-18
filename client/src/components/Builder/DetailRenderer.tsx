@@ -12,8 +12,6 @@ const DetailRenderer: React.FC<DetailRendererProps> = ({
 }: DetailRendererProps) => {
   let components: ReactNode = null;
 
-  console.log(nodeType);
-
   if (nodeType === "PaperInputNode") {
     components = <PaperInputDescription />;
   } else if (nodeType === "MultipleOutputNode") {
