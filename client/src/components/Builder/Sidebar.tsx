@@ -30,12 +30,12 @@ const Sidebar = ({ selectedNode }: SidebarProps) => {
 
   return (
     <aside className="lg:w-2/6 border-l border-gray-300 p-4 bg-white">
-      <div className="description">
+      {/* <div className="description">
         <h2 className="text-xl font-bold">Acticle Features</h2>
         <p className="text-gray-500">
           A Set of features for knowledge extraction.
         </p>
-      </div>
+      </div> */}
 
       <div className="flex flex-col w-full">
         <div className="divider !my-1">Providers</div>
