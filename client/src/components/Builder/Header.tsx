@@ -52,11 +52,24 @@ const Header = ({ fileName }: HeaderProps) => {
                 </ul>
               </details>
             </li>
+            <li>
+              <details className="dropdown">
+                <summary>Run</summary>
+                <ul className="p-2 bg-base-100">
+                  <li>
+                    <a>Run all</a>
+                  </li>
+                  <li>
+                    <a>Run modified only</a>
+                  </li>
+                </ul>
+              </details>
+            </li>
           </ul>
         </div>
       </div>
       <div className="navbar-center">
-        <span className="btn btn-ghost normal-case text-xl">{fileName}</span>
+        <span className="normal-case text-xl">{fileName}</span>
       </div>
       <div className="navbar-end z-10">
         <button className="btn btn-ghost btn-circle">

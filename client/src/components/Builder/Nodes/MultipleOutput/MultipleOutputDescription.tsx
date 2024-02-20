@@ -14,9 +14,10 @@ const MultipleOutputDescription: React.FC = () => {
             defaultValue={"Choose an option"}
           >
             <option disabled>Choose an option</option>
+            <option>GPT-4-turbo</option>
             <option>GPT-4</option>
-            <option>Amazon MTurk</option>
-            <option>Gemini-2</option>
+            <option>GPT-3.5</option>
+            <option>Human</option>
           </select>
         </div>
 

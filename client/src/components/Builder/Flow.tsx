@@ -6,7 +6,6 @@ import ReactFlow, {
   useEdgesState,
   Connection,
   Edge,
-  Panel,
   Node as ReactFlowNode,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -19,7 +18,6 @@ import {
   PaperInputNode,
   MultipleOutputNode,
   SingleOutputNode,
-  MTurkOutputNode,
 } from "./Nodes/index";
 
 const initialNodes = [
@@ -27,19 +25,33 @@ const initialNodes = [
     id: "node-1",
     type: "PaperInputNode",
     position: { x: 0, y: 0 },
-    data: { value: 123, label: "paper node", variable: "context" },
+    draggable: false,
+    data: {
+      name: "undefined",
+      text: "undefined",
+      maxLength: 0,
+    },
   },
   {
     id: "node-2",
     type: "MultipleOutputNode",
-    position: { x: 0, y: 200 },
-    data: { value: 123, label: "paper node", variable: "condition_name" },
+    position: { x: 150, y: 300 },
+    data: {
+      name: "Node 2",
+      text: "This is the node's text content, which is a string, and it can be up to 50 characters long.",
+      maxLength: 65,
+    },
   },
   {
     id: "node-3",
     type: "SingleOutputNode",
-    position: { x: 300, y: 200 },
-    data: { value: 123, label: "paper node", variable: "condition_num" },
+    position: { x: -150, y: 300 },
+    isConnectable: true,
+    data: {
+      name: "Node 3",
+      text: "This is the node's text content, which is a string, and it can be up to 50 characters long.",
+      maxLength: 65,
+    },
   },
 ];
 
@@ -47,7 +59,6 @@ const nodeTypes = {
   PaperInputNode,
   SingleOutputNode,
   MultipleOutputNode,
-  MTurkOutputNode,
 };
 
 let id = 0;
@@ -61,8 +72,15 @@ const Flow = () => {
   const [selectedNode, setSelectedNode] = useState({
     id: null,
     type: null,
-    data: null,
+    data: {
+      name: undefined,
+    },
   });
+
+  const updatedNodes = nodes.map((node) => ({
+    ...node,
+    className: node.id === selectedNode.id ? "border-4" : "",
+  }));
 
   const onInit = useCallback((rfInstance: any) => {
     setReactFlowInstance(rfInstance);
@@ -70,14 +88,8 @@ const Flow = () => {
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      const { source } = params;
-      const sourceNode = nodes.find((node) => node.id === source);
-      const label =
-        sourceNode?.data?.variable || sourceNode?.data?.variable || "";
-
       const edgeWithLabel = {
         ...params,
-        label,
       };
 
       setEdges((eds) => addEdge(edgeWithLabel, eds));
@@ -94,7 +106,7 @@ const Flow = () => {
       } || {
         id: null,
         type: null,
-        data: null,
+        data: { name: undefined },
       }
     );
   }, []);
@@ -142,7 +154,7 @@ const Flow = () => {
       <ReactFlowProvider>
         <div className="reactflow-wrapper h-screen" ref={reactFlowWrapper}>
           <ReactFlow
-            nodes={nodes}
+            nodes={updatedNodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -156,18 +168,7 @@ const Flow = () => {
           ></ReactFlow>
         </div>
 
-        <Panel position="bottom-left">
-          <div className="flex flex-col gap-1 text-start">
-            <button className="btn btn-sm btn-wide join-item">Run all</button>
-            <button className="btn btn-sm btn-wide join-item">
-              Export data
-            </button>
-            <button className="btn btn-sm btn-wide join-item">
-              Export workflow
-            </button>
-          </div>
-        </Panel>
-        <Sidebar selectedNode={selectedNode} />
+        <Sidebar selectedNode={selectedNode} setNodes={setNodes} />
       </ReactFlowProvider>
     </div>
   );

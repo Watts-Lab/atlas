@@ -2,41 +2,50 @@ import { Handle, Position } from "reactflow";
 
 type SingleOutputNodeProps = {
   isConnectable: boolean | undefined;
+  className?: string;
+  data: {
+    name: string;
+    text: string; // Add a prop for text content
+    maxLength: number;
+  };
 };
-function SingleOutputNode({ isConnectable }: SingleOutputNodeProps) {
+
+function SingleOutputNode({
+  isConnectable,
+  className,
+  data,
+}: SingleOutputNodeProps) {
+  const { name, text, maxLength } = data;
+
+  const trimmedText =
+    text?.length ?? 0 > maxLength ? text?.slice(0, maxLength) + "..." : text;
+
   return (
-    <div className="paper-input-node">
+    <div className={`paper-input-node ${className}`}>
       <Handle
-        id="paper-handle"
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
-        style={{
-          zIndex: 999,
-          width: "10px",
-          height: "10px",
-        }}
       />
 
-      <div className=" border-2 border-gray-500 w-24 h-24 flex items-center justify-center bg-green-400">
-        <p className="text-base text-center font-bold">Single Output</p>
+      <div
+        className={`${className} border-gray-500 w-52 h-20 p-2 bg-slate-300 rounded`}
+      >
+        <div className="flex justify-between items-start">
+          <p className=" text-sm font-bold">{name}</p>
+          <span className="badge badge-md badge-neutral text-xs">GPT-4</span>
+        </div>
+        <p className="mt-2 text-xs text-justify">{trimmedText}</p>
       </div>
 
       <Handle
-        className="!w-3"
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
-        style={{
-          zIndex: 999,
-          width: "10px",
-          height: "10px",
-        }}
       />
     </div>
   );
 }
-
 export const displayGroup = "LLMs";
 export const displayName = "Single output feature";
 

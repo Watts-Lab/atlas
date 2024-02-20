@@ -5,10 +5,12 @@ import SingleOutputDescription from "./Nodes/SingleOutput/SingleOutputDescriptio
 
 type DetailRendererProps = {
   nodeType: string;
+  setNodes: any;
 };
 
 const DetailRenderer: React.FC<DetailRendererProps> = ({
   nodeType,
+  setNodes,
 }: DetailRendererProps) => {
   let components: ReactNode = null;
 
@@ -17,7 +19,7 @@ const DetailRenderer: React.FC<DetailRendererProps> = ({
   } else if (nodeType === "MultipleOutputNode") {
     components = <MultipleOutputDescription />;
   } else if (nodeType === "SingleOutputNode") {
-    components = <SingleOutputDescription />;
+    components = <SingleOutputDescription setNodes={setNodes} />;
   }
 
   return <div>{components}</div>;

@@ -1,16 +1,69 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { Node, useNodes } from "reactflow";
 
-const SingleOutputDescription: React.FC = () => {
+type SingleOutputDescriptionProps = {
+  setNodes: any;
+};
+
+const SingleOutputDescription = ({
+  setNodes,
+}: SingleOutputDescriptionProps) => {
+  const nodes = useNodes();
+  const [nodeName, setNodeName] = useState("");
+
+  const thisNode: any = nodes.find((node) => node.id === "node-3");
+
+  useEffect(() => {
+    if (thisNode) {
+      setNodeName(thisNode?.data.name || "");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (thisNode) {
+      // Modify node parameters here
+      setNodes((oldNodes: Node[]) => {
+        console.log(oldNodes);
+        return oldNodes.map((node) => {
+          if (node.id === "node-3") {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                name: nodeName,
+              },
+            };
+          }
+          return node;
+        });
+      });
+    }
+  }, [nodeName]);
+
   return (
     <div>
       <form className="space-y-4">
+        <div className="form-control">
+          <label className="label" htmlFor="nodeName">
+            <span className="label-text">Variable Name</span>
+          </label>
+          <input
+            id="nodeName"
+            type="text"
+            placeholder="Variable name"
+            className="input input-bordered input-sm w-full max-w-xs"
+            value={nodeName}
+            onChange={(e) => setNodeName(e.target.value)}
+          />
+        </div>
+
         <div className="form-control">
           <label className="label" htmlFor="measurement">
             <span className="label-text">How is this feature measured?</span>
           </label>
           <select
             id="measurement"
-            className="select select-bordered"
+            className="select select-bordered select-sm w-full max-w-xs"
             defaultValue={"Choose an option"}
           >
             <option disabled>Choose an option</option>
@@ -22,44 +75,13 @@ const SingleOutputDescription: React.FC = () => {
 
         <div className="form-control">
           <label className="label" htmlFor="dataAppearance">
-            <span className="label-text">What does the data look like?</span>
+            <span className="label-text">Prompt</span>
           </label>
           <textarea
             id="dataAppearance"
             className="textarea textarea-bordered"
-            placeholder="Shows some values"
+            placeholder="What is the title of this feature..."
           ></textarea>
-        </div>
-
-        <div className="form-control">
-          <label className="label" htmlFor="featureQuality">
-            <span className="label-text">How good is the feature?</span>
-          </label>
-          <select
-            id="featureQuality"
-            className="select select-bordered"
-            defaultValue={"Choose an option"}
-          >
-            <option disabled>Choose an option</option>
-            <option>Quality Metric 1</option>
-            <option>Quality Metric 2</option>
-            <option>Quality Metric 3</option>
-          </select>
-        </div>
-
-        <div className="form-control">
-          <label className="cursor-pointer label">
-            <span className="label-text mr-2">Is there ground truth?</span>
-            <input type="checkbox" className="toggle" />
-          </label>
-        </div>
-
-        {/* Dynamic form sections can be added based on the feature type selected */}
-
-        <div className="form-control mt-6">
-          <button type="submit" className="btn btn-primary">
-            Save Changes
-          </button>
         </div>
       </form>
     </div>

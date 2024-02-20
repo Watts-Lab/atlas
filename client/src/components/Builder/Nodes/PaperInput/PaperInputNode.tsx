@@ -3,13 +3,13 @@ import { Handle, Position } from "reactflow";
 type PaperInputNodeProps = {
   isConnectable: boolean | undefined;
   data: {
-    value: number;
-    label: string;
+    name?: string;
+    text?: string; // Add a prop for text content
+    maxLength?: number;
   };
 };
 
 function PaperInputNode({ isConnectable }: PaperInputNodeProps) {
-
   return (
     <div className="paper-input-node">
       <div className="border-dashed border-2 border-gray-500 rotate-45 w-24 h-24 flex items-center justify-center">
@@ -19,6 +19,7 @@ function PaperInputNode({ isConnectable }: PaperInputNodeProps) {
       </div>
 
       <Handle
+        className="!rounded-none"
         id="paper-handle"
         type="source"
         position={Position.Bottom}
