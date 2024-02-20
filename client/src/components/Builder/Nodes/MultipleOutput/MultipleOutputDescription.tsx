@@ -1,50 +1,99 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { Node, useNodes } from "reactflow";
 
-const MultipleOutputDescription: React.FC = () => {
+type MeasurementOption = "Choose an option" | "GPT-4" | "GPT-3.5" | "Human";
+
+type MultipleOutputDescriptionProps = {
+  setNodes: any;
+  selectedNode: any;
+};
+
+const MultipleOutputDescription = ({
+  setNodes,
+  selectedNode,
+}: MultipleOutputDescriptionProps) => {
+  const nodes = useNodes();
+  const [nodeName, setNodeName] = useState("");
+  const [measurement, setMeasurement] =
+    useState<MeasurementOption>("Choose an option");
+  const [prompt, setPrompt] = useState("");
+
+  const thisNode: any = nodes.find((node) => node.id === selectedNode.id);
+
+  useEffect(() => {
+    if (thisNode) {
+      setNodeName(thisNode?.data.name || "");
+      setMeasurement(thisNode?.data.measurement || "Choose an option");
+      setPrompt(thisNode?.data.prompt || "");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (thisNode) {
+      setNodes((oldNodes: Node[]) => {
+        return oldNodes.map((node) => {
+          if (node.id === thisNode.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                name: nodeName,
+                measurement: measurement.toString(),
+                prompt: prompt,
+              },
+            };
+          }
+          return node;
+        });
+      });
+    }
+  }, [nodeName, measurement, prompt]);
+
   return (
     <div>
       <form className="space-y-4">
+        <div className="form-control">
+          <label className="label" htmlFor="nodeName">
+            <span className="label-text">Variable Name</span>
+          </label>
+          <input
+            id="nodeName"
+            type="text"
+            placeholder="Variable name"
+            className="input input-bordered input-sm w-full max-w-xs"
+            value={nodeName}
+            onChange={(e) => setNodeName(e.target.value)}
+          />
+        </div>
         <div className="form-control">
           <label className="label" htmlFor="measurement">
             <span className="label-text">How is this feature measured?</span>
           </label>
           <select
             id="measurement"
-            className="select select-bordered select-xs w-full max-w-xs"
-            defaultValue={"Choose an option"}
+            className="select select-bordered select-sm w-full max-w-xs"
+            value={measurement}
+            onChange={(e) =>
+              setMeasurement(e.target.value as MeasurementOption)
+            }
           >
             <option disabled>Choose an option</option>
-            <option>GPT-4-turbo</option>
             <option>GPT-4</option>
             <option>GPT-3.5</option>
             <option>Human</option>
           </select>
         </div>
-
         <div className="form-control">
-          <label className="label" htmlFor="dataAppearance">
-            <span className="label-text">What does the data look like?</span>
+          <label className="label" htmlFor="prompt">
+            <span className="label-text">Prompt</span>
           </label>
           <textarea
-            id="dataAppearance"
+            id="prompt"
             className="textarea textarea-bordered"
-            placeholder="Shows some values"
+            placeholder="What is the title of this feature..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
           ></textarea>
-        </div>
-
-        <div className="form-control">
-          <label className="cursor-pointer label">
-            <span className="label-text mr-2">Is there ground truth?</span>
-            <input type="checkbox" className="toggle toggle-xs" />
-          </label>
-        </div>
-
-        {/* Dynamic form sections can be added based on the feature type selected */}
-
-        <div className="form-control mt-6">
-          <button type="submit" className="btn btn-primary">
-            Save Changes
-          </button>
         </div>
       </form>
     </div>

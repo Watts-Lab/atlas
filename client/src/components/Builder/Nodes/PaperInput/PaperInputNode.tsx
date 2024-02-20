@@ -4,6 +4,7 @@ type PaperInputNodeProps = {
   isConnectable: boolean | undefined;
   data: {
     name?: string;
+    measurement?: string;
     text?: string; // Add a prop for text content
     maxLength?: number;
   };

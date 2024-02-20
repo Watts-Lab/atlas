@@ -5,7 +5,8 @@ type MultipleOutputNodeProps = {
   className?: string;
   data: {
     name: string;
-    text: string; // Add a prop for text content
+    measurement: string;
+    prompt: string; // Add a prop for text content
     maxLength: number;
   };
 };
@@ -15,9 +16,10 @@ function MultipleOutputNode({
   className,
   data,
 }: MultipleOutputNodeProps) {
-  const { name, text, maxLength = 65 } = data;
+  const { name, measurement, prompt, maxLength = 60 } = data;
+
   const trimmedText =
-    text?.length ?? 0 > maxLength ? text?.slice(0, maxLength) + "..." : text;
+    prompt.length > maxLength ? prompt.slice(0, maxLength) + "..." : prompt;
 
   return (
     <div className="paper-input-node">
@@ -32,7 +34,9 @@ function MultipleOutputNode({
       >
         <div className="flex justify-between items-start">
           <p className=" text-sm font-bold">{name}</p>
-          <span className="badge badge-md badge-neutral text-xs">GPT-4-t</span>
+          <span className="badge badge-md badge-neutral text-xs">
+            {measurement === "Choose an option" ? "" : measurement}
+          </span>
         </div>
         <p className="mt-2 text-xs text-justify">{trimmedText}</p>
       </div>

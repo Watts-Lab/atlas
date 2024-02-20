@@ -6,20 +6,32 @@ import SingleOutputDescription from "./Nodes/SingleOutput/SingleOutputDescriptio
 type DetailRendererProps = {
   nodeType: string;
   setNodes: any;
+  selectedNode: any;
 };
 
 const DetailRenderer: React.FC<DetailRendererProps> = ({
   nodeType,
   setNodes,
+  selectedNode,
 }: DetailRendererProps) => {
   let components: ReactNode = null;
 
   if (nodeType === "PaperInputNode") {
     components = <PaperInputDescription />;
   } else if (nodeType === "MultipleOutputNode") {
-    components = <MultipleOutputDescription />;
+    components = (
+      <MultipleOutputDescription
+        setNodes={setNodes}
+        selectedNode={selectedNode}
+      />
+    );
   } else if (nodeType === "SingleOutputNode") {
-    components = <SingleOutputDescription setNodes={setNodes} />;
+    components = (
+      <SingleOutputDescription
+        setNodes={setNodes}
+        selectedNode={selectedNode}
+      />
+    );
   }
 
   return <div>{components}</div>;

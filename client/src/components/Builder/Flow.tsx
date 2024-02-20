@@ -28,7 +28,8 @@ const initialNodes = [
     draggable: false,
     data: {
       name: "undefined",
-      text: "undefined",
+      measurement: "Choose an option",
+      prompt: "undefined",
       maxLength: 0,
     },
   },
@@ -37,9 +38,11 @@ const initialNodes = [
     type: "MultipleOutputNode",
     position: { x: 150, y: 300 },
     data: {
-      name: "Node 2",
-      text: "This is the node's text content, which is a string, and it can be up to 50 characters long.",
-      maxLength: 65,
+      name: "paper_title",
+      measurement: "GPT-3.5",
+      prompt:
+        "This is the node's prompt content, which is a string, and it can be up to 50 characters long.",
+      maxLength: 60,
     },
   },
   {
@@ -48,9 +51,11 @@ const initialNodes = [
     position: { x: -150, y: 300 },
     isConnectable: true,
     data: {
-      name: "Node 3",
-      text: "This is the node's text content, which is a string, and it can be up to 50 characters long.",
-      maxLength: 65,
+      name: "paper_abstract",
+      measurement: "GPT-4",
+      prompt:
+        "This is the node's prompt content, which is a string, and it can be up to 50 characters long.",
+      maxLength: 60,
     },
   },
 ];
@@ -72,9 +77,7 @@ const Flow = () => {
   const [selectedNode, setSelectedNode] = useState({
     id: null,
     type: null,
-    data: {
-      name: undefined,
-    },
+    data: null,
   });
 
   const updatedNodes = nodes.map((node) => ({
@@ -106,7 +109,7 @@ const Flow = () => {
       } || {
         id: null,
         type: null,
-        data: { name: undefined },
+        data: null,
       }
     );
   }, []);
@@ -137,10 +140,11 @@ const Flow = () => {
         type,
         position,
         data: {
-          nullable: true,
-          label: "new node",
-          variable: "new variable",
-          value: 0,
+          name:
+            type === "SingleOutputNode" ? "single_output" : "multiple_output",
+            measurement: "Choose an option",
+          prompt: "LLM prompt.",
+          maxLength: 60,
         },
       };
 

@@ -1,36 +1,45 @@
 import { useEffect, useState } from "react";
 import { Node, useNodes } from "reactflow";
 
+type MeasurementOption = "Choose an option" | "GPT-4" | "GPT-3.5" | "Human";
+
 type SingleOutputDescriptionProps = {
   setNodes: any;
+  selectedNode: any;
 };
 
 const SingleOutputDescription = ({
   setNodes,
+  selectedNode,
 }: SingleOutputDescriptionProps) => {
   const nodes = useNodes();
   const [nodeName, setNodeName] = useState("");
+  const [measurement, setMeasurement] =
+    useState<MeasurementOption>("Choose an option");
+  const [prompt, setPrompt] = useState("");
 
-  const thisNode: any = nodes.find((node) => node.id === "node-3");
+  const thisNode: any = nodes.find((node) => node.id === selectedNode.id);
 
   useEffect(() => {
     if (thisNode) {
       setNodeName(thisNode?.data.name || "");
+      setMeasurement(thisNode?.data.measurement || "Choose an option");
+      setPrompt(thisNode?.data.prompt || "");
     }
   }, []);
 
   useEffect(() => {
     if (thisNode) {
-      // Modify node parameters here
       setNodes((oldNodes: Node[]) => {
-        console.log(oldNodes);
         return oldNodes.map((node) => {
-          if (node.id === "node-3") {
+          if (node.id === thisNode.id) {
             return {
               ...node,
               data: {
                 ...node.data,
                 name: nodeName,
+                measurement: measurement.toString(),
+                prompt: prompt,
               },
             };
           }
@@ -38,7 +47,7 @@ const SingleOutputDescription = ({
         });
       });
     }
-  }, [nodeName]);
+  }, [nodeName, measurement, prompt]);
 
   return (
     <div>
@@ -64,23 +73,28 @@ const SingleOutputDescription = ({
           <select
             id="measurement"
             className="select select-bordered select-sm w-full max-w-xs"
-            defaultValue={"Choose an option"}
+            value={measurement}
+            onChange={(e) =>
+              setMeasurement(e.target.value as MeasurementOption)
+            }
           >
             <option disabled>Choose an option</option>
             <option>GPT-4</option>
-            <option>Amazon MTurk</option>
-            <option>Gemini-2</option>
+            <option>GPT-3.5</option>
+            <option>Human</option>
           </select>
         </div>
 
         <div className="form-control">
-          <label className="label" htmlFor="dataAppearance">
+          <label className="label" htmlFor="prompt">
             <span className="label-text">Prompt</span>
           </label>
           <textarea
-            id="dataAppearance"
+            id="prompt"
             className="textarea textarea-bordered"
             placeholder="What is the title of this feature..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
           ></textarea>
         </div>
       </form>

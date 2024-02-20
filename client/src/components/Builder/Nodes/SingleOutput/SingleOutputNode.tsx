@@ -5,7 +5,8 @@ type SingleOutputNodeProps = {
   className?: string;
   data: {
     name: string;
-    text: string; // Add a prop for text content
+    measurement: string;
+    prompt: string;
     maxLength: number;
   };
 };
@@ -15,10 +16,10 @@ function SingleOutputNode({
   className,
   data,
 }: SingleOutputNodeProps) {
-  const { name, text, maxLength } = data;
+  const { name, measurement, prompt, maxLength = 60 } = data;
 
   const trimmedText =
-    text?.length ?? 0 > maxLength ? text?.slice(0, maxLength) + "..." : text;
+    prompt.length > maxLength ? prompt.slice(0, maxLength) + "..." : prompt;
 
   return (
     <div className={`paper-input-node ${className}`}>
@@ -33,7 +34,9 @@ function SingleOutputNode({
       >
         <div className="flex justify-between items-start">
           <p className=" text-sm font-bold">{name}</p>
-          <span className="badge badge-md badge-neutral text-xs">GPT-4</span>
+          <span className="badge badge-md badge-neutral text-xs">
+            {measurement === "Choose an option" ? "" : measurement}
+          </span>
         </div>
         <p className="mt-2 text-xs text-justify">{trimmedText}</p>
       </div>

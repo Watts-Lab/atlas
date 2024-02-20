@@ -55,7 +55,7 @@ const Sidebar = ({ selectedNode, setNodes }: SidebarProps) => {
       </div>
       {nodeType && (
         <>
-          <DetailRenderer nodeType={nodeType} setNodes={setNodes} />
+          <DetailRenderer nodeType={nodeType} setNodes={setNodes} selectedNode={selectedNode} />
         </>
       )}
     </aside>
