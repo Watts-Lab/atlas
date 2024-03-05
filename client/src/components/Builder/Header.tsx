@@ -1,5 +1,4 @@
-// import { useContext } from "react";
-// import { WorkflowContext } from "./workflow-context";
+import { useState } from "react";
 import { useCallback, useContext } from "react";
 import { useReactFlow } from "reactflow";
 import { WorkflowContext } from "../../context/WorkflowProvider.types";
@@ -16,7 +15,12 @@ const Header = ({ fileName }: HeaderProps) => {
     const nodes = reactFlow.getNodes();
     const edges = reactFlow.getEdges();
     saveWorkflow(nodes, edges);
-  }, [reactFlow]);
+
+    setIsVisible(true);
+    setTimeout(() => setIsVisible(false), 3000);
+  }, [reactFlow, saveWorkflow]);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   return (
     <div className="navbar bg-base-100">
@@ -72,7 +76,14 @@ const Header = ({ fileName }: HeaderProps) => {
         </div>
       </div>
       <div className="navbar-center">
-        <span className="normal-case text-xl">{fileName}</span>
+        <span className="normal-case text-xl">
+          {fileName}{" "}
+          <span
+            className={`${isVisible ? "visible" : "invisible"} text-green-700`}
+          >
+            - Saved!
+          </span>
+        </span>
       </div>
       <div className="navbar-end z-10">
         <button className="btn btn-ghost btn-circle">
