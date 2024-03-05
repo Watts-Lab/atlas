@@ -1,6 +1,8 @@
-import { useContext } from "react";
-import { WorkflowContext } from "./workflow-context";
-import { useNodes, useEdges } from "reactflow";
+// import { useContext } from "react";
+// import { WorkflowContext } from "./workflow-context";
+import { useCallback, useContext } from "react";
+import { useReactFlow } from "reactflow";
+import { WorkflowContext } from "../../context/WorkflowProvider.types";
 
 interface HeaderProps {
   fileName: string;
@@ -8,12 +10,13 @@ interface HeaderProps {
 
 const Header = ({ fileName }: HeaderProps) => {
   const { saveWorkflow } = useContext(WorkflowContext);
+  const reactFlow = useReactFlow();
 
-  const handleSave = () => {
-    const nodes = useNodes();
-    const edges = useEdges();
+  const handleSave = useCallback(() => {
+    const nodes = reactFlow.getNodes();
+    const edges = reactFlow.getEdges();
     saveWorkflow(nodes, edges);
-  };
+  }, [reactFlow]);
 
   return (
     <div className="navbar bg-base-100">

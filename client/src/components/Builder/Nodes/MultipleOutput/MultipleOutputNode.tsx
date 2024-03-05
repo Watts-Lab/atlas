@@ -3,6 +3,7 @@ import { Handle, Position } from "reactflow";
 type MultipleOutputNodeProps = {
   isConnectable: boolean | undefined;
   className?: string;
+  selected?: boolean;
   data: {
     name: string;
     measurement: string;
@@ -13,7 +14,7 @@ type MultipleOutputNodeProps = {
 
 function MultipleOutputNode({
   isConnectable,
-  className,
+  selected,
   data,
 }: MultipleOutputNodeProps) {
   const { name, measurement, prompt, maxLength = 60 } = data;
@@ -30,7 +31,9 @@ function MultipleOutputNode({
       />
 
       <div
-        className={`${className} border-gray-500 w-52 h-20 p-2 bg-yellow-200 rounded`}
+        className={`border-2 w-52 h-24 p-2 bg-yellow-300 rounded ${
+          selected ? "border-slate-600" : "border-yellow-300"
+        }`}
       >
         <div className="flex justify-between items-start">
           <p className=" text-sm font-bold">{name}</p>

@@ -1,5 +1,5 @@
-import Dashboard from "./components/Builder";
-import WorkflowProvider from "./components/WorkflowProvider";
+import Dashboard from "./components/Builder/Dashboard";
+import WorkflowProvider from "./context/WorkflowProvider";
 import { ReactFlowProvider } from "reactflow";
 
 function App() {

@@ -3,6 +3,7 @@ import { Handle, Position } from "reactflow";
 type SingleOutputNodeProps = {
   isConnectable: boolean | undefined;
   className?: string;
+  selected?: boolean;
   data: {
     name: string;
     measurement: string;
@@ -13,7 +14,7 @@ type SingleOutputNodeProps = {
 
 function SingleOutputNode({
   isConnectable,
-  className,
+  selected,
   data,
 }: SingleOutputNodeProps) {
   const { name, measurement, prompt, maxLength = 60 } = data;
@@ -22,7 +23,7 @@ function SingleOutputNode({
     prompt.length > maxLength ? prompt.slice(0, maxLength) + "..." : prompt;
 
   return (
-    <div className={`paper-input-node ${className}`}>
+    <div className={`paper-input-node`}>
       <Handle
         type="target"
         position={Position.Top}
@@ -30,7 +31,9 @@ function SingleOutputNode({
       />
 
       <div
-        className={`${className} border-gray-500 w-52 h-20 p-2 bg-slate-300 rounded`}
+        className={`border-2 w-52 h-24 p-2 bg-slate-300 rounded ${
+          selected ? "border-slate-600" : "border-slate-300"
+        }`}
       >
         <div className="flex justify-between items-start">
           <p className=" text-sm font-bold">{name}</p>

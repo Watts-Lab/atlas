@@ -26,6 +26,9 @@ const Sidebar = ({ selectedNode, setNodes }: SidebarProps) => {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
     setNodeType(selectedNode?.type);
   }, [selectedNode]);
 
@@ -55,7 +58,11 @@ const Sidebar = ({ selectedNode, setNodes }: SidebarProps) => {
       </div>
       {nodeType && (
         <>
-          <DetailRenderer nodeType={nodeType} setNodes={setNodes} selectedNode={selectedNode} />
+          <DetailRenderer
+            nodeType={nodeType}
+            setNodes={setNodes}
+            selectedNode={selectedNode}
+          />
         </>
       )}
     </aside>

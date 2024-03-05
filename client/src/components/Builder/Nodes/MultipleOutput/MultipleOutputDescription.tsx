@@ -26,7 +26,7 @@ const MultipleOutputDescription = ({
       setMeasurement(thisNode?.data.measurement || "Choose an option");
       setPrompt(thisNode?.data.prompt || "");
     }
-  }, []);
+  }, [selectedNode.id]);
 
   useEffect(() => {
     if (thisNode) {

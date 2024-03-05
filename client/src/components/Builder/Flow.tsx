@@ -1,12 +1,11 @@
 import { useState, useRef, useCallback } from "react";
 import ReactFlow, {
-  ReactFlowProvider,
   addEdge,
   useNodesState,
   useEdgesState,
   Connection,
   Edge,
-  Node as ReactFlowNode,
+  Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./index.css";
@@ -20,46 +19,6 @@ import {
   SingleOutputNode,
 } from "./Nodes/index";
 
-const initialNodes = [
-  {
-    id: "node-1",
-    type: "PaperInputNode",
-    position: { x: 0, y: 0 },
-    draggable: false,
-    data: {
-      name: "undefined",
-      measurement: "Choose an option",
-      prompt: "undefined",
-      maxLength: 0,
-    },
-  },
-  {
-    id: "node-2",
-    type: "MultipleOutputNode",
-    position: { x: 150, y: 300 },
-    data: {
-      name: "paper_title",
-      measurement: "GPT-3.5",
-      prompt:
-        "This is the node's prompt content, which is a string, and it can be up to 50 characters long.",
-      maxLength: 60,
-    },
-  },
-  {
-    id: "node-3",
-    type: "SingleOutputNode",
-    position: { x: -150, y: 300 },
-    isConnectable: true,
-    data: {
-      name: "paper_abstract",
-      measurement: "GPT-4",
-      prompt:
-        "This is the node's prompt content, which is a string, and it can be up to 50 characters long.",
-      maxLength: 60,
-    },
-  },
-];
-
 const nodeTypes = {
   PaperInputNode,
   SingleOutputNode,
@@ -69,21 +28,22 @@ const nodeTypes = {
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
-const Flow = () => {
+const Flow = ({
+  initialNodes,
+  initialEdges,
+}: {
+  initialNodes: Node[];
+  initialEdges: Edge[];
+}) => {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [selectedNode, setSelectedNode] = useState({
     id: null,
     type: null,
     data: null,
   });
-
-  const updatedNodes = nodes.map((node) => ({
-    ...node,
-    className: node.id === selectedNode.id ? "border-4" : "",
-  }));
 
   const onInit = useCallback((rfInstance: any) => {
     setReactFlowInstance(rfInstance);
@@ -135,14 +95,14 @@ const Flow = () => {
         y: event.clientY,
       });
 
-      const newNode: ReactFlowNode = {
+      const newNode: Node = {
         id: getId(),
         type,
         position,
         data: {
           name:
             type === "SingleOutputNode" ? "single_output" : "multiple_output",
-            measurement: "Choose an option",
+          measurement: "Choose an option",
           prompt: "LLM prompt.",
           maxLength: 60,
         },
@@ -155,25 +115,23 @@ const Flow = () => {
 
   return (
     <div className="dndflow">
-      <ReactFlowProvider>
-        <div className="reactflow-wrapper h-screen" ref={reactFlowWrapper}>
-          <ReactFlow
-            nodes={updatedNodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onSelectionChange={onSelectionChange}
-            onInit={onInit}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            nodeTypes={nodeTypes}
-            fitView
-          ></ReactFlow>
-        </div>
+      <div className="reactflow-wrapper h-screen" ref={reactFlowWrapper}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onSelectionChange={onSelectionChange}
+          onInit={onInit}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          nodeTypes={nodeTypes}
+          fitView
+        ></ReactFlow>
+      </div>
 
-        <Sidebar selectedNode={selectedNode} setNodes={setNodes} />
-      </ReactFlowProvider>
+      <Sidebar selectedNode={selectedNode} setNodes={setNodes} />
     </div>
   );
 };
