@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, Api
+from flask_cors import CORS
 
 import json
 import argparse
@@ -10,15 +11,33 @@ import os
 app = Flask(__name__)
 api = Api(app)
 
+CORS(app)
+
 
 class HelloWorld(Resource):
     def get(self):
-        response_data = {'message': 'Hello, World!'}
+        response_data = {"message": "Hello, World!"}
         response = make_response(jsonify(response_data))
         response.status_code = 200
         return response
 
-api.add_resource(HelloWorld, "/status")
+    def post(self):
+        data = request.get_json()
+        nodes = data.get("nodes")
+        edges = data.get("edges")
+
+        print("nodes:")
+        for n in nodes:
+            print(n)
+
+        print("edges:")
+        for e in edges:
+            print(e)
+
+        return jsonify({"message": "Nodes and edges received successfully"})
+
+
+api.add_resource(HelloWorld, "/api/workflow")
 
 
 if __name__ == "__main__":

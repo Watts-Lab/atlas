@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header = ({ fileName }: HeaderProps) => {
-  const { saveWorkflow } = useContext(WorkflowContext);
+  const { saveWorkflow, sendToBackend } = useContext(WorkflowContext);
   const reactFlow = useReactFlow();
 
   const handleSave = useCallback(() => {
@@ -19,6 +19,12 @@ const Header = ({ fileName }: HeaderProps) => {
     setIsVisible(true);
     setTimeout(() => setIsVisible(false), 3000);
   }, [reactFlow, saveWorkflow]);
+
+  const handleSendToBackend = useCallback(() => {
+    const nodes = reactFlow.getNodes();
+    const edges = reactFlow.getEdges();
+    sendToBackend(nodes, edges);
+  }, [reactFlow, sendToBackend]);
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -64,7 +70,7 @@ const Header = ({ fileName }: HeaderProps) => {
                 <summary>Run</summary>
                 <ul className="p-2 bg-base-100">
                   <li>
-                    <a>Run all</a>
+                    <a onClick={handleSendToBackend}>Run all</a>
                   </li>
                   <li>
                     <a>Run modified only</a>

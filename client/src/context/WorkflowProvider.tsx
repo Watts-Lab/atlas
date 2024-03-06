@@ -57,8 +57,40 @@ const WorkflowProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  const sendToBackend = useCallback((nodes: Node[], edges: Edge[]) => {
+    const simplifiedNodes = nodes.map(({ id, data }) => ({ id, data }));
+
+    const simplifiedEdges = edges.map(({ source, target }) => ({
+      source,
+      target,
+    }));
+
+    fetch("http://127.0.0.1:8000/api/workflow", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nodes: simplifiedNodes, edges: simplifiedEdges }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Nodes and edges sent to the backend successfully");
+        } else {
+          console.error("Failed to send nodes and edges to the backend");
+        }
+      })
+      .catch((error) => {
+        console.error(
+          "Error occurred while sending nodes and edges to the backend:",
+          error
+        );
+      });
+  }, []);
+
   return (
-    <WorkflowContext.Provider value={{ saveWorkflow, loadWorkflow }}>
+    <WorkflowContext.Provider
+      value={{ saveWorkflow, loadWorkflow, sendToBackend }}
+    >
       {children}
     </WorkflowContext.Provider>
   );
