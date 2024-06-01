@@ -40,6 +40,38 @@ class HelloWorld(Resource):
 api.add_resource(HelloWorld, "/api/workflow")
 
 
+
+# Create a new prompt
+class Prompt(Resource):
+    def post(self):
+        prompt_data = request.json
+        prompt_id = prompt_data["prompt_id"]
+
+        document = {
+            "prompt_id": prompt_id,
+            "current_version": 1,
+            "versions": [{"version": 1, "data": prompt_data["data"]}],
+        }
+
+        collection.insert_one(document)
+
+        return jsonify({"message": "Prompt created", "prompt_id": prompt_id}), 201
+# @app.route("/prompt", methods=["POST"])
+# def create_prompt():
+#     prompt_data = request.json
+#     prompt_id = prompt_data["prompt_id"]
+
+#     document = {
+#         "prompt_id": prompt_id,
+#         "current_version": 1,
+#         "versions": [{"version": 1, "data": prompt_data["data"]}],
+#     }
+
+#     collection.insert_one(document)
+
+#     return jsonify({"message": "Prompt created", "prompt_id": prompt_id}), 201
+
+
 if __name__ == "__main__":
     # getting list of command line arguments
     parser = argparse.ArgumentParser(description="Flask RESTful api end point.")
