@@ -1,8 +1,9 @@
 """
-Condition name feature. This feature is responsible for returning the name of the conditions in the experiment.
+Condition name feature. This feature is responsible 
+for returning the name of the conditions in the experiment.
 """
 
-from server.features.gpt_feature import GPTFeature
+from ..gpt_feature import GPTFeature
 
 
 class Feature(GPTFeature):
@@ -12,7 +13,18 @@ class Feature(GPTFeature):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        feature_name = "condition_name"
+        feature_type = "string"
+        feature_prompt = (
+            "Give each condition a one or two word name to describe it. "
+            "Author's words: Where possible, use the label the research authors give it. "
+            "Look at tables/figures to see their naming conventions for the conditions and use those if they exist. "
+            "**Make sure the FIRST (1) condition is considered the CONTROL. This should be the condition you indicate is the focal comparator, in the results tab."
+        )
+        feature_enum = None
+        super().__init__(
+            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+        )
         print("Condition Name Feature initialized.", args, kwargs)
 
     def display(self) -> None:
