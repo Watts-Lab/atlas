@@ -1,25 +1,18 @@
 import Dashboard from "./components/Builder/Dashboard";
 import WorkflowProvider from "./context/WorkflowProvider";
 import { ReactFlowProvider } from "reactflow";
-import { BrowserRouter as Router, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import Table from "./pages/Table";
 
 function App() {
   return (
     <>
       <ReactFlowProvider>
         <WorkflowProvider>
-          <Router>
-            <ul>
-              <li>
-                <Link to="/dashboard">
-                  <Dashboard />
-                </Link>
-              </li>
-              <li>
-                <Link to="/table">Zillow Group</Link>
-              </li>
-            </ul>
-          </Router>
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/table" element={<Table />} />
+          </Routes>
         </WorkflowProvider>
       </ReactFlowProvider>
     </>

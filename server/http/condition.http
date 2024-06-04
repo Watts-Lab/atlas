@@ -1,0 +1,18 @@
+### Get all available features
+GET http://localhost:8000/api/features HTTP/1.1
+content-type: application/json
+
+{
+    
+}
+
+### Run feature toggle
+POST http://localhost:8000/api/run HTTP/1.1
+content-type: application/json
+
+{
+    "features": [
+        "condition.condition_name",
+        "condition.condition_description"
+    ]
+}
