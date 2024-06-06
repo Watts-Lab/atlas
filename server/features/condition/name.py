@@ -13,7 +13,7 @@ class Feature(GPTFeature):
     """
 
     def __init__(self, *args, **kwargs):
-        feature_name = "condition_name"
+        feature_name = "name"
         feature_type = "string"
         feature_prompt = (
             "Give each condition a one or two word name to describe it. "

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Header from "../components/Builder/Header";
 
 interface DataRow {
   id: number;
-  name: string;
-  job: string;
-  company: string;
-  location: string;
-  lastLogin: string;
-  favoriteColor: string;
+  paper_id: string;
+  condition_name: string;
+  condition_description: string;
+  condition_type: string;
+  condition_message: string;
 }
 
 const Table: React.FC = () => {
@@ -19,23 +19,35 @@ const Table: React.FC = () => {
   const data: DataRow[] = [
     {
       id: 1,
-      name: "Cy Ganderton",
-      job: "Quality Control Specialist",
-      company: "Littel, Schaden and Vandervort",
-      location: "Canada",
-      lastLogin: "12/16/2020",
-      favoriteColor: "Blue",
+      paper_id: "A_67a_2021_BehaviouralNudgesIncrease",
+      condition_name: "Quality",
+      condition_type: "something2",
+      condition_message: "Canada",
+      condition_description: "asdsda",
     },
     {
       id: 2,
-      name: "Hart Hagerty",
-      job: "Desktop Support Technician",
-      company: "Zemlak, Daniel and Leannon",
-      location: "United States",
-      lastLogin: "12/5/2020",
-      favoriteColor: "Purple",
+      paper_id: "A_67a_2021_BehaviouralNudgesIncrease",
+      condition_name: "Desktop",
+      condition_type: "something",
+      condition_message: "United States",
+      condition_description: "asdsadsad",
     },
   ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://api.example.com/data");
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const requestSort = (key: keyof DataRow) => {
     let direction: "ascending" | "descending" = "ascending";
@@ -66,45 +78,54 @@ const Table: React.FC = () => {
   }, [data, sortConfig]);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="table table-xs">
-        <thead>
-          <tr>
-            <th></th>
-            <th onClick={() => requestSort("name")}>Name</th>
-            <th onClick={() => requestSort("job")}>Job</th>
-            <th onClick={() => requestSort("company")}>Company</th>
-            <th onClick={() => requestSort("location")}>Location</th>
-            <th onClick={() => requestSort("lastLogin")}>Last Login</th>
-            <th onClick={() => requestSort("favoriteColor")}>Favorite Color</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((row) => (
-            <tr key={row.id}>
-              <th>{row.id}</th>
-              <td>{row.name}</td>
-              <td>{row.job}</td>
-              <td>{row.company}</td>
-              <td>{row.location}</td>
-              <td>{row.lastLogin}</td>
-              <td>{row.favoriteColor}</td>
+    <>
+      <Header fileName="Workflow-1" />
+      <div className="overflow-x-auto">
+        <table className="table table-xs">
+          <thead>
+            <tr>
+              <th></th>
+              <th onClick={() => requestSort("paper_id")}>paper_id</th>
+              <th onClick={() => requestSort("condition_name")}>
+                condition_name
+              </th>
+              <th onClick={() => requestSort("condition_description")}>
+                condition_description
+              </th>
+              <th onClick={() => requestSort("condition_type")}>
+                condition_type
+              </th>
+              <th onClick={() => requestSort("condition_message")}>
+                condition_message
+              </th>
             </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Job</th>
-            <th>Company</th>
-            <th>Location</th>
-            <th>Last Login</th>
-            <th>Favorite Color</th>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {sortedData.map((row) => (
+              <tr key={row.id}>
+                <th>{row.id}</th>
+                <td>{row.paper_id}</td>
+                <td>{row.condition_name}</td>
+                <td>{row.condition_description}</td>
+                <td>{row.condition_type}</td>
+                <td>{row.condition_message}</td>
+              </tr>
+            ))}
+          </tbody>
+          {/* <tfoot>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Job</th>
+              <th>Company</th>
+              <th>Location</th>
+              <th>Last Login</th>
+              <th>Favorite Color</th>
+            </tr>
+          </tfoot> */}
+        </table>
+      </div>
+    </>
   );
 };
 

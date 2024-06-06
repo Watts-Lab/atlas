@@ -12,7 +12,7 @@ content-type: application/json
 
 {
     "features": [
-        "condition.condition_name",
+        "condition_physics.condition_name",
         "condition.condition_description"
     ]
 }
