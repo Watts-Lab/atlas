@@ -13,7 +13,7 @@ class Feature(GPTFeature):
     """
 
     def __init__(self, *args, **kwargs):
-        feature_name = "condition_message"
+        feature_name = "message"
         feature_type = "string"
         feature_prompt = (
             "Does the condition contain a major messaging component? "

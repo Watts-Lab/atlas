@@ -13,7 +13,7 @@ class Feature(GPTFeature):
     """
 
     def __init__(self, *args, **kwargs):
-        feature_name = "condition_type"
+        feature_name = "type"
         feature_type = "string"
         feature_prompt = (
             "Is the condition considered a control or treatment in the original source? "
