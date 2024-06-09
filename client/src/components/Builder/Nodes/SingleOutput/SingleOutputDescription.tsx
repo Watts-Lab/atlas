@@ -1,32 +1,28 @@
-import { useEffect, useState } from "react";
-import { Node, useNodes } from "reactflow";
+import { useEffect, useState } from 'react'
+import { Node, useNodes } from 'reactflow'
 
-type MeasurementOption = "Choose an option" | "GPT-4" | "GPT-3.5" | "Human";
+type MeasurementOption = 'Choose an option' | 'GPT-4' | 'GPT-3.5' | 'Human'
 
 type SingleOutputDescriptionProps = {
-  setNodes: any;
-  selectedNode: any;
-};
+  setNodes: any
+  selectedNode: any
+}
 
-const SingleOutputDescription = ({
-  setNodes,
-  selectedNode,
-}: SingleOutputDescriptionProps) => {
-  const nodes = useNodes();
-  const [nodeName, setNodeName] = useState("");
-  const [measurement, setMeasurement] =
-    useState<MeasurementOption>("Choose an option");
-  const [prompt, setPrompt] = useState("");
+const SingleOutputDescription = ({ setNodes, selectedNode }: SingleOutputDescriptionProps) => {
+  const nodes = useNodes()
+  const [nodeName, setNodeName] = useState('')
+  const [measurement, setMeasurement] = useState<MeasurementOption>('Choose an option')
+  const [prompt, setPrompt] = useState('')
 
-  const thisNode: any = nodes.find((node) => node.id === selectedNode.id);
+  const thisNode: any = nodes.find((node) => node.id === selectedNode.id)
 
   useEffect(() => {
     if (thisNode) {
-      setNodeName(thisNode?.data.name || "");
-      setMeasurement(thisNode?.data.measurement || "Choose an option");
-      setPrompt(thisNode?.data.prompt || "");
+      setNodeName(thisNode?.data.name || '')
+      setMeasurement(thisNode?.data.measurement || 'Choose an option')
+      setPrompt(thisNode?.data.prompt || '')
     }
-  }, [selectedNode.id]);
+  }, [selectedNode.id])
 
   useEffect(() => {
     if (thisNode) {
@@ -41,42 +37,40 @@ const SingleOutputDescription = ({
                 measurement: measurement.toString(),
                 prompt: prompt,
               },
-            };
+            }
           }
-          return node;
-        });
-      });
+          return node
+        })
+      })
     }
-  }, [nodeName, measurement, prompt]);
+  }, [nodeName, measurement, prompt])
 
   return (
     <div>
-      <form className="space-y-4">
-        <div className="form-control">
-          <label className="label" htmlFor="nodeName">
-            <span className="label-text">Variable Name</span>
+      <form className='space-y-4'>
+        <div className='form-control'>
+          <label className='label' htmlFor='nodeName'>
+            <span className='label-text'>Variable Name</span>
           </label>
           <input
-            id="nodeName"
-            type="text"
-            placeholder="Variable name"
-            className="input input-bordered input-sm w-full max-w-xs"
+            id='nodeName'
+            type='text'
+            placeholder='Variable name'
+            className='input input-bordered input-sm w-full max-w-xs'
             value={nodeName}
             onChange={(e) => setNodeName(e.target.value)}
           />
         </div>
 
-        <div className="form-control">
-          <label className="label" htmlFor="measurement">
-            <span className="label-text">How is this feature measured?</span>
+        <div className='form-control'>
+          <label className='label' htmlFor='measurement'>
+            <span className='label-text'>How is this feature measured?</span>
           </label>
           <select
-            id="measurement"
-            className="select select-bordered select-sm w-full max-w-xs"
+            id='measurement'
+            className='select select-bordered select-sm w-full max-w-xs'
             value={measurement}
-            onChange={(e) =>
-              setMeasurement(e.target.value as MeasurementOption)
-            }
+            onChange={(e) => setMeasurement(e.target.value as MeasurementOption)}
           >
             <option disabled>Choose an option</option>
             <option>GPT-4</option>
@@ -85,21 +79,21 @@ const SingleOutputDescription = ({
           </select>
         </div>
 
-        <div className="form-control">
-          <label className="label" htmlFor="prompt">
-            <span className="label-text">Prompt</span>
+        <div className='form-control'>
+          <label className='label' htmlFor='prompt'>
+            <span className='label-text'>Prompt</span>
           </label>
           <textarea
-            id="prompt"
-            className="textarea textarea-bordered"
-            placeholder="What is the title of this feature..."
+            id='prompt'
+            className='textarea textarea-bordered'
+            placeholder='What is the title of this feature...'
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           ></textarea>
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default SingleOutputDescription;
+export default SingleOutputDescription

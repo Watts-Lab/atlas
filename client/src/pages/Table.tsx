@@ -40,7 +40,7 @@ const Table: React.FC = () => {
       try {
         const response = await fetch('https://api.example.com/data')
         const jsonData = await response.json()
-        setData(jsonData)
+        // setData(jsonData)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
