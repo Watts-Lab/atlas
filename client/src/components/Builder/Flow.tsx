@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState, useRef, useCallback } from 'react'
 import ReactFlow, { addEdge, useNodesState, useEdgesState, Connection, Edge, Node } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -45,6 +47,7 @@ const Flow = ({ initialNodes, initialEdges }: { initialNodes: Node[]; initialEdg
 
   const onSelectionChange = useCallback((elements: any) => {
     setSelectedNode(
+      // eslint-disable-next-line no-constant-binary-expression
       {
         id: elements.nodes[0]?.id,
         type: elements.nodes[0]?.type,

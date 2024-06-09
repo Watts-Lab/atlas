@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Node, useNodes } from 'reactflow'
+import { selectedNode } from '../../Flow.types'
 
 type MeasurementOption = 'Choose an option' | 'GPT-4' | 'GPT-3.5' | 'Human'
 
 type SingleOutputDescriptionProps = {
-  setNodes: any
-  selectedNode: any
+  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  selectedNode: selectedNode
 }
 
 const SingleOutputDescription = ({ setNodes, selectedNode }: SingleOutputDescriptionProps) => {
@@ -14,7 +15,7 @@ const SingleOutputDescription = ({ setNodes, selectedNode }: SingleOutputDescrip
   const [measurement, setMeasurement] = useState<MeasurementOption>('Choose an option')
   const [prompt, setPrompt] = useState('')
 
-  const thisNode: any = nodes.find((node) => node.id === selectedNode.id)
+  const thisNode: Node = nodes.find((node) => node.id === selectedNode.id)!
 
   useEffect(() => {
     if (thisNode) {

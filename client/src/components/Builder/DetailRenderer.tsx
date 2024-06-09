@@ -2,11 +2,13 @@ import { ReactNode } from 'react'
 import PaperInputDescription from './Nodes/PaperInput/PaperInputDescription'
 import MultipleOutputDescription from './Nodes/MultipleOutput/MultipleOutputDescription'
 import SingleOutputDescription from './Nodes/SingleOutput/SingleOutputDescription'
+import { selectedNode } from './Flow.types'
+import { Node } from 'reactflow'
 
 type DetailRendererProps = {
   nodeType: string
-  setNodes: any
-  selectedNode: any
+  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  selectedNode: selectedNode
 }
 
 const DetailRenderer: React.FC<DetailRendererProps> = ({

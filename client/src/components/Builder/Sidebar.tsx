@@ -1,10 +1,12 @@
 import { DragEvent, useEffect, useState } from 'react'
 import DetailRenderer from './DetailRenderer'
 import { loadNodeTypes } from './Nodes'
+import { selectedNode } from './Flow.types'
+import { Node } from 'reactflow'
 
 type SidebarProps = {
-  selectedNode: any
-  setNodes: any
+  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  selectedNode: selectedNode
 }
 
 const Sidebar = ({ selectedNode, setNodes }: SidebarProps) => {
@@ -29,7 +31,7 @@ const Sidebar = ({ selectedNode, setNodes }: SidebarProps) => {
   }, [])
 
   useEffect(() => {
-    setNodeType(selectedNode?.type)
+    setNodeType(selectedNode?.type ?? '')
   }, [selectedNode])
 
   return (

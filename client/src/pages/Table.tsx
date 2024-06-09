@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Header from '../components/Builder/Header'
 
 interface DataRow {
@@ -34,20 +34,6 @@ const Table: React.FC = () => {
       condition_description: 'asdsadsad',
     },
   ]
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('https://api.example.com/data')
-        const jsonData = await response.json()
-        // setData(jsonData)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   const requestSort = (key: keyof DataRow) => {
     let direction: 'ascending' | 'descending' = 'ascending'
