@@ -2,7 +2,7 @@ import os
 import certifi
 import logging
 from dotenv import load_dotenv
-from db_logger import bcolors
+from db_logger import BColors
 import datetime
 
 # Database interface
@@ -21,7 +21,7 @@ class DatabaseInterface:
         )
         self.db = self.client.get_database("atlas_main")
         self.logger = logging.getLogger(__name__)
-        print(f"{bcolors.OKGREEN}Database interface initialized{bcolors.ENDC}")
+        print(f"{BColors.OKGREEN}Database interface initialized{BColors.ENDC}")
 
     def get_collection_names(self):
         return self.db.list_collection_names()

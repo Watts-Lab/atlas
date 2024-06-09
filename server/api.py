@@ -7,13 +7,19 @@ import json
 
 from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, Api
+from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
 
 app = Flask(__name__)
 api = Api(app)
 
-CORS(app)
+app.config["SECRET_KEY"] = "secret!"
+
+# Enable CORS
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 class GetFeatures(Resource):
@@ -133,6 +139,29 @@ class RunFeatures(Resource):
 api.add_resource(GetFeatures, "/api/features")
 api.add_resource(RunFeatures, "/api/run")
 
+
+@socketio.on("connect")
+def connected():
+    """event listener when client connects to the server"""
+    print(request.sid)
+    print("client has connected")
+    emit("connect", {"data": f"id: {request.sid} is connected"})
+
+
+@socketio.on("data")
+def handle_message(data):
+    """event listener when client types a message"""
+    print("data from the front end: ", str(data))
+    emit("data", {"data": data, "id": request.sid}, broadcast=True)
+
+
+@socketio.on("disconnect")
+def disconnected():
+    """event listener when client disconnects to the server"""
+    print("user disconnected")
+    emit("disconnect", f"user {request.sid} disconnected", broadcast=True)
+
+
 if __name__ == "__main__":
     # getting list of command line arguments
     parser = argparse.ArgumentParser(description="Flask RESTful api end point.")
@@ -144,4 +173,5 @@ if __name__ == "__main__":
     port = args.port if args.port else 8000
     debug = args.debug if args.debug else True
 
-    app.run(host="0.0.0.0", port=port, debug=debug)
+    # app.run(host="0.0.0.0", port=port, debug=debug)
+    socketio.run(app, host="0.0.0.0", port=port, debug=debug)
