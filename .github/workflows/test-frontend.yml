@@ -1,0 +1,19 @@
+name: Run Tests (Frontend)
+
+on: [push]
+
+jobs:
+  jest-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+        working-directory: client
+      - run: npm run lint
+        working-directory: client
+      - run: npm run build
+        working-directory: client
+      - run: npm test
+        working-directory: client
