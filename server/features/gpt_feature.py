@@ -28,14 +28,22 @@ class GPTFeature:
             "feature_enum": self.feature_enum,
         }
 
-    def get_functional_object(self):
+    def get_functional_object(self, prefix=""):
         """Returns a functional object representing the feature."""
-        return {
-            "feature_name": self.feature_name,
-            "feature_type": self.feature_type,
-            "feature_prompt": self.feature_prompt,
-            "feature_enum": self.feature_enum,
+
+        feature_name = prefix + self.feature_name
+
+        res = {
+            feature_name: {
+                "type": self.feature_type,
+                "description": self.feature_prompt,
+            },
         }
+
+        if self.feature_enum:
+            res[feature_name]["enum"] = self.feature_enum
+
+        return res
 
     def __str__(self) -> str:
         return f"Feature {self.feature_name}"

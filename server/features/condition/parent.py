@@ -13,7 +13,7 @@ class Feature(GPTFeature):
     """
 
     def __init__(self, *args, **kwargs):
-        feature_name = "condition"
+        feature_name = "conditions"
         feature_type = "object"
         feature_prompt = (
             "Define the conditions in the experiment.  "
@@ -31,3 +31,6 @@ class Feature(GPTFeature):
         Display method for the Condition type class.
         """
         print("This is the Condition class.")
+
+    def get_functional_object(self, prefix="") -> dict:
+        return super().get_functional_object(prefix=prefix)

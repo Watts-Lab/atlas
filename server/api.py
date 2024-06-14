@@ -10,6 +10,9 @@ from flask_restful import Resource, Api
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
+# pylint: disable=import-error
+from assistant import call_asssistant_api
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -20,6 +23,11 @@ app.config["SECRET_KEY"] = "secret!"
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+UPLOAD_DIRECTORY = "paper/"
+
+if not os.path.exists(UPLOAD_DIRECTORY):
+    os.makedirs(UPLOAD_DIRECTORY)
 
 
 class GetFeatures(Resource):
@@ -136,8 +144,54 @@ class RunFeatures(Resource):
         return response
 
 
+class RunAssistant(Resource):
+    """
+    Represents a resource for handling file uploads.
+
+    Methods:
+    - post: Handles the POST request for file uploads.
+    """
+
+    def post(self):
+        """
+        Handles the POST request for file uploads.
+
+        Returns:
+        - JSON response containing the status of the upload:
+            - If successful, returns {"message": "File successfully uploaded", "path": file_path}.
+            - If there is an error, returns {"error": "No file part"} or {"error": "No selected file"}.
+        """
+        if "file" not in request.files:
+            return jsonify({"error": "No file part"})
+
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "No selected file"})
+
+        if file:
+            file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
+            file.save(file_path)
+
+            result = call_asssistant_api(file_path)
+
+            response_data = {
+                "message": "File successfully uploaded",
+                "path": file.filename,
+                "result": result["conditions"],
+            }
+            response = make_response(jsonify(response_data))
+            response.status_code = 200
+            return response
+        else:
+            response_data = {"error": "File upload failed"}
+            response = make_response(jsonify(response_data))
+            response.status_code = 400
+            return response
+
+
 api.add_resource(GetFeatures, "/api/features")
 api.add_resource(RunFeatures, "/api/run")
+api.add_resource(RunAssistant, "/api/run_assistant")
 
 
 @socketio.on("connect")

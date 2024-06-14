@@ -42,3 +42,6 @@ class Feature(GPTFeature):
         Display method for the Condition type class.
         """
         print("This is the Condition type class.")
+
+    def get_functional_object(self, prefix="condition") -> dict:
+        return super().get_functional_object(prefix=prefix)
