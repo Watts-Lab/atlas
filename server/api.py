@@ -5,24 +5,28 @@ import os
 import argparse
 import json
 
+from dotenv import load_dotenv
+
 from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, Api
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
 # pylint: disable=import-error
-from assistant import call_asssistant_api
+from assistant import AssistantException, call_asssistant_api
 
+load_dotenv()
 
 app = Flask(__name__)
 api = Api(app)
 
-app.config["SECRET_KEY"] = "secret!"
+CORS(app)
 
-# Enable CORS
-CORS(app, resources={r"/*": {"origins": "*"}})
+app.config["SECRET_KEY"] = os.getenv("SOCKET_SECRET")
+socketio = SocketIO(
+    app, cors_allowed_origins=["http://127.0.0.1:5173", "http://localhost:5173"]
+)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 UPLOAD_DIRECTORY = "paper/"
 
@@ -147,7 +151,6 @@ class RunFeatures(Resource):
 class RunAssistant(Resource):
     """
     Represents a resource for handling file uploads.
-
     Methods:
     - post: Handles the POST request for file uploads.
     """
@@ -155,33 +158,35 @@ class RunAssistant(Resource):
     def post(self):
         """
         Handles the POST request for file uploads.
-
         Returns:
         - JSON response containing the status of the upload:
-            - If successful, returns {"message": "File successfully uploaded", "path": file_path}.
-            - If there is an error, returns {"error": "No file part"} or {"error": "No selected file"}.
+        - If successful, returns {"message": "File successfully uploaded", "path": file_path}.
+        - If there is an error, returns {"error": "No file part"} or {"error": "No selected file"}.
         """
+        sid = request.form.get("sid")
         if "file" not in request.files:
             return jsonify({"error": "No file part"})
-
         file = request.files["file"]
         if file.filename == "":
             return jsonify({"error": "No selected file"})
-
         if file:
             file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
             file.save(file_path)
-
-            result = call_asssistant_api(file_path)
-
-            response_data = {
-                "message": "File successfully uploaded",
-                "path": file.filename,
-                "result": result["conditions"],
-            }
-            response = make_response(jsonify(response_data))
-            response.status_code = 200
-            return response
+            try:
+                result = call_asssistant_api(file_path, sid)
+                response_data = {
+                    "message": "File successfully uploaded",
+                    "path": file.filename,
+                    "result": result["conditions"],
+                }
+                response = make_response(jsonify(response_data))
+                response.status_code = 200
+                return response
+            except AssistantException as e:
+                response_data = {"error": str(e)}
+                response = make_response(jsonify(response_data))
+                response.status_code = 500
+                return response
         else:
             response_data = {"error": "File upload failed"}
             response = make_response(jsonify(response_data))
@@ -194,26 +199,11 @@ api.add_resource(RunFeatures, "/api/run")
 api.add_resource(RunAssistant, "/api/run_assistant")
 
 
-@socketio.on("connect")
-def connected():
-    """event listener when client connects to the server"""
-    print(request.sid)
-    print("client has connected")
-    emit("connect", {"data": f"id: {request.sid} is connected"})
-
-
 @socketio.on("data")
 def handle_message(data):
     """event listener when client types a message"""
     print("data from the front end: ", str(data))
     emit("data", {"data": data, "id": request.sid}, broadcast=True)
-
-
-@socketio.on("disconnect")
-def disconnected():
-    """event listener when client disconnects to the server"""
-    print("user disconnected")
-    emit("disconnect", f"user {request.sid} disconnected", broadcast=True)
 
 
 if __name__ == "__main__":
@@ -222,10 +212,8 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--port", help="Port for the server.", type=int)
     parser.add_argument("-d", "--debug", help="Debug mode on or off.", type=bool)
     args = parser.parse_args()
-
     # setting default values
     port = args.port if args.port else 8000
     debug = args.debug if args.debug else True
-
     # app.run(host="0.0.0.0", port=port, debug=debug)
     socketio.run(app, host="0.0.0.0", port=port, debug=debug)

@@ -1,5 +1,5 @@
 import React, { useState, DragEvent } from 'react'
-import Header from '../components/Builder/Header'
+import Header from '../../Builder/Header'
 
 interface DataRow {
   id: number
@@ -79,11 +79,13 @@ const Table: React.FC = () => {
     const files = e.dataTransfer.files
     const formData = new FormData()
     formData.append('file', files[0])
+    // formData.append('sid', socket.socket.id ?? '')
 
     try {
       const response = await fetch('http://localhost:8000/api/run_assistant', {
         method: 'POST',
         body: formData,
+        headers: {},
       })
       if (response.ok) {
         const data = await response.json()

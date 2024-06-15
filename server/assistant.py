@@ -7,8 +7,23 @@ import importlib
 from datetime import datetime
 from typing import Dict, List, Union
 from openai import OpenAI
+import socketio
 
 client = OpenAI()
+sio = socketio.Server(cors_allowed_origins="*")
+
+
+class AssistantException(Exception):
+    """
+    Custom exception class for assistant errors.
+    """
+
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
+
+    def __str__(self):
+        return f"AssistantException: {self.message}"
 
 
 def get_all_features() -> List[str]:
@@ -125,56 +140,96 @@ def update_assistant(
     return my_updated_assistant
 
 
-def call_asssistant_api(file_path: str):
-    feature_list = get_all_features()
-    functions = build_feature_functions(feature_list)
-    vector_store = upload_file_to_vector_store(file_path)
-    updated_assistant = update_assistant(
-        "asst_2THkE8dZlIZDDCZvd3ZBjara", vector_store, functions
-    )
-
-    thread_message = client.beta.threads.create(
-        messages=[
-            {
-                "role": "user",
-                "content": "define_conditions",
-            }
-        ],
-    )
-
-    run = client.beta.threads.runs.create_and_poll(
-        thread_id=thread_message.id, assistant_id=updated_assistant.id
-    )
-
-    tool_outputs = json.loads(
-        run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
-    )
-
-    # deleting the vector store
-    vector_store_files = client.beta.vector_stores.files.list(
-        vector_store_id=vector_store.id
-    )
-    file_ids = [file.id for file in vector_store_files.data]
-
-    deleted_vector_store = client.beta.vector_stores.delete(
-        vector_store_id=vector_store.id
-    )
-
-    if deleted_vector_store.deleted == True:
-        print("Vector store deleted successfully")
+def check_output_format(output):
+    """
+    Checks if the tool output is correctly formatted.
+    Args:
+    - output: The output to check.
+    Returns:
+    - True if the format is correct, raises an exception if not.
+    """
+    # Implement your format checking logic here
+    if isinstance(output, dict) and "conditions" in output:
+        return True
     else:
-        print("Vector store deletion failed")
+        raise AssistantException("Output format is incorrect")
 
-    # deleting the file
-    for file_id in file_ids:
-        deleted_file = client.files.delete(file_id)
-        if deleted_file.deleted == True:
-            print("File deleted successfully")
+
+def call_asssistant_api(file_path: str, sid: str):
+    try:
+        sio.emit("status", {"status": "Fetching all features..."}, to=sid)
+        feature_list = get_all_features()
+
+        sio.emit("status", {"status": "Building feature functions..."}, to=sid)
+        functions = build_feature_functions(feature_list)
+
+        sio.emit("status", {"status": "Uploading file to vector store..."}, to=sid)
+        vector_store = upload_file_to_vector_store(file_path)
+
+        sio.emit("status", {"status": "Updating assistant..."}, to=sid)
+        updated_assistant = update_assistant(
+            "asst_2THkE8dZlIZDDCZvd3ZBjara", vector_store, functions
+        )
+
+        sio.emit("status", {"status": "Creating thread message..."}, to=sid)
+        thread_message = client.beta.threads.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": "define_conditions",
+                }
+            ],
+        )
+
+        sio.emit("status", {"status": "Running assistant..."}, to=sid)
+        run = client.beta.threads.runs.create_and_poll(
+            thread_id=thread_message.id, assistant_id=updated_assistant.id
+        )
+
+        sio.emit("status", {"status": "Getting tool outputs..."}, to=sid)
+        tool_outputs = json.loads(
+            run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
+        )
+
+        sio.emit("status", {"status": "Checking output format..."}, to=sid)
+        check_output_format(tool_outputs)
+
+    except json.JSONDecodeError as je:
+        print(je)
+        raise AssistantException("Assistant run failed - JSON Decode Error") from je
+    except TypeError as te:
+        print(te)
+        raise AssistantException("Assistant run failed - Type Error") from te
+    except Exception as e:
+        print(e)
+        raise AssistantException("Assistant run failed") from e
+    finally:
+        sio.emit("status", {"status": "Cleaning up resources..."}, to=sid)
+        # deleting the vector store
+        vector_store_files = client.beta.vector_stores.files.list(
+            vector_store_id=vector_store.id
+        )
+        file_ids = [file.id for file in vector_store_files.data]
+        deleted_vector_store = client.beta.vector_stores.delete(
+            vector_store_id=vector_store.id
+        )
+        if deleted_vector_store.deleted:
+            print("Vector store deleted successfully")
         else:
-            print("File deletion failed")
+            print("Vector store deletion failed")
+
+        # deleting the file
+        for file_id in file_ids:
+            deleted_file = client.files.delete(file_id)
+            if deleted_file.deleted == True:
+                print("File deleted successfully")
+            else:
+                print("File deletion failed")
+
+        client.beta.threads.delete(thread_id=thread_message.id)
 
     return tool_outputs
 
 
 if __name__ == "__main__":
-    call_asssistant_api("paper/A_67a_2021_BehaviouralNudgesIncrease.pdf")
+    call_asssistant_api("paper/A_67a_2021_BehaviouralNudgesIncrease.pdf", "123")

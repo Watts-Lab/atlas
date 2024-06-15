@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useCallback, useContext } from 'react'
 import { useReactFlow } from 'reactflow'
-import { WorkflowContext } from '../../context/WorkflowProvider.types'
+import { WorkflowContext } from '../../context/Workflow/WorkflowProvider.types'
 
 interface HeaderProps {
   fileName: string

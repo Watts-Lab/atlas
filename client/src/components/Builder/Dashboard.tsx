@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import Flow from './Flow'
 import Header from './Header'
-import { WorkflowContext } from '../../context/WorkflowProvider.types'
+import { WorkflowContext } from '../../context/Workflow/WorkflowProvider.types'
 
 const Dashboard = () => {
   const { loadWorkflow } = useContext(WorkflowContext)
