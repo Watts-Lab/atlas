@@ -81,10 +81,10 @@ const Header = ({ fileName }: HeaderProps) => {
           </ul>
         </div>
       </div>
-      <div className='navbar-center'>
+      <div className='navbar-center text-center'>
         <span className='normal-case text-xl'>
           {fileName}{' '}
-          <span className={`${isVisible ? 'visible' : 'invisible'} text-green-700`}>- Saved!</span>
+          <span className={`${isVisible ? 'visible' : 'hidden'} text-green-700`}>- Saved!</span>
         </span>
       </div>
       <div className='navbar-end z-10'>
