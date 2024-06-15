@@ -1,10 +1,15 @@
-import React, { useState, DragEvent, useContext, useMemo } from 'react'
+import React, { useState, DragEvent, useContext, useMemo, useEffect } from 'react'
 import Header from '../../Builder/Header'
 import { SocketContext } from '../../../context/Socket/SocketProvider'
 
 interface DataRow {
   id: number
   [key: string]: number | string
+}
+
+type RunStatus = {
+  status: string
+  progress: number
 }
 
 const Table: React.FC = () => {
@@ -76,10 +81,24 @@ const Table: React.FC = () => {
     console.log('connected')
   })
 
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
+  const [pathLength, setPathLength] = useState(0)
 
-  on('status', (data: { status: string }) => {
-    setStatus(data.status)
+  useEffect(() => {
+    // Ensure the path element exists before trying to get its length
+    const path = document.querySelector<SVGPathElement>('#uploadPath')
+    if (path) {
+      const length = path.getTotalLength()
+      setPathLength(length)
+    }
+  }, [status])
+
+  const getStrokeDashoffset = () => {
+    return pathLength - (pathLength * status.progress) / 100
+  }
+
+  on('status', (data: { status: string; progress: number }) => {
+    setStatus({ status: data.status, progress: Number(data.progress) })
   })
 
   useMemo(() => {
@@ -111,7 +130,6 @@ const Table: React.FC = () => {
           paper_id: data.path,
           ...row,
         }))
-        console.log(newData)
         setData(newData)
       } else {
         console.error('Upload failed')
@@ -120,6 +138,7 @@ const Table: React.FC = () => {
       console.error('Error uploading file:', error)
     } finally {
       setIsUploading(false)
+      setStatus({ status: '', progress: 0 })
     }
   }
 
@@ -143,9 +162,18 @@ const Table: React.FC = () => {
               strokeLinejoin='round'
               d='M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z'
             />
+            <path
+              id='uploadPath'
+              className='text-gray-500 h-20 w-20'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z'
+              strokeDasharray={pathLength}
+              strokeDashoffset={getStrokeDashoffset()}
+            />
           </svg>
           <span className='loading loading-dots loading-lg text-gray-400'></span>
-          <span className='text-gray-400'>{status}</span>
+          <span className='text-gray-400'>{status.status}</span>
         </div>
       )}
       <main
@@ -166,7 +194,7 @@ const Table: React.FC = () => {
                 <th onClick={() => requestSort('condition_message')}>condition_message</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDragging || isUploading ? 'skeleton' : ''}>
               {sortedData.map((row) => (
                 <tr key={row.id}>
                   <th>{row.id}</th>
