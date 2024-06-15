@@ -1,5 +1,6 @@
-import React, { useState, DragEvent } from 'react'
+import React, { useState, DragEvent, useContext, useMemo } from 'react'
 import Header from '../../Builder/Header'
+import { SocketContext } from '../../../context/Socket/SocketProvider'
 
 interface DataRow {
   id: number
@@ -69,6 +70,22 @@ const Table: React.FC = () => {
     setIsDragging(false)
   }
 
+  const { socket, on } = useContext(SocketContext)
+
+  on('connect', () => {
+    console.log('connected')
+  })
+
+  const [status, setStatus] = useState('')
+
+  on('status', (data: { status: string }) => {
+    setStatus(data.status)
+  })
+
+  useMemo(() => {
+    console.log(status)
+  }, [status])
+
   const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
@@ -79,7 +96,7 @@ const Table: React.FC = () => {
     const files = e.dataTransfer.files
     const formData = new FormData()
     formData.append('file', files[0])
-    // formData.append('sid', socket.socket.id ?? '')
+    formData.append('sid', socket.id ?? '')
 
     try {
       const response = await fetch('http://localhost:8000/api/run_assistant', {

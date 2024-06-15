@@ -4,6 +4,7 @@ import importlib
 import os
 import argparse
 import json
+import time
 
 from dotenv import load_dotenv
 
@@ -164,6 +165,7 @@ class RunAssistant(Resource):
         - If there is an error, returns {"error": "No file part"} or {"error": "No selected file"}.
         """
         sid = request.form.get("sid")
+
         if "file" not in request.files:
             return jsonify({"error": "No file part"})
         file = request.files["file"]
@@ -173,7 +175,7 @@ class RunAssistant(Resource):
             file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
             file.save(file_path)
             try:
-                result = call_asssistant_api(file_path, sid)
+                result = call_asssistant_api(file_path, sid, socketio)
                 response_data = {
                     "message": "File successfully uploaded",
                     "path": file.filename,
@@ -199,11 +201,22 @@ api.add_resource(RunFeatures, "/api/run")
 api.add_resource(RunAssistant, "/api/run_assistant")
 
 
-@socketio.on("data")
+@socketio.on("connect")
+def handle_connect():
+    """event listener when client connects"""
+    print("client connected", request.sid)
+
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    """event listener when client disconnects"""
+    print("client disconnected", request.sid)
+
+
+@socketio.on("status")
 def handle_message(data):
     """event listener when client types a message"""
-    print("data from the front end: ", str(data))
-    emit("data", {"data": data, "id": request.sid}, broadcast=True)
+    print("data from the front end: ", str(data), request.sid)
 
 
 if __name__ == "__main__":

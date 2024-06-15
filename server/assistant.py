@@ -7,10 +7,9 @@ import importlib
 from datetime import datetime
 from typing import Dict, List, Union
 from openai import OpenAI
-import socketio
+
 
 client = OpenAI()
-sio = socketio.Server(cors_allowed_origins="*")
 
 
 class AssistantException(Exception):
@@ -155,7 +154,7 @@ def check_output_format(output):
         raise AssistantException("Output format is incorrect")
 
 
-def call_asssistant_api(file_path: str, sid: str):
+def call_asssistant_api(file_path: str, sid: str, sio):
     try:
         sio.emit("status", {"status": "Fetching all features..."}, to=sid)
         feature_list = get_all_features()
@@ -229,7 +228,3 @@ def call_asssistant_api(file_path: str, sid: str):
         client.beta.threads.delete(thread_id=thread_message.id)
 
     return tool_outputs
-
-
-if __name__ == "__main__":
-    call_asssistant_api("paper/A_67a_2021_BehaviouralNudgesIncrease.pdf", "123")
