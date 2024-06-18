@@ -94,82 +94,107 @@ type TableData = {
 
 const flattenData = (
   data: Result,
-
   expandedExperiment: boolean,
-
   expandedCondition: boolean,
-
   expandedBehavior: boolean,
 ): TableData => {
+  const defaultHeaders = ['id', 'paper_id', 'paper_title', 'experiments', 'conditions', 'behaviors']
+  const expandedHeaders = [
+    'experiment_name',
+    'experiment_description',
+    'condition_name',
+    'condition_description',
+    'condition_type',
+    'condition_message',
+    'behavior_name',
+    'behavior_description',
+    'behavior_type',
+    'behavior_message',
+  ]
+
   if (!expandedExperiment && !expandedCondition && !expandedBehavior) {
-    const experimentData = data.experiments.map((experiment, index) => {
-      return {
-        id: index + 1,
-        paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
-        paper_title: 'paper title',
-        experiments: experiment.experiment_name,
-        conditions: `${experiment.conditions.length} conditions found`,
-        behaviors: `${experiment.behavior.length} behaviors found`,
-      }
-    })
-
-    return { headers: Object.keys(experimentData[0]), rows: experimentData }
-  }
-
-  if (expandedExperiment && !expandedCondition && !expandedBehavior) {
-    const experimentData = data.experiments.map((experiment, index) => {
-      return {
-        id: index + 1,
-        paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
-        paper_title: 'paper title',
-        experiment_name: experiment.experiment_name,
-        experiment_description: experiment.experiment_description,
-        conditions: experiment.conditions.length,
-        behaviors: experiment.behavior.length,
-      }
-    })
-
-    return { headers: Object.keys(experimentData[0]), rows: experimentData }
+    const experimentData = data.experiments.map((experiment, index) => ({
+      id: index + 1,
+      paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
+      paper_title: 'paper title',
+      experiments: `experiment ${index + 1}`,
+      conditions: `${experiment.conditions.length} conditions found`,
+      behaviors: `${experiment.behavior.length} behaviors found`,
+    }))
+    return { headers: defaultHeaders, rows: experimentData }
   }
 
   const detailedData: KeyValuePairs[] = []
 
   data.experiments.forEach((experiment, expIndex) => {
-    if (expandedCondition) {
-      experiment.conditions.forEach((condition) => {
-        detailedData.push({
-          id: expIndex + 1,
-          paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
-          experiment_name: experiment.experiment_name,
-          experiment_description: experiment.experiment_description,
-          condition_name: condition.condition_name,
-          condition_description: condition.condition_description,
-          condition_type: condition.condition_type,
-          condition_message: condition.condition_message,
-        })
+    if (expandedExperiment) {
+      detailedData.push({
+        id: expIndex + 1,
+        paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
+        paper_title: 'paper title',
+        experiment_name: experiment.experiment_name,
+        experiment_description: experiment.experiment_description,
+        conditions: expandedCondition
+          ? `${experiment.conditions.length} conditions found`
+          : 'no data',
+        behaviors: expandedBehavior ? `${experiment.behavior.length} behaviors found` : 'no data',
       })
-    }
+    } else {
+      if (expandedCondition) {
+        experiment.conditions.forEach((condition) => {
+          detailedData.push({
+            id: expIndex + 1,
+            paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
+            experiment_name: experiment.experiment_name,
+            experiment_description: experiment.experiment_description,
+            condition_name: condition.condition_name,
+            condition_description: condition.condition_description,
+            condition_type: condition.condition_type,
+            condition_message: condition.condition_message,
+          })
+        })
+      }
 
-    if (expandedBehavior) {
-      experiment.behavior.forEach((behavior) => {
-        detailedData.push({
-          id: expIndex + 1,
-          paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
-          experiment_name: experiment.experiment_name,
-          experiment_description: experiment.experiment_description,
-          behavior_name: behavior.behavior_name,
-          behavior_description: behavior.behavior_description,
-          behavior_type: behavior.behavior_type,
-          behavior_message: behavior.behavior_message,
+      if (expandedBehavior) {
+        experiment.behavior.forEach((behavior) => {
+          detailedData.push({
+            id: expIndex + 1,
+            paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
+            experiment_name: experiment.experiment_name,
+            experiment_description: experiment.experiment_description,
+            behavior_name: behavior.behavior_name,
+            behavior_description: behavior.behavior_description,
+            behavior_type: behavior.behavior_type,
+            behavior_message: behavior.behavior_message,
+          })
         })
-      })
+      }
     }
   })
 
-  return {
-    headers: detailedData.length ? Object.keys(detailedData[0]) : [],
+  const headers = expandedExperiment
+    ? [
+        'id',
+        'paper_id',
+        'paper_title',
+        'experiment_name',
+        'experiment_description',
+        'conditions',
+        'behaviors',
+      ]
+    : expandedCondition || expandedBehavior
+      ? [
+          'id',
+          'paper_id',
+          ...expandedHeaders.filter((header) =>
+            header.includes(expandedCondition ? 'condition' : 'behavior'),
+          ),
+        ]
+      : defaultHeaders
 
-    rows: detailedData.length ? detailedData : [{}],
+  return {
+    headers,
+    rows: detailedData.length ? detailedData : Array(data.experiments.length).fill(undefined),
   }
 }
 
