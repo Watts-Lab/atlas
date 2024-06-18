@@ -32,16 +32,23 @@ def get_all_features() -> List[str]:
     Returns:
     - List of all available features.
     """
-    return [
-        "features.condition.name",
-        "features.condition.description",
-        "features.condition.type",
-        "features.condition.message",
-    ]
+    return (
+        [
+            "features.condition.name",
+            "features.condition.description",
+            "features.condition.type",
+            "features.condition.message",
+        ],
+        [
+            "features.behavior.description",
+            "features.behavior.priority",
+            "features.behavior.focal",
+        ],
+    )
 
 
 def build_feature_functions(
-    feature_list: List[str],
+    feature_list: tuple[List[str], List[str]]
 ) -> List[Dict[str, Union[int, str]]]:
     """
     Builds a list of dictionaries containing the feature functions.
@@ -59,8 +66,8 @@ def build_feature_functions(
     print(parent_class.get_functional_object())
 
     function_call = {
-        "name": "define_conditions",
-        "description": "Define the conditions in the experiment. Each condition should be a separate object with specified properties.",
+        "name": "define_conditions_and_behaviors",
+        "description": "Define the conditions and behaviors in the experiment. Each condition and behavior should be a separate object with specified properties.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -71,13 +78,21 @@ def build_feature_functions(
                         "type": "object",
                         "properties": {},
                     },
-                }
+                },
+                "behaviors": {
+                    "type": "array",
+                    "description": "Array of behaviors objects with detailed properties.",
+                    "items": {
+                        "type": "object",
+                        "properties": {},
+                    },
+                },
             },
-            "required": ["conditions"],
+            "required": ["conditions", "behaviors"],
         },
     }
 
-    for feature in feature_list:
+    for feature in feature_list[0]:
         feature_module = importlib.import_module(feature)
         feature_class = feature_module.Feature()
         function_call["parameters"]["properties"]["conditions"]["items"][
@@ -87,6 +102,18 @@ def build_feature_functions(
                 "properties"
             ],
             **feature_class.get_functional_object(prefix="condition_"),
+        }
+
+    for feature in feature_list[1]:
+        feature_module = importlib.import_module(feature)
+        feature_class = feature_module.Feature()
+        function_call["parameters"]["properties"]["behaviors"]["items"][
+            "properties"
+        ] = {
+            **function_call["parameters"]["properties"]["behaviors"]["items"][
+                "properties"
+            ],
+            **feature_class.get_functional_object(prefix="behavior_"),
         }
 
     return function_call
@@ -187,7 +214,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             messages=[
                 {
                     "role": "user",
-                    "content": "define_conditions",
+                    "content": "define_conditions_and_behaviors",
                 }
             ],
         )

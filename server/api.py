@@ -175,54 +175,56 @@ class RunAssistant(Resource):
             file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
             file.save(file_path)
             try:
-                # result = call_asssistant_api(file_path, sid, socketio)
+                result = call_asssistant_api(file_path, sid, socketio)
                 socketio.emit(
                     "status",
                     {"status": "Fetching all features...", "progress": 0},
                     to=sid,
                 )
 
-                result = {
-                    "experiments": [
-                        {
-                            "experiment_name": "experiment_name",
-                            "experiment_description": "experiment_description",
-                            "conditions": [
-                                {
-                                    "condition_name": "condition_name",
-                                    "condition_description": "condition_description",
-                                    "condition_type": "condition_type",
-                                    "condition_message": "condition_message",
-                                },
-                                {
-                                    "condition_name": "condition_name2",
-                                    "condition_description": "condition_description2",
-                                    "condition_type": "condition_type2",
-                                    "condition_message": "condition_message2",
-                                },
-                            ],
-                            "behavior": [
-                                {
-                                    "behavior_name": "behavior_name",
-                                    "behavior_description": "behavior_description",
-                                    "behavior_type": "behavior_type",
-                                    "behavior_message": "behavior_message",
-                                },
-                                {
-                                    "behavior_name": "behavior_name2",
-                                    "behavior_description": "behavior_description2",
-                                    "behavior_type": "behavior_type2",
-                                    "behavior_message": "behavior_message2",
-                                },
-                            ],
-                        }
-                    ]
-                }
+                # result = {
+                #     "experiments": [
+                #         {
+                #             "experiment_name": "experiment_name",
+                #             "experiment_description": "experiment_description",
+                #             "conditions": [
+                #                 {
+                #                     "condition_name": "condition_name",
+                #                     "condition_description": "condition_description",
+                #                     "condition_type": "condition_type",
+                #                     "condition_message": "condition_message",
+                #                 },
+                #                 {
+                #                     "condition_name": "condition_name2",
+                #                     "condition_description": "condition_description2",
+                #                     "condition_type": "condition_type2",
+                #                     "condition_message": "condition_message2",
+                #                 },
+                #             ],
+                #             "behavior": [
+                #                 {
+                #                     "behavior_name": "behavior_name",
+                #                     "behavior_description": "behavior_description",
+                #                     "behavior_type": "behavior_type",
+                #                     "behavior_message": "behavior_message",
+                #                 },
+                #                 {
+                #                     "behavior_name": "behavior_name2",
+                #                     "behavior_description": "behavior_description2",
+                #                     "behavior_type": "behavior_type2",
+                #                     "behavior_message": "behavior_message2",
+                #                 },
+                #             ],
+                #         }
+                #     ]
+                # }
+
+                print("result", result)
 
                 response_data = {
                     "message": "File successfully uploaded",
                     "path": file.filename,
-                    "result": result,
+                    "result": result["conditions"],
                 }
                 response = make_response(jsonify(response_data))
                 response.status_code = 200

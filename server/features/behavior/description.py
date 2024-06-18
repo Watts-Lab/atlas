@@ -16,7 +16,7 @@ class Feature(GPTFeature):
         feature_name = "description"
         feature_type = "string"
         feature_prompt = (
-            "Describe the behavioral outcome in a few words. "
+            "Describe the behavioral outcome in a few words (4 at most). "
             "Author's words: If the authors have a clear, short description of each behavior in the paper itself, copy their words here instead of paraphrasing.  "
             "If their description is not clear enough on its own, or is very verbose, please paraphrase here."
         )

@@ -125,6 +125,7 @@ const Table: React.FC = () => {
       })
       if (response.ok) {
         const data = await response.json()
+        console.log(data)
         const newData = data.result.map((row: Omit<DataRow, 'id'>, index: number) => ({
           id: index + 1,
           paper_id: data.path,
@@ -146,7 +147,9 @@ const Table: React.FC = () => {
     <>
       <Header fileName='Workflow-1' />
       {(isDragging || isUploading) && (
-        <div className='absolute inset-0 flex flex-col items-center justify-center '>
+        <div
+          className={`absolute inset-0 flex flex-col items-center justify-center ${isUploading ? 'z-50' : ''}`}
+        >
           <svg
             xmlns='http://www.w3.org/2000/svg'
             fill='none'
@@ -186,12 +189,28 @@ const Table: React.FC = () => {
           <table className='table table-xs'>
             <thead>
               <tr>
-                <th></th>
-                <th onClick={() => requestSort('paper_id')}>paper_id</th>
-                <th onClick={() => requestSort('condition_name')}>condition_name</th>
-                <th onClick={() => requestSort('condition_description')}>condition_description</th>
-                <th onClick={() => requestSort('condition_type')}>condition_type</th>
-                <th onClick={() => requestSort('condition_message')}>condition_message</th>
+                <th className='text-base font-bold'>id</th>
+                <th className='text-base font-bold' onClick={() => requestSort('paper_id')}>
+                  paper_id
+                </th>
+                <th className='text-base font-bold' onClick={() => requestSort('condition_name')}>
+                  condition_name
+                </th>
+                <th
+                  className='text-base font-bold'
+                  onClick={() => requestSort('condition_description')}
+                >
+                  condition_description
+                </th>
+                <th className='text-base font-bold' onClick={() => requestSort('condition_type')}>
+                  condition_type
+                </th>
+                <th
+                  className='text-base font-bold'
+                  onClick={() => requestSort('condition_message')}
+                >
+                  condition_message
+                </th>
               </tr>
             </thead>
             <tbody className={isDragging || isUploading ? 'skeleton' : ''}>
