@@ -2,7 +2,7 @@ import os
 import certifi
 import logging
 from dotenv import load_dotenv
-from db_logger import BColors
+from .db_logger import BColors
 import datetime
 
 # Database interface

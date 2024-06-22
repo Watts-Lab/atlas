@@ -1,9 +1,13 @@
 ### Get all available features
-GET http://localhost:8000/api/features HTTP/1.1
-content-type: application/json
+POST http://localhost:8000/api/features HTTP/1.1
+User-Agent: rest-client
+Accept: */*
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxOTA3NDQ3MCwianRpIjoiNWQ2MWZmMjEtNmM4OS00M2RiLWIwYzktYTY5NWY2MDIzYWRhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzE5MDc0NDcwLCJjc3JmIjoiZmUzYTU2OTctMzI0ZS00YjlmLWJkOWEtNWJlN2Q3YzYwZDU1IiwiZXhwIjoxNzE5MDc1MzcwfQ.9GqIJsqRR4rNokK6P4mCoSY8yD-A3g0266pVI4wYOAs
+Accept-Language: en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4
+Content-Type: application/json
 
 {
-    
+    "name": "condition"
 }
 
 ### Run feature toggle
@@ -15,4 +19,14 @@ content-type: application/json
         "condition_physics.condition_name",
         "condition.condition_description"
     ]
+}
+
+# "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxOTA3NDQ3MCwianRpIjoiNWQ2MWZmMjEtNmM4OS00M2RiLWIwYzktYTY5NWY2MDIzYWRhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzE5MDc0NDcwLCJjc3JmIjoiZmUzYTU2OTctMzI0ZS00YjlmLWJkOWEtNWJlN2Q3YzYwZDU1IiwiZXhwIjoxNzE5MDc1MzcwfQ.9GqIJsqRR4rNokK6P4mCoSY8yD-A3g0266pVI4wYOAs"
+### Run feature toggle
+POST http://localhost:8000/api/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "admin"
 }

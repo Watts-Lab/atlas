@@ -4,17 +4,23 @@ import importlib
 import os
 import argparse
 import json
-import time
 
 from dotenv import load_dotenv
 
 from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, Api
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 from flask_cors import CORS
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    get_jwt_identity,
+    jwt_required,
+)
 
 # pylint: disable=import-error
 from assistant import AssistantException, call_asssistant_api
+from db.db import DatabaseInterface
 
 load_dotenv()
 
@@ -24,9 +30,14 @@ api = Api(app)
 CORS(app)
 
 app.config["SECRET_KEY"] = os.getenv("SOCKET_SECRET")
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+
 socketio = SocketIO(
     app, cors_allowed_origins=["http://127.0.0.1:5173", "http://localhost:5173"]
 )
+
+jwt = JWTManager(app)
 
 
 UPLOAD_DIRECTORY = "paper/"
@@ -35,12 +46,16 @@ if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
 
+db = DatabaseInterface()
+
+
 class GetFeatures(Resource):
     """
     Represents a resource for the HelloWorld endpoint.
     This resource provides GET and POST methods for the HelloWorld endpoint.
     """
 
+    @jwt_required()
     def get(self):
         """
         Handles GET requests to the features endpoint.
@@ -80,6 +95,7 @@ class GetFeatures(Resource):
         response.status_code = 200
         return response
 
+    @jwt_required()
     def post(self):
         """
         Handles POST requests to the HelloWorld endpoint.
@@ -87,6 +103,8 @@ class GetFeatures(Resource):
         Returns:
         A Flask response object with a JSON representation of the response data.
         """
+        user_id = get_jwt_identity()
+        print(f"User ID: {user_id}")
         data = request.get_json()
         return jsonify(data)
 
@@ -127,7 +145,8 @@ class RunFeatures(Resource):
             response = make_response(jsonify(response_data))
             response.status_code = 400
             return response
-        # Assuming `features` is obtained from the GetFeatures endpoint, this is a mock to demonstrate
+        # Assuming `features` is obtained from the GetFeatures endpoint,
+        # this is a mock to demonstrate
         features = [
             "features.condition.condition",
             "features.condition.condition_name",
@@ -241,9 +260,43 @@ class RunAssistant(Resource):
             return response
 
 
+class Login(Resource):
+    """
+    Represents a resource for handling user login.
+    Methods:
+    - post: Handles the POST request for user login.
+    """
+
+    def post(self):
+        """
+        Handles the POST request for user login.
+        Returns:
+        - JSON response containing the status of the login:
+        - If successful, returns {"message": "User successfully logged in"}.
+        - If there is an error, returns {"error": "Invalid username or password"}.
+        """
+        data = request.get_data()
+        username = data.get("username")
+        password = data.get("password")
+
+        if username == "admin" and password == "admin":
+            access_token = create_access_token(identity=1)
+            response = make_response(
+                jsonify({"message": "Login Success", "access_token": access_token})
+            )
+            response.status_code = 200
+            return response
+        else:
+            response_data = {"error": "Invalid username or password"}
+            response = make_response(jsonify(response_data))
+            response.status_code = 401
+            return response
+
+
 api.add_resource(GetFeatures, "/api/features")
 api.add_resource(RunFeatures, "/api/run")
 api.add_resource(RunAssistant, "/api/run_assistant")
+api.add_resource(Login, "/api/login")
 
 
 @socketio.on("connect")
