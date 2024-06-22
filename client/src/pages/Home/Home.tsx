@@ -17,11 +17,7 @@ const Home = ({ loggingIn }: HomeProps) => {
 
   if (loggingIn) {
     if (params.magicLink) {
-      const {
-        data,
-        loading,
-        error: _error,
-      } = useFetch('http://localhost:8000/api/login', {
+      const { data, loading } = useFetch('http://localhost:8000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +52,7 @@ const Home = ({ loggingIn }: HomeProps) => {
       ) : (
         <>
           <p className='text-center py-3'>
-            Enter your email to get started. We'll send you a link to sign in.
+            Enter your email to get started. We&apos;ll send you a link to sign in.
           </p>
           <Login />
         </>
