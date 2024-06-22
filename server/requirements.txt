@@ -103,7 +103,7 @@ traitlets==5.14.3
 transformers==4.41.2
 typing_extensions==4.11.0
 tzdata==2024.1
-urllib3==2.2.1
+urllib3==2.2.2
 wcwidth==0.2.13
 Werkzeug==3.0.1
 wsproto==1.2.0
