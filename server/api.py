@@ -21,10 +21,13 @@ from flask_jwt_extended import (
 # pylint: disable=import-error
 from assistant import AssistantException, call_asssistant_api
 from db.db import DatabaseInterface
+from resources.user import User
+
+users = User()
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../build", static_url_path="/")
 api = Api(app)
 
 CORS(app)
@@ -34,7 +37,7 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 
 socketio = SocketIO(
-    app, cors_allowed_origins=["http://127.0.0.1:5173", "http://localhost:5173"]
+    app, cors_allowed_origins=["http://127.0.0.1:8000", "http://localhost:8000"]
 )
 
 jwt = JWTManager(app)
@@ -275,14 +278,30 @@ class Login(Resource):
         - If successful, returns {"message": "User successfully logged in"}.
         - If there is an error, returns {"error": "Invalid username or password"}.
         """
-        data = request.get_data()
-        username = data.get("username")
-        password = data.get("password")
+        try:
+            data = request.get_json()
+        except json.JSONDecodeError:
+            response_data = {"error": "Invalid JSON data."}
+            response = make_response(jsonify(response_data))
+            response.status_code = 400
+            return response
 
-        if username == "admin" and password == "admin":
-            access_token = create_access_token(identity=1)
+        email = data["email"]
+        magic_link = data["magic_link"]
+
+        user = users.find_by_email(email)
+
+        print("user", user)
+
+        if user and user["magic_link"] == magic_link:
+            access_token = create_access_token(identity=user["username"])
             response = make_response(
-                jsonify({"message": "Login Success", "access_token": access_token})
+                jsonify(
+                    {
+                        "message": "User successfully logged in",
+                        "access_token": access_token,
+                    }
+                )
             )
             response.status_code = 200
             return response
@@ -315,6 +334,17 @@ def handle_disconnect():
 def handle_message(data):
     """event listener when client types a message"""
     print("data from the front end: ", str(data), request.sid)
+
+
+@app.route("/")
+def index():
+    """Serves the index.html file."""
+    return app.send_static_file("index.html")
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return app.send_static_file("index.html")
 
 
 if __name__ == "__main__":

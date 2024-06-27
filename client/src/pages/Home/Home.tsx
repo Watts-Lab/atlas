@@ -1,41 +1,74 @@
 import Login from '../../components/View/Login/Login'
 
-import icon from '../../../public/icon.svg'
-import useFetch from '../../service/useFetch'
-import { useState } from 'react'
+import icon from '../../icons/icon.svg'
+
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 type HomeProps = {
   loggingIn?: boolean
 }
 
+type Params = {
+  email?: string
+  magicLink?: string
+}
+
+type FetchDataResponse = {
+  token: string
+}
+
 const Home = ({ loggingIn }: HomeProps) => {
-  const params = useParams()
+  const params: Params = useParams()
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState<boolean>(false)
 
-  if (loggingIn) {
-    if (params.magicLink) {
-      const { data, loading } = useFetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ magicLink: params.magicLink }),
-      })
-      setLoading(loading)
-      if (data) {
-        localStorage.setItem('token', data.token)
-        navigate('/dashboard')
+  useEffect(() => {
+    const fetchData = async (): Promise<FetchDataResponse | null> => {
+      setLoading(true)
+
+      try {
+        const response = await fetch('http://localhost:8000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json()
+        return data
+      } catch (error: unknown) {
+        console.error('Error logging in:', error)
+        return null
+      } finally {
+        setLoading(false)
       }
     }
-  } else {
-    const token = localStorage.getItem('token')
-    if (token) {
-      navigate('/dashboard')
+
+    const executeLogin = async () => {
+      if (loggingIn && params.magicLink) {
+        const data = await fetchData()
+
+        if (data) {
+          localStorage.setItem('token', data.token)
+          navigate('/dashboard')
+        }
+      } else {
+        const token = localStorage.getItem('token')
+        if (token) {
+          navigate('/dashboard')
+        }
+      }
     }
-  }
+
+    executeLogin()
+  }, [loggingIn, params.magicLink, navigate, params.email])
 
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
