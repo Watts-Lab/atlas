@@ -1,8 +1,11 @@
 name: Deploy to Amazon ECS
 
 on:
-  push:
-    branches: ["main"]
+  workflow_run:
+    workflows: ["Run Tests (Frontend)"]
+    branches: [main]
+    types:
+      - completed
 
 env:
   AWS_REGION: us-east-1 # AWS region, e.g. us-west-1
