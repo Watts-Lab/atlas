@@ -36,9 +36,7 @@ app.config["SECRET_KEY"] = os.getenv("SOCKET_SECRET")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 
-socketio = SocketIO(
-    app, cors_allowed_origins=["http://127.0.0.1:8000", "http://localhost:8000"]
-)
+socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 jwt = JWTManager(app)
 
@@ -355,6 +353,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # setting default values
     port = args.port if args.port else 8000
-    debug = args.debug if args.debug else True
+    debug = args.debug if args.debug else False
     # app.run(host="0.0.0.0", port=port, debug=debug)
     socketio.run(app, host="0.0.0.0", port=port, debug=debug)

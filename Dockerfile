@@ -5,6 +5,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY client/package*.json ./
 RUN npm ci
 COPY client/ ./
+ENV NODE_ENV production
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
@@ -18,6 +19,6 @@ RUN pip install -r ./api/requirements.txt
 RUN pip install gunicorn
 ENV FLASK_ENV production
 
-EXPOSE 8000
+EXPOSE 80
 WORKDIR /app/api
-CMD ["gunicorn", "-b", ":8000", "api:app"]
+CMD ["gunicorn", "-b", ":80", "api:app"]
