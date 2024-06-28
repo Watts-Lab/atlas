@@ -316,7 +316,7 @@ api.add_resource(RunAssistant, "/api/run_assistant")
 api.add_resource(Login, "/api/login")
 
 
-@socketio.on("connect", namespace="/")
+@socketio.on("connect", namespace="/home")
 def handle_connect():
     """event listener when client connects"""
     print("client connected", request.sid)
