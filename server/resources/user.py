@@ -2,6 +2,8 @@
 User class 
 """
 
+from datetime import datetime
+
 
 class User:
     def __init__(self):
@@ -14,7 +16,7 @@ class User:
             }
         )
 
-    def add_user(self, username, email, magic_link, available_tokens):
+    def add_user(self, email, magic_link, available_tokens):
         self.users.append(
             {
                 "email": email,
@@ -24,20 +26,14 @@ class User:
             }
         )
 
-    def find_by_username(self, username):
-        for user in self.users:
-            if user["username"] == username:
-                return user
-        return None
-
     def find_by_email(self, email):
         for user in self.users:
             if user["email"] == email:
                 return user
         return None
 
-    def delete_user(self, username):
-        user = self.find_by_username(username)
+    def delete_user(self, email):
+        user = self.find_by_email(email)
         if user:
             self.users.remove(user)
             return True

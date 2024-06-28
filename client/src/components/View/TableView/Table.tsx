@@ -118,7 +118,7 @@ const Table: React.FC = () => {
     formData.append('sid', socket.id ?? '')
 
     try {
-      const response = await fetch('http://localhost:8000/api/run_assistant', {
+      const response = await fetch('/api/run_assistant', {
         method: 'POST',
         body: formData,
         headers: {},
