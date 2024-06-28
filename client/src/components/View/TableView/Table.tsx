@@ -1,6 +1,6 @@
-import React, { useState, DragEvent, useContext, useMemo, useEffect } from 'react'
+import React, { useState, DragEvent, useMemo, useEffect } from 'react'
 import Header from '../../Builder/Header'
-import { SocketContext } from '../../../context/Socket/SocketProvider'
+// import { SocketContext } from '../../../context/Socket/SocketProvider'
 
 interface DataRow {
   id: number
@@ -77,11 +77,11 @@ const Table: React.FC = () => {
     setIsDragging(false)
   }
 
-  const { socket } = useContext(SocketContext)
+  // const { socket } = useContext(SocketContext)
 
-  socket.on('connect', () => {
-    console.log('connected')
-  })
+  // socket.on('connect', () => {
+  //   console.log('connected')
+  // })
 
   const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
   const [pathLength, setPathLength] = useState(0)
@@ -99,9 +99,9 @@ const Table: React.FC = () => {
     return pathLength - (pathLength * status.progress) / 100
   }
 
-  socket.on('status', (data: { status: string; progress: number }) => {
-    setStatus({ status: data.status, progress: Number(data.progress) })
-  })
+  // socket.on('status', (data: { status: string; progress: number }) => {
+  //   setStatus({ status: data.status, progress: Number(data.progress) })
+  // })
 
   useMemo(() => {
     console.log(status)
@@ -117,7 +117,7 @@ const Table: React.FC = () => {
     const files = e.dataTransfer.files
     const formData = new FormData()
     formData.append('file', files[0])
-    formData.append('sid', socket.id ?? '')
+    formData.append('sid', '')
 
     try {
       const response = await fetch('/api/run_assistant', {
