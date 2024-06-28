@@ -246,6 +246,15 @@ class RunAssistant(Resource):
                     "path": file.filename,
                     "result": result["conditions"],
                 }
+
+                # Delete the uploaded
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    print("File removed from local storage successfully")
+                else:
+                    # If it fails, inform the user.
+                    print("Error: %s file not found" % file_path)
+
                 response = make_response(jsonify(response_data))
                 response.status_code = 200
                 return response
