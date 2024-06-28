@@ -24,19 +24,21 @@ const Table: React.FC = () => {
   const [data, setData] = useState<DataRow[]>([
     {
       id: 1,
-      paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
-      condition_name: 'Quality',
-      condition_type: 'something2',
-      condition_message: 'Canada',
-      condition_description: 'asdsda',
+      file_name: 'science.1121066.pdf',
+      condition_name: 'Independent',
+      condition_description:
+        'Participants made decisions about which songs to listen to, given only the names of the bands and their songs. They rated the songs and chose whether to download them without any information on the previous choices of others.',
+      condition_type: 'control',
+      condition_message: 'No',
     },
     {
       id: 2,
-      paper_id: 'A_67a_2021_BehaviouralNudgesIncrease',
-      condition_name: 'Desktop',
-      condition_type: 'something',
-      condition_message: 'United States',
-      condition_description: 'asdsadsad',
+      file_name: 'science.1121066.pdf',
+      condition_name: 'Social Influence',
+      condition_description:
+        'Participants could see how many times each song had been downloaded by previous participants. The songs and their download counts were presented in a grid (Experiment 1) or in one column in descending order of popularity (Experiment 2).',
+      condition_type: 'treatment',
+      condition_message: 'No',
     },
   ])
 
@@ -75,9 +77,9 @@ const Table: React.FC = () => {
     setIsDragging(false)
   }
 
-  const { socket, on } = useContext(SocketContext)
+  const { socket } = useContext(SocketContext)
 
-  on('connect', () => {
+  socket.on('connect', () => {
     console.log('connected')
   })
 
@@ -97,7 +99,7 @@ const Table: React.FC = () => {
     return pathLength - (pathLength * status.progress) / 100
   }
 
-  on('status', (data: { status: string; progress: number }) => {
+  socket.on('status', (data: { status: string; progress: number }) => {
     setStatus({ status: data.status, progress: Number(data.progress) })
   })
 
@@ -128,7 +130,7 @@ const Table: React.FC = () => {
         console.log(data)
         const newData = data.result.map((row: Omit<DataRow, 'id'>, index: number) => ({
           id: index + 1,
-          paper_id: data.path,
+          file_name: data.path,
           ...row,
         }))
         setData(newData)
@@ -145,7 +147,7 @@ const Table: React.FC = () => {
 
   return (
     <>
-      <Header fileName='Workflow-1' />
+      <Header fileName='Atlas project' />
       {(isDragging || isUploading) && (
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center ${isUploading ? 'z-50' : ''}`}
@@ -180,7 +182,7 @@ const Table: React.FC = () => {
         </div>
       )}
       <main
-        className={`h-screen w-screen ${isDragging || isUploading ? 'blur-sm' : ''}`}
+        className={`h-screen w-screen px-4 ${isDragging || isUploading ? 'blur-sm' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -189,27 +191,27 @@ const Table: React.FC = () => {
           <table className='table table-xs'>
             <thead>
               <tr>
-                <th className='text-base font-bold'>id</th>
-                <th className='text-base font-bold' onClick={() => requestSort('paper_id')}>
-                  paper_id
+                <th className='text-base font-bold'></th>
+                <th className='text-base font-bold' onClick={() => requestSort('file_name')}>
+                  file name
                 </th>
                 <th className='text-base font-bold' onClick={() => requestSort('condition_name')}>
-                  condition_name
+                  condition name
                 </th>
                 <th
                   className='text-base font-bold'
                   onClick={() => requestSort('condition_description')}
                 >
-                  condition_description
+                  condition description
                 </th>
                 <th className='text-base font-bold' onClick={() => requestSort('condition_type')}>
-                  condition_type
+                  condition type
                 </th>
                 <th
                   className='text-base font-bold'
                   onClick={() => requestSort('condition_message')}
                 >
-                  condition_message
+                  condition message
                 </th>
               </tr>
             </thead>
@@ -217,7 +219,7 @@ const Table: React.FC = () => {
               {sortedData.map((row) => (
                 <tr key={row.id}>
                   <th>{row.id}</th>
-                  <td>{row.paper_id}</td>
+                  <td>{row.file_name}</td>
                   <td>{row.condition_name}</td>
                   <td>{row.condition_description}</td>
                   <td>{row.condition_type}</td>

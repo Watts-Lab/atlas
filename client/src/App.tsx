@@ -3,7 +3,7 @@ import WorkflowProvider from './context/Workflow/WorkflowProvider'
 import { ReactFlowProvider } from 'reactflow'
 import { Routes, Route } from 'react-router-dom'
 import Table from './components/View/TableView/Table'
-import SocketProvider from './context/Socket/SocketProvider'
+import { SocketProvider } from './context/Socket/SocketProvider'
 import ArrageTable from './components/View/TableView/ArrangeTable'
 import Home from './pages/Home/Home'
 

@@ -1,38 +1,38 @@
-import { useState } from 'react'
-import { useCallback, useContext } from 'react'
-import { useReactFlow } from 'reactflow'
-import { WorkflowContext } from '../../context/Workflow/WorkflowProvider.types'
+// import { useState } from 'react'
+// import { useCallback, useContext } from 'react'
+// import { useReactFlow } from 'reactflow'
+// import { WorkflowContext } from '../../context/Workflow/WorkflowProvider.types'
 
 interface HeaderProps {
   fileName: string
 }
 
 const Header = ({ fileName }: HeaderProps) => {
-  const { saveWorkflow, sendToBackend } = useContext(WorkflowContext)
-  const reactFlow = useReactFlow()
+  // const { saveWorkflow, sendToBackend } = useContext(WorkflowContext)
+  // const reactFlow = useReactFlow()
 
-  const handleSave = useCallback(() => {
-    const nodes = reactFlow.getNodes()
-    const edges = reactFlow.getEdges()
-    saveWorkflow(nodes, edges)
+  // const handleSave = useCallback(() => {
+  //   const nodes = reactFlow.getNodes()
+  //   const edges = reactFlow.getEdges()
+  //   saveWorkflow(nodes, edges)
 
-    setIsVisible(true)
-    setTimeout(() => setIsVisible(false), 3000)
-  }, [reactFlow, saveWorkflow])
+  //   setIsVisible(true)
+  //   setTimeout(() => setIsVisible(false), 3000)
+  // }, [reactFlow, saveWorkflow])
 
-  const handleSendToBackend = useCallback(() => {
-    const nodes = reactFlow.getNodes()
-    const edges = reactFlow.getEdges()
-    sendToBackend(nodes, edges)
-  }, [reactFlow, sendToBackend])
+  // const handleSendToBackend = useCallback(() => {
+  //   const nodes = reactFlow.getNodes()
+  //   const edges = reactFlow.getEdges()
+  //   sendToBackend(nodes, edges)
+  // }, [reactFlow, sendToBackend])
 
-  const [isVisible, setIsVisible] = useState(false)
+  // const [isVisible, setIsVisible] = useState(false)
 
   return (
     <div className='navbar bg-base-100'>
       <div className='navbar-start z-10'>
         <div className='flex-none'>
-          <ul className='menu menu-horizontal px-1'>
+          {/* <ul className='menu menu-horizontal px-1'>
             <li>
               <details className='dropdown'>
                 <summary>File</summary>
@@ -78,17 +78,17 @@ const Header = ({ fileName }: HeaderProps) => {
                 </ul>
               </details>
             </li>
-          </ul>
+          </ul> */}
         </div>
       </div>
       <div className='navbar-center text-center'>
         <span className='normal-case text-xl'>
           {fileName}{' '}
-          <span className={`${isVisible ? 'visible' : 'hidden'} text-green-700`}>- Saved!</span>
+          {/* <span className={`${isVisible ? 'visible' : 'hidden'} text-green-700`}>- Saved!</span> */}
         </span>
       </div>
       <div className='navbar-end z-10'>
-        <button className='btn btn-ghost btn-circle'>
+        {/* <button className='btn btn-ghost btn-circle'>
           <div className='indicator'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -106,7 +106,7 @@ const Header = ({ fileName }: HeaderProps) => {
             </svg>
             <span className='badge badge-xs badge-primary indicator-item'></span>
           </div>
-        </button>
+        </button> */}
       </div>
     </div>
   )
