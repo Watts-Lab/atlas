@@ -1,5 +1,5 @@
 # Build step #1: build the React front end
-FROM node:18-alpine as build-step
+FROM --platform=linux/amd64 public.ecr.aws/bitnami/node:20 as build-step
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY client/package*.json ./
@@ -8,7 +8,7 @@ COPY client/ ./
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
-FROM python:3.9
+FROM public.ecr.aws/docker/library/python:3.10
 WORKDIR /app
 COPY --from=build-step /app/dist ./build
 
@@ -17,7 +17,6 @@ COPY server ./api
 RUN pip install -r ./api/requirements.txt
 RUN pip install gunicorn
 ENV FLASK_ENV production
-
 
 EXPOSE 8000
 WORKDIR /app/api
