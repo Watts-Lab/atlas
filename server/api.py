@@ -30,13 +30,13 @@ load_dotenv()
 app = Flask(__name__, static_folder="../build", static_url_path="/")
 api = Api(app)
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["SECRET_KEY"] = os.getenv("SOCKET_SECRET")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 
-socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 jwt = JWTManager(app)
 
@@ -316,7 +316,7 @@ api.add_resource(RunAssistant, "/api/run_assistant")
 api.add_resource(Login, "/api/login")
 
 
-@socketio.on("connect")
+@socketio.on("connect", namespace="/")
 def handle_connect():
     """event listener when client connects"""
     print("client connected", request.sid)
