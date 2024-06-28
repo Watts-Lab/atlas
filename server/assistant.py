@@ -7,7 +7,9 @@ import importlib
 from datetime import datetime
 from typing import Dict, List, Union
 from openai import OpenAI
+from dotenv import load_dotenv
 
+load_dotenv()
 
 client = OpenAI()
 
