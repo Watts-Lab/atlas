@@ -147,7 +147,7 @@ const Table: React.FC = () => {
 
   return (
     <>
-      <Header fileName='Atlas project' />
+      <Header fileName='Atlas' />
       {(isDragging || isUploading) && (
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center ${isUploading ? 'z-50' : ''}`}

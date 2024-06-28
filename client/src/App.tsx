@@ -14,7 +14,7 @@ function App() {
         <WorkflowProvider>
           <SocketProvider>
             <Routes>
-              <Route path='/' element={<Home />} />
+              <Route path='/' element={<Table />} />
               <Route path='/login/:email/:magicLink' element={<Home loggingIn={true} />} />
               <Route path='/dashboard' element={<Dashboard />} />
               <Route path='/table' element={<Table />} />

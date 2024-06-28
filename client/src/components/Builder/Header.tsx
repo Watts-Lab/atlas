@@ -83,8 +83,26 @@ const Header = ({ fileName }: HeaderProps) => {
       </div>
       <div className='navbar-center text-center'>
         <span className='normal-case text-xl'>
-          {fileName}{' '}
-          {/* <span className={`${isVisible ? 'visible' : 'hidden'} text-green-700`}>- Saved!</span> */}
+          {fileName}
+
+          <br></br>
+          <span className='text-xs'>
+            drag and drop a pdf{' '}
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+              className='size-6 h-4 w-4 inline-block ml-1'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15'
+              />
+            </svg>
+          </span>
         </span>
       </div>
       <div className='navbar-end z-10'>
