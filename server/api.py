@@ -352,7 +352,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--debug", help="Debug mode on or off.", type=bool)
     args = parser.parse_args()
     # setting default values
-    port = args.port if args.port else 8000
+    port = args.port if args.port else 80
     debug = args.debug if args.debug else False
     # app.run(host="0.0.0.0", port=port, debug=debug)
     socketio.run(app, host="0.0.0.0", port=port, debug=debug)
