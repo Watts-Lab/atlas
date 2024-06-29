@@ -16,9 +16,9 @@ COPY --from=build-step /app/dist ./build
 RUN mkdir ./api
 COPY server ./api
 RUN pip install -r ./api/requirements.txt
-RUN pip install gunicorn
+RUN pip install gunicorn eventlet
 ENV FLASK_ENV production
 
 EXPOSE 80
 WORKDIR /app/api
-CMD ["gunicorn", "-b", ":80", "api:app"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", ":80", "api:app"]
