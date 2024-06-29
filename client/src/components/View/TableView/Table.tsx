@@ -1,6 +1,7 @@
-import React, { useState, DragEvent, useMemo, useEffect } from 'react'
+import React, { useState, DragEvent, useEffect, useCallback } from 'react'
 import Header from '../../Builder/Header'
-// import { SocketContext } from '../../../context/Socket/SocketProvider'
+import { useSocket } from '../../../context/Socket/UseSocket'
+import { API_URL } from '../../../service/api'
 
 interface DataRow {
   id: number
@@ -42,6 +43,9 @@ const Table: React.FC = () => {
     },
   ])
 
+  const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
+  const [pathLength, setPathLength] = useState(0)
+
   const requestSort = (key: keyof DataRow) => {
     let direction: 'ascending' | 'descending' = 'ascending'
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -77,14 +81,23 @@ const Table: React.FC = () => {
     setIsDragging(false)
   }
 
-  // const { socket } = useContext(SocketContext)
+  const socket = useSocket()
 
-  // socket.on('connect', () => {
-  //   console.log('connected')
-  // })
+  const onMessage = useCallback((data: { status: string; progress: number }) => {
+    setStatus({ status: data.status, progress: Number(data.progress) })
+  }, [])
 
-  const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
-  const [pathLength, setPathLength] = useState(0)
+  useEffect(() => {
+    if (!socket) {
+      return
+    }
+
+    socket.on('status', onMessage)
+
+    return () => {
+      socket.off('status', onMessage)
+    }
+  }, [socket, onMessage])
 
   useEffect(() => {
     // Ensure the path element exists before trying to get its length
@@ -99,14 +112,6 @@ const Table: React.FC = () => {
     return pathLength - (pathLength * status.progress) / 100
   }
 
-  // socket.on('status', (data: { status: string; progress: number }) => {
-  //   setStatus({ status: data.status, progress: Number(data.progress) })
-  // })
-
-  useMemo(() => {
-    console.log(status)
-  }, [status])
-
   const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
@@ -117,10 +122,10 @@ const Table: React.FC = () => {
     const files = e.dataTransfer.files
     const formData = new FormData()
     formData.append('file', files[0])
-    formData.append('sid', '')
+    formData.append('sid', socket?.id || '')
 
     try {
-      const response = await fetch('/api/run_assistant', {
+      const response = await fetch(`${API_URL}/run_assistant`, {
         method: 'POST',
         body: formData,
         headers: {},

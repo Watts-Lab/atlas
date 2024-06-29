@@ -186,7 +186,10 @@ def check_output_format(output):
 def call_asssistant_api(file_path: str, sid: str, sio):
     try:
         sio.emit(
-            "status", {"status": "Fetching all features...", "progress": 0}, to=sid
+            "status",
+            {"status": "Fetching all features...", "progress": 0},
+            to=sid,
+            namespace="/home",
         )
         feature_list = get_all_features()
 
@@ -194,6 +197,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             "status",
             {"status": "Building feature functions...", "progress": 5},
             to=sid,
+            namespace="/home",
         )
         functions = build_feature_functions(feature_list)
 
@@ -201,16 +205,25 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             "status",
             {"status": "Uploading file to vector store...", "progress": 10},
             to=sid,
+            namespace="/home",
         )
         vector_store = upload_file_to_vector_store(file_path)
 
-        sio.emit("status", {"status": "Updating assistant...", "progress": 15}, to=sid)
+        sio.emit(
+            "status",
+            {"status": "Updating assistant...", "progress": 15},
+            to=sid,
+            namespace="/home",
+        )
         updated_assistant = update_assistant(
             "asst_2THkE8dZlIZDDCZvd3ZBjara", vector_store, functions
         )
 
         sio.emit(
-            "status", {"status": "Creating thread message...", "progress": 30}, to=sid
+            "status",
+            {"status": "Creating thread message...", "progress": 30},
+            to=sid,
+            namespace="/home",
         )
         thread_message = client.beta.threads.create(
             messages=[
@@ -221,20 +234,31 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             ],
         )
 
-        sio.emit("status", {"status": "Running assistant...", "progress": 40}, to=sid)
+        sio.emit(
+            "status",
+            {"status": "Running assistant...", "progress": 40},
+            to=sid,
+            namespace="/home",
+        )
         run = client.beta.threads.runs.create_and_poll(
             thread_id=thread_message.id, assistant_id=updated_assistant.id
         )
 
         sio.emit(
-            "status", {"status": "Getting tool outputs...", "progress": 50}, to=sid
+            "status",
+            {"status": "Getting tool outputs...", "progress": 50},
+            to=sid,
+            namespace="/home",
         )
         tool_outputs = json.loads(
             run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
         )
 
         sio.emit(
-            "status", {"status": "Checking output format...", "progress": 60}, to=sid
+            "status",
+            {"status": "Checking output format...", "progress": 60},
+            to=sid,
+            namespace="/home",
         )
         check_output_format(tool_outputs)
 
@@ -249,7 +273,10 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         raise AssistantException("Assistant run failed") from e
     finally:
         sio.emit(
-            "status", {"status": "Cleaning up resources...", "progress": 70}, to=sid
+            "status",
+            {"status": "Cleaning up resources...", "progress": 70},
+            to=sid,
+            namespace="/home",
         )
         # deleting the vector store
         vector_store_files = client.beta.vector_stores.files.list(

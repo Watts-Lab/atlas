@@ -331,7 +331,7 @@ def handle_connect():
     print("client connected", request.sid)
 
 
-@socketio.on("disconnect")
+@socketio.on("disconnect", namespace="/home")
 def handle_disconnect():
     """event listener when client disconnects"""
     print("client disconnected", request.sid)

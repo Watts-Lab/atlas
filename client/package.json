@@ -58,6 +58,5 @@
   "description": "tool for exploring scientific litreture ",
   "main": "postcss.config.js",
   "author": "A.Nakhaei",
-  "license": "ISC",
-  "proxy": "http://localhost:80"
+  "license": "ISC"
 }

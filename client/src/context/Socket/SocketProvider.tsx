@@ -1,20 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { FC, ReactNode, createContext } from 'react'
+import { FC, ReactNode, createContext, useEffect, useState } from 'react'
 import { URL } from '../../service/socket'
 import { Socket, io } from 'socket.io-client'
 
 export interface SocketContextType {
-  socket: Socket
+  socket: Socket | null
 }
 
-const createSocketState = () => {
-  const socket = React.useMemo(() => io(URL as string), [])
+export const SocketContext = createContext<SocketContextType>({ socket: null })
 
-  return { socket }
+export const SocketProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const [socket, setSocket] = useState<Socket | null>(null)
+
+  useEffect(() => {
+    const newSocket = io(URL as string)
+
+    const onDisconnect = () => {
+      setTimeout(() => {
+        const reconnectSocket = io(URL as string)
+        setSocket(reconnectSocket)
+      }, 1000)
+    }
+
+    newSocket.on('disconnect', onDisconnect)
+
+    setSocket(newSocket)
+
+    return () => {
+      newSocket.off('disconnect', onDisconnect)
+      newSocket.close()
+    }
+  }, [])
+
+  return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>
 }
-
-export const SocketContext = createContext<SocketContextType>({ socket: {} as Socket })
-
-export const SocketProvider: FC<{ children: ReactNode }> = ({ children }) => (
-  <SocketContext.Provider value={createSocketState()}>{children}</SocketContext.Provider>
-)
