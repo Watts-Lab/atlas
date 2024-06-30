@@ -19,7 +19,7 @@ export const SocketProvider: FC<{ children: ReactNode }> = ({ children }) => {
       setTimeout(() => {
         const reconnectSocket = io(URL as string)
         setSocket(reconnectSocket)
-      }, 1000)
+      }, 5000)
     }
 
     newSocket.on('disconnect', onDisconnect)
