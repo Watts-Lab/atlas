@@ -20,7 +20,7 @@ export interface Result {
 }
 
 export type KeyValuePairs = {
-  [key: string]: number | string | Behavior[]
+  [key: string]: number | string
 }
 
 export type TableData = {
@@ -61,7 +61,7 @@ export const flattenData = (
         : [...defaultHeaders, ...experimentHeaders, ...conditionHeaders, 'behaviors']
 
       const rows = expandedBehavior
-        ? data.experiments.flatMap((experiment, exp_index) =>
+        ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.condition_behaviors.map((behavior, beh_index) => ({
                 id: `${exp_index}-${con_index}-${beh_index}`,
@@ -79,8 +79,8 @@ export const flattenData = (
                 behavior_message: behavior.behavior_message,
               })),
             ),
-          )
-        : data.experiments.flatMap((experiment, exp_index) =>
+          ) as KeyValuePairs[])
+        : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
               id: `${exp_index}-${con_index}`,
               file_name: data.file_name || '',
@@ -93,7 +93,7 @@ export const flattenData = (
               condition_message: condition.condition_message,
               behaviors: `${condition.condition_behaviors.length} behavior`,
             })),
-          )
+          ) as KeyValuePairs[])
 
       return { headers, rows }
     } else {
@@ -103,7 +103,7 @@ export const flattenData = (
         : [...defaultHeaders, ...experimentHeaders, 'conditions', 'behaviors']
 
       const rows = expandedBehavior
-        ? data.experiments.flatMap((experiment, exp_index) =>
+        ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.condition_behaviors.map((behavior, beh_index) => ({
                 id: `${exp_index}-${con_index}-${beh_index}`,
@@ -118,7 +118,7 @@ export const flattenData = (
                 behavior_message: behavior.behavior_message,
               })),
             ),
-          )
+          ) as KeyValuePairs[])
         : data.experiments.flatMap((experiment, exp_index) => ({
             id: `${exp_index}`,
             file_name: data.file_name || '',
@@ -136,35 +136,80 @@ export const flattenData = (
     }
   } else {
     if (expandedCondition) {
-      return {
-        headers: [...defaultHeaders, 'experiments', ...conditionHeaders, 'behaviors'],
-        rows: data.experiments.map((experiment, index) => ({
-          id: index,
-          file_name: data.file_name || '',
-          paper_title: data.paper_title || '',
-          experiments: experiment.experiment_name,
-          conditions: experiment.conditions.length,
-          behaviors: experiment.conditions.reduce(
-            (acc, condition) => acc + condition.condition_behaviors.length,
-            0,
-          ),
-        })),
-      }
+      // !expandedExperiment && expandedCondition
+      const headers = expandedBehavior
+        ? [...defaultHeaders, 'experiments', ...conditionHeaders, ...behaviorHeaders]
+        : [...defaultHeaders, 'experiments', ...conditionHeaders, 'behaviors']
+
+      const rows = expandedBehavior
+        ? (data.experiments.flatMap((experiment, exp_index) =>
+            experiment.conditions.flatMap((condition, con_index) =>
+              condition.condition_behaviors.map((behavior, beh_index) => ({
+                id: `${exp_index}-${con_index}-${beh_index}`,
+                file_name: data.file_name || '',
+                paper_title: data.paper_title || '',
+                experiments: experiment.experiment_name,
+                condition_name: condition.condition_name,
+                condition_description: condition.condition_description,
+                condition_type: condition.condition_type,
+                condition_message: condition.condition_message,
+                behavior_name: behavior.behavior_name,
+                behavior_description: behavior.behavior_description,
+                behavior_type: behavior.behavior_type,
+                behavior_message: behavior.behavior_message,
+              })),
+            ),
+          ) as KeyValuePairs[])
+        : (data.experiments.flatMap((experiment, exp_index) =>
+            experiment.conditions.map((condition, con_index) => ({
+              id: `${exp_index}-${con_index}`,
+              file_name: data.file_name || '',
+              paper_title: data.paper_title || '',
+              experiments: experiment.experiment_name,
+              condition_name: condition.condition_name,
+              condition_description: condition.condition_description,
+              condition_type: condition.condition_type,
+              condition_message: condition.condition_message,
+              behaviors: `${condition.condition_behaviors.length} behavior`,
+            })),
+          ) as KeyValuePairs[])
+
+      return { headers, rows }
     } else {
-      return {
-        headers: [...defaultHeaders, 'experiments', 'conditions', 'behaviors'],
-        rows: data.experiments.map((experiment, index) => ({
-          id: index,
-          file_name: data.file_name || '',
-          paper_title: data.paper_title || '',
-          experiments: experiment.experiment_name,
-          conditions: experiment.conditions.length,
-          behaviors: experiment.conditions.reduce(
-            (acc, condition) => acc + condition.condition_behaviors.length,
-            0,
-          ),
-        })),
-      }
+      // !expandedExperiment && !expandedCondition
+      const headers = expandedBehavior
+        ? [...defaultHeaders, 'experiments', 'conditions', ...behaviorHeaders]
+        : [...defaultHeaders, 'experiments', 'conditions', 'behaviors']
+
+      const rows = expandedBehavior
+        ? (data.experiments.flatMap((experiment, exp_index) =>
+            experiment.conditions.flatMap((condition, con_index) =>
+              condition.condition_behaviors.map((behavior, beh_index) => ({
+                id: `${exp_index}-${con_index}-${beh_index}`,
+                file_name: data.file_name || '',
+                paper_title: data.paper_title || '',
+                experiments: experiment.experiment_name,
+                conditions: condition.condition_name,
+                behavior_name: behavior.behavior_name,
+                behavior_description: behavior.behavior_description,
+                behavior_type: behavior.behavior_type,
+                behavior_message: behavior.behavior_message,
+              })),
+            ),
+          ) as KeyValuePairs[])
+        : (data.experiments.flatMap((experiment, exp_index) => ({
+            id: `${exp_index}`,
+            file_name: data.file_name || '',
+            paper_title: data.paper_title || '',
+            experiments: experiment.experiment_name,
+            conditions: `${experiment.conditions.length} condition`,
+            behaviors: `${experiment.conditions.reduce(
+              (acc, condition) => acc + condition.condition_behaviors.length,
+              0,
+            )} behavior`,
+          })) as KeyValuePairs[])
+
+      return { headers, rows }
     }
   }
 }

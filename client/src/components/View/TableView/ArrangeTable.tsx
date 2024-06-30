@@ -63,7 +63,7 @@ const result: Result = {
           condition_name: 'exp2 Condition 1',
           condition_description: 'exp2 Description 1',
           condition_type: 'exp2 Type 1',
-          condition_message: 'exp2 Message 1',
+          condition_messalsge: 'exp2 Message 1',
           condition_behaviors: [
             {
               behavior_name: '--',
