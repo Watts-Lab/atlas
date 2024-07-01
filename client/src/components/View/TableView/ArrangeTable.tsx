@@ -20,7 +20,6 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
 
   useEffect(() => {
     setRows(flattenData(result, expandedExperiment, expandedCondition, expandedBehavior))
-    console.log(flattenData(result, expandedExperiment, expandedCondition, expandedBehavior))
   }, [expandedExperiment, expandedCondition, expandedBehavior])
 
   const changeExpanded = (type: string) => {
@@ -37,6 +36,28 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
       default:
         break
     }
+  }
+
+  const handleMouseEnter = (colIndex: number) => {
+    const firstCell = document.querySelector(`th[data-col="${colIndex}"]`)
+    const lastCell = document.querySelector(`tbody tr:last-child td[data-col="${colIndex}"]`)
+    const cells = document.querySelectorAll(
+      `td[data-col="${colIndex}"], th[data-col="${colIndex}"]`,
+    )
+    firstCell?.classList.add('hover-column-first')
+    lastCell?.classList.add('hover-column-last')
+    cells.forEach((cell) => cell.classList.add('hover-column'))
+  }
+
+  const handleMouseLeave = (colIndex: number) => {
+    const firstCell = document.querySelector(`th[data-col="${colIndex}"]`)
+    const lastCell = document.querySelector(`tbody tr:last-child td[data-col="${colIndex}"]`)
+    const cells = document.querySelectorAll(
+      `td[data-col="${colIndex}"], th[data-col="${colIndex}"]`,
+    )
+    firstCell?.classList.remove('hover-column-first')
+    lastCell?.classList.remove('hover-column-last')
+    cells.forEach((cell) => cell.classList.remove('hover-column'))
   }
 
   return (
@@ -70,21 +91,35 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
         </ul>
       </div>
       <main className='h-screen w-screen px-4'>
-        <div className='overflow-x-auto transition-all duration-300 ease-in-out'>
-          <table className='table table-xs'>
+        <div className='overflow-x-auto'>
+          <table className='table table-xs table-hover'>
             <thead>
               <tr>
                 {rows.headers.map((header, index) => (
-                  <th key={index}>{header}</th>
+                  <th
+                    key={index}
+                    data-col={index}
+                    onMouseEnter={() => handleMouseEnter(index)}
+                    onMouseLeave={() => handleMouseLeave(index)}
+                  >
+                    {header}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.rows.map((row, index) =>
+              {rows.rows.map((row, rowIndex) =>
                 row ? (
-                  <tr key={index} className='transition-all duration-300 ease-in-out'>
-                    {Object.values(row).map((value, index) => (
-                      <td key={index}>{value}</td>
+                  <tr key={rowIndex} className='hover:bg-gray-100'>
+                    {Object.values(row).map((value, colIndex) => (
+                      <td
+                        key={colIndex}
+                        data-col={colIndex}
+                        onMouseEnter={() => handleMouseEnter(colIndex)}
+                        onMouseLeave={() => handleMouseLeave(colIndex)}
+                      >
+                        {value}
+                      </td>
                     ))}
                   </tr>
                 ) : null,

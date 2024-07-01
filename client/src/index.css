@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+table-hover td,
+.table-hover th {
+  position: relative;
+  border: 1px solid transparent; /* Set transparent borders by default */
+}
+
+.table-hover td.hover-column,
+.table-hover th.hover-column {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
+}
+
+.table-hover .hover-column-first {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
+}
+
+.table-hover .hover-column-last {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
+}

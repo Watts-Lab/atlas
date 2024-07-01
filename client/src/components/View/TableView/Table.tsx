@@ -94,10 +94,6 @@ const Table: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    console.log(data)
-  }, [data])
-
   return (
     <>
       <Header fileName='Atlas' />

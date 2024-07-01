@@ -74,7 +74,7 @@ const WorkflowProvider = ({ children }: { children: React.ReactNode }) => {
     })
       .then((response) => {
         if (response.ok) {
-          console.log('Nodes and edges sent to the backend successfully')
+          console.warn('Nodes and edges sent to the backend successfully')
         } else {
           console.error('Failed to send nodes and edges to the backend')
         }
