@@ -24,6 +24,7 @@ export type KeyValuePairs = {
 
 export type TableData = {
   headers: string[]
+  headersGroup: { name: string; span: number }[]
   rows: KeyValuePairs[]
 }
 
@@ -49,7 +50,7 @@ export const flattenData = (
   ]
 
   if (!data.experiments) {
-    return { headers: defaultHeaders, rows: [] }
+    return { headers: defaultHeaders, rows: [], headersGroup: [] }
   }
 
   if (expandedExperiment) {
@@ -92,7 +93,21 @@ export const flattenData = (
             })),
           ) as KeyValuePairs[])
 
-      return { headers, rows }
+      const headersGroup = expandedBehavior
+        ? [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 2 },
+            { name: 'Conditions', span: 4 },
+            { name: 'Behaviors', span: 4 },
+          ]
+        : [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 2 },
+            { name: 'Conditions', span: 4 },
+            { name: 'Behaviors', span: 1 },
+          ]
+
+      return { headers, rows, headersGroup }
     } else {
       // expandedExperiment && !expandedCondition
       const headers = expandedBehavior
@@ -127,8 +142,21 @@ export const flattenData = (
               0,
             )} behavior`,
           }))
+      const headersGroup = expandedBehavior
+        ? [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 2 },
+            { name: 'Conditions', span: 1 },
+            { name: 'Behaviors', span: 4 },
+          ]
+        : [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 2 },
+            { name: 'Conditions', span: 1 },
+            { name: 'Behaviors', span: 1 },
+          ]
 
-      return { headers, rows }
+      return { headers, rows, headersGroup }
     }
   } else {
     if (expandedCondition) {
@@ -168,7 +196,20 @@ export const flattenData = (
             })),
           ) as KeyValuePairs[])
 
-      return { headers, rows }
+      const headersGroup = expandedBehavior
+        ? [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 1 },
+            { name: 'Conditions', span: 4 },
+            { name: 'Behaviors', span: 4 },
+          ]
+        : [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 1 },
+            { name: 'Conditions', span: 4 },
+            { name: 'Behaviors', span: 1 },
+          ]
+      return { headers, rows, headersGroup }
     } else {
       // !expandedExperiment && !expandedCondition
       const headers = expandedBehavior
@@ -201,7 +242,21 @@ export const flattenData = (
             )} behavior`,
           })) as KeyValuePairs[])
 
-      return { headers, rows }
+      const headersGroup = expandedBehavior
+        ? [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 1 },
+            { name: 'Conditions', span: 1 },
+            { name: 'Behaviors', span: 4 },
+          ]
+        : [
+            { name: 'Paper', span: 2 },
+            { name: 'Experiments', span: 1 },
+            { name: 'Conditions', span: 1 },
+            { name: 'Behaviors', span: 1 },
+          ]
+
+      return { headers, rows, headersGroup }
     }
   }
 }

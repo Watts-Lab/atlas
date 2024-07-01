@@ -95,6 +95,17 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
           <table className='table table-xs table-hover'>
             <thead>
               <tr>
+                {rows.headersGroup.map((header, index) => (
+                  <th
+                    key={`${index}-group`}
+                    className={index % 2 === 0 ? 'bg-slate-200' : 'bg-slate-100'}
+                    colSpan={header.span}
+                  >
+                    {header.name}
+                  </th>
+                ))}
+              </tr>
+              <tr>
                 {rows.headers.map((header, index) => (
                   <th
                     key={index}
