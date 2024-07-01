@@ -27,7 +27,7 @@ class AssistantException(Exception):
         return f"AssistantException: {self.message}"
 
 
-def get_all_features() -> List[str]:
+def get_all_features() -> tuple[List[str], List[str]]:
     """
     Gets all the available features.
 
@@ -42,6 +42,7 @@ def get_all_features() -> List[str]:
             "features.condition.message",
         ],
         [
+            "features.behavior.name",
             "features.behavior.description",
             "features.behavior.priority",
             "features.behavior.focal",
@@ -62,63 +63,80 @@ def build_feature_functions(
     - List of dictionaries containing the feature functions.
     """
 
-    parent = "features.condition.parent"
-    parent_module = importlib.import_module(parent)
-    parent_class = parent_module.Feature()
-    print(parent_class.get_functional_object())
-
-    function_call = {
-        "name": "define_conditions_and_behaviors",
-        "description": "Define the conditions and behaviors in the experiment. Each condition and behavior should be a separate object with specified properties.",
+    experiments_function_call = {
+        "name": "define_experiments_conditions_and_behaviors",
+        "description": "Define the conditions and behaviors in each experiment. Each condition and behavior should be a separate object with specified properties and values under the experiments object.",
         "parameters": {
             "type": "object",
             "properties": {
-                "conditions": {
+                "experiments": {
                     "type": "array",
-                    "description": "Array of condition objects with detailed properties.",
+                    "description": "Array of experiments objects with detailed properties.",
                     "items": {
                         "type": "object",
-                        "properties": {},
-                    },
-                },
-                "behaviors": {
-                    "type": "array",
-                    "description": "Array of behaviors objects with detailed properties.",
-                    "items": {
-                        "type": "object",
-                        "properties": {},
+                        "properties": {
+                            "experiment_name": {
+                                "type": "string",
+                                "description": "Name of the experiment.",
+                            },
+                            "experiment_description": {
+                                "type": "string",
+                                "description": "Description of the experiment.",
+                            },
+                            "conditions": {},
+                        },
                     },
                 },
             },
-            "required": ["conditions", "behaviors"],
+            "required": [
+                "experiments",
+            ],
+        },
+    }
+    function_call = {
+        "type": "array",
+        "description": "Array of condition objects with detailed properties.",
+        "items": {
+            "type": "object",
+            "properties": {},
         },
     }
 
     for feature in feature_list[0]:
         feature_module = importlib.import_module(feature)
         feature_class = feature_module.Feature()
-        function_call["parameters"]["properties"]["conditions"]["items"][
-            "properties"
-        ] = {
-            **function_call["parameters"]["properties"]["conditions"]["items"][
-                "properties"
-            ],
+        function_call["items"]["properties"] = {
+            **function_call["items"]["properties"],
             **feature_class.get_functional_object(prefix="condition_"),
         }
+
+    function_call["items"]["properties"]["condition_behaviors"] = {
+        "type": "array",
+        "description": "Array of behaviors objects with detailed properties.",
+        "items": {
+            "type": "object",
+            "properties": {},
+        },
+    }
 
     for feature in feature_list[1]:
         feature_module = importlib.import_module(feature)
         feature_class = feature_module.Feature()
-        function_call["parameters"]["properties"]["behaviors"]["items"][
+
+        function_call["items"]["properties"]["condition_behaviors"]["items"][
             "properties"
         ] = {
-            **function_call["parameters"]["properties"]["behaviors"]["items"][
+            **function_call["items"]["properties"]["condition_behaviors"]["items"][
                 "properties"
             ],
             **feature_class.get_functional_object(prefix="behavior_"),
         }
 
-    return function_call
+    experiments_function_call["parameters"]["properties"]["experiments"]["items"][
+        "properties"
+    ]["conditions"] = function_call
+
+    return experiments_function_call
 
 
 def upload_file_to_vector_store(file_path: str) -> str:
@@ -177,7 +195,7 @@ def check_output_format(output):
     - True if the format is correct, raises an exception if not.
     """
     # Implement your format checking logic here
-    if isinstance(output, dict) and "conditions" in output:
+    if isinstance(output, dict) and "experiments" in output:
         return True
     else:
         raise AssistantException("Output format is incorrect")
@@ -302,3 +320,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         client.beta.threads.delete(thread_id=thread_message.id)
 
     return tool_outputs
+
+
+if __name__ == "__main__":
+    build_feature_functions(get_all_features())

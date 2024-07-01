@@ -2,11 +2,9 @@ import React, { useState, DragEvent, useEffect, useCallback } from 'react'
 import Header from '../../Builder/Header'
 import { useSocket } from '../../../context/Socket/UseSocket'
 import { API_URL } from '../../../service/api'
-
-interface DataRow {
-  id: number
-  [key: string]: number | string
-}
+import ArrageTable from './ArrangeTable'
+import { Result } from './hooks/data-handler'
+import { check_data } from './hooks/mock-data'
 
 type RunStatus = {
   status: string
@@ -14,61 +12,13 @@ type RunStatus = {
 }
 
 const Table: React.FC = () => {
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof DataRow
-    direction: 'ascending' | 'descending'
-  } | null>(null)
-
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
 
-  const [data, setData] = useState<DataRow[]>([
-    {
-      id: 1,
-      file_name: 'science.1121066.pdf',
-      condition_name: 'Independent',
-      condition_description:
-        'Participants made decisions about which songs to listen to, given only the names of the bands and their songs. They rated the songs and chose whether to download them without any information on the previous choices of others.',
-      condition_type: 'control',
-      condition_message: 'No',
-    },
-    {
-      id: 2,
-      file_name: 'science.1121066.pdf',
-      condition_name: 'Social Influence',
-      condition_description:
-        'Participants could see how many times each song had been downloaded by previous participants. The songs and their download counts were presented in a grid (Experiment 1) or in one column in descending order of popularity (Experiment 2).',
-      condition_type: 'treatment',
-      condition_message: 'No',
-    },
-  ])
+  const [data, setData] = useState<Result>(check_data)
 
   const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
   const [pathLength, setPathLength] = useState(0)
-
-  const requestSort = (key: keyof DataRow) => {
-    let direction: 'ascending' | 'descending' = 'ascending'
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending'
-    }
-    setSortConfig({ key, direction })
-  }
-
-  const sortedData = React.useMemo(() => {
-    if (sortConfig !== null) {
-      const sortedArray = [...data].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1
-        }
-        return 0
-      })
-      return sortedArray
-    }
-    return data
-  }, [data, sortConfig])
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -131,14 +81,8 @@ const Table: React.FC = () => {
         headers: {},
       })
       if (response.ok) {
-        const data = await response.json()
-        console.log(data)
-        const newData = data.result.map((row: Omit<DataRow, 'id'>, index: number) => ({
-          id: index + 1,
-          file_name: data.path,
-          ...row,
-        }))
-        setData(newData)
+        const new_data = await response.json()
+        setData({ ...new_data })
       } else {
         console.error('Upload failed')
       }
@@ -149,6 +93,10 @@ const Table: React.FC = () => {
       setStatus({ status: '', progress: 0 })
     }
   }
+
+  useEffect(() => {
+    console.log(data)
+  }, [data])
 
   return (
     <>
@@ -192,48 +140,7 @@ const Table: React.FC = () => {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className='overflow-x-auto'>
-          <table className='table table-xs'>
-            <thead>
-              <tr>
-                <th className='text-base font-bold'></th>
-                <th className='text-base font-bold' onClick={() => requestSort('file_name')}>
-                  file name
-                </th>
-                <th className='text-base font-bold' onClick={() => requestSort('condition_name')}>
-                  condition name
-                </th>
-                <th
-                  className='text-base font-bold'
-                  onClick={() => requestSort('condition_description')}
-                >
-                  condition description
-                </th>
-                <th className='text-base font-bold' onClick={() => requestSort('condition_type')}>
-                  condition type
-                </th>
-                <th
-                  className='text-base font-bold'
-                  onClick={() => requestSort('condition_message')}
-                >
-                  condition message
-                </th>
-              </tr>
-            </thead>
-            <tbody className={isDragging || isUploading ? 'skeleton' : ''}>
-              {sortedData.map((row) => (
-                <tr key={row.id}>
-                  <th>{row.id}</th>
-                  <td>{row.file_name}</td>
-                  <td>{row.condition_name}</td>
-                  <td>{row.condition_description}</td>
-                  <td>{row.condition_type}</td>
-                  <td>{row.condition_message}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ArrageTable result={data} />
       </main>
     </>
   )
