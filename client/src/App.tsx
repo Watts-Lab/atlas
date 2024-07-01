@@ -4,7 +4,6 @@ import { ReactFlowProvider } from 'reactflow'
 import { Routes, Route } from 'react-router-dom'
 import Table from './components/View/TableView/Table'
 import { SocketProvider } from './context/Socket/SocketProvider'
-import ArrageTable from './components/View/TableView/ArrangeTable'
 import Home from './pages/Home/Home'
 
 function App() {
@@ -17,8 +16,6 @@ function App() {
               <Route path='/' element={<Table />} />
               <Route path='/login/:email/:magicLink' element={<Home loggingIn={true} />} />
               <Route path='/dashboard' element={<Dashboard />} />
-              <Route path='/table' element={<Table />} />
-              <Route path='/test' element={<ArrageTable />} />
             </Routes>
           </SocketProvider>
         </WorkflowProvider>
