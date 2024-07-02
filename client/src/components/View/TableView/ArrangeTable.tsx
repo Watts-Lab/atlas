@@ -97,7 +97,7 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
 
   return (
     <>
-      <div className='navbar bg-base-100'>
+      <div className='navbar bg-base-100 flex flex-col sm:flex-row'>
         <div className='navbar-start z-10 pl-5'>
           <div className='flex-none'>
             <span className='normal-case text-xl '>
@@ -158,56 +158,53 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
           </button>
         </div>
       </div>
-
-      <main className='h-screen w-screen px-4'>
-        <div className='overflow-x-auto'>
-          <table className='table table-xs table-hover'>
-            <thead>
-              <tr>
-                {rows.headersGroup.map((header, index) => (
-                  <th
-                    key={`${index}-group`}
-                    className={index % 2 === 0 ? 'bg-slate-300' : 'bg-gray-300'}
-                    colSpan={header.span}
-                  >
-                    {header.name}
-                  </th>
-                ))}
-              </tr>
-              <tr>
-                {rows.headers.map((header, index) => (
-                  <th
-                    key={index}
-                    data-col={index}
-                    onMouseEnter={() => handleMouseEnter(index)}
-                    onMouseLeave={() => handleMouseLeave(index)}
-                  >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.rows.map((row, rowIndex) =>
-                row ? (
-                  <tr key={rowIndex} className='hover:bg-gray-100'>
-                    {Object.values(row).map((value, colIndex) => (
-                      <td
-                        key={colIndex}
-                        data-col={colIndex}
-                        onMouseEnter={() => handleMouseEnter(colIndex)}
-                        onMouseLeave={() => handleMouseLeave(colIndex)}
-                      >
-                        {value}
-                      </td>
-                    ))}
-                  </tr>
-                ) : null,
-              )}
-            </tbody>
-          </table>
-        </div>
-      </main>
+      <div className='overflow-x-auto'>
+        <table className='table table-xs table-hover'>
+          <thead>
+            <tr>
+              {rows.headersGroup.map((header, index) => (
+                <th
+                  key={`${index}-group`}
+                  className={index % 2 === 0 ? 'bg-slate-300' : 'bg-gray-300'}
+                  colSpan={header.span}
+                >
+                  {header.name}
+                </th>
+              ))}
+            </tr>
+            <tr>
+              {rows.headers.map((header, index) => (
+                <th
+                  key={index}
+                  data-col={index}
+                  onMouseEnter={() => handleMouseEnter(index)}
+                  onMouseLeave={() => handleMouseLeave(index)}
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.rows.map((row, rowIndex) =>
+              row ? (
+                <tr key={rowIndex} className='hover:bg-gray-100'>
+                  {Object.values(row).map((value, colIndex) => (
+                    <td
+                      key={colIndex}
+                      data-col={colIndex}
+                      onMouseEnter={() => handleMouseEnter(colIndex)}
+                      onMouseLeave={() => handleMouseLeave(colIndex)}
+                    >
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ) : null,
+            )}
+          </tbody>
+        </table>
+      </div>
     </>
   )
 }
