@@ -128,43 +128,23 @@ def build_feature_functions(
                             },
                             "age_mean": {
                                 "type": "number",
-                                "description": "What is the average age of participants? If not mentioned, leave blank.",
+                                "description": "What is the average age of participants? If not mentioned, leave '--'.",
                             },
                             "age_sd": {
                                 "type": "number",
-                                "description": "What is the standard deviation of the age of participants? If not mentioned, leave blank.",
+                                "description": "What is the standard deviation of the age of participants? If not mentioned, leave '--'.",
                             },
                             "female_perc": {
                                 "type": "number",
-                                "description": "What is the percentage of participants identified as female? give a number between 0 and 1, If not mentioned, leave blank.",
+                                "description": "What is the percentage of participants identified as female? give a number between 0 and 1, If not mentioned, leave '--'.",
                             },
                             "male_perc": {
                                 "type": "number",
-                                "description": "What is the percentage of participants identified as male? give a number between 0 and 1, If not mentioned, leave blank.",
+                                "description": "What is the percentage of participants identified as male? give a number between 0 and 1, If not mentioned, leave '--'.",
                             },
                             "gender_other": {
                                 "type": "number",
-                                "description": "What is the percentage of participants identified as neither female nor male? give a number between 0 and 1, If not mentioned, leave blank.",
-                            },
-                            "white_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as white? give a number between 0 and 1, If not mentioned, leave blank.",
-                            },
-                            "black_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as black? give a number between 0 and 1, If not mentioned, leave blank.",
-                            },
-                            "hispanic_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as hispanic? give a number between 0 and 1, If not mentioned, leave blank.",
-                            },
-                            "asian_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as asian? give a number between 0 and 1, If not mentioned, leave blank.",
-                            },
-                            "other_ethnicity_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as an ethnicity other than white, black, hispanic, or asian? give a number between 0 and 1, If not mentioned, leave blank.",
+                                "description": "What is the percentage of participants identified as neither female nor male? give a number between 0 and 1, If not mentioned, leave '--'.",
                             },
                             "language": {
                                 "type": "string",
@@ -427,4 +407,5 @@ def call_asssistant_api(file_path: str, sid: str, sio):
 
 
 if __name__ == "__main__":
-    build_feature_functions(get_all_features())
+    s = build_feature_functions(get_all_features())
+    print(json.dumps(s))

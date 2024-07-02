@@ -14,20 +14,15 @@ export interface Experiment {
   participant_source_category: string
   units_randomized: string
   units_analyzed: string
-  sample_size_randomized: string
-  sample_size_analyzed: string
+  sample_size_randomized: number
+  sample_size_analyzed: number
   sample_size_notes: string
   adults: string
-  age_mean: string
-  age_sd: string
-  female_perc: string
-  male_perc: string
-  gender_other: string
-  white_perc: string
-  black_perc: string
-  hispanic_perc: string
-  asian_perc: string
-  other_ethnicity_perc: string
+  age_mean: number | string | null
+  age_sd: number | string | null
+  female_perc: number | string | null
+  male_perc: number | string | null
+  gender_other: number | string | null
   language: string
   language_secondary: string
   compensation: string
@@ -42,7 +37,7 @@ export interface Result {
 }
 
 export type KeyValuePairs = {
-  [key: string]: number | string
+  [key: string]: number | string | null
 }
 
 export type TableData = {
@@ -92,11 +87,6 @@ export const flattenExperiment = (
     'female_perc',
     'male_perc',
     'gender_other',
-    'white_perc',
-    'black_perc',
-    'hispanic_perc',
-    'asian_perc',
-    'other_ethnicity_perc',
     'language',
     'language_secondary',
     'compensation',
@@ -149,11 +139,11 @@ export const flattenExperiment = (
                 female_perc: experiment.female_perc,
                 male_perc: experiment.male_perc,
                 gender_other: experiment.gender_other,
-                white_perc: experiment.white_perc,
-                black_perc: experiment.black_perc,
-                hispanic_perc: experiment.hispanic_perc,
-                asian_perc: experiment.asian_perc,
-                other_ethnicity_perc: experiment.other_ethnicity_perc,
+                // white_perc: experiment.white_perc,
+                // black_perc: experiment.black_perc,
+                // hispanic_perc: experiment.hispanic_perc,
+                // asian_perc: experiment.asian_perc,
+                // other_ethnicity_perc: experiment.other_ethnicity_perc,
                 language: experiment.language,
                 language_secondary: experiment.language_secondary,
                 compensation: experiment.compensation,
@@ -189,11 +179,11 @@ export const flattenExperiment = (
               female_perc: experiment.female_perc,
               male_perc: experiment.male_perc,
               gender_other: experiment.gender_other,
-              white_perc: experiment.white_perc,
-              black_perc: experiment.black_perc,
-              hispanic_perc: experiment.hispanic_perc,
-              asian_perc: experiment.asian_perc,
-              other_ethnicity_perc: experiment.other_ethnicity_perc,
+              //   white_perc: experiment.white_perc,
+              //   black_perc: experiment.black_perc,
+              //   hispanic_perc: experiment.hispanic_perc,
+              //   asian_perc: experiment.asian_perc,
+              //   other_ethnicity_perc: experiment.other_ethnicity_perc,
               language: experiment.language,
               language_secondary: experiment.language_secondary,
               compensation: experiment.compensation,
@@ -249,11 +239,11 @@ export const flattenExperiment = (
                 female_perc: experiment.female_perc,
                 male_perc: experiment.male_perc,
                 gender_other: experiment.gender_other,
-                white_perc: experiment.white_perc,
-                black_perc: experiment.black_perc,
-                hispanic_perc: experiment.hispanic_perc,
-                asian_perc: experiment.asian_perc,
-                other_ethnicity_perc: experiment.other_ethnicity_perc,
+                // white_perc: experiment.white_perc,
+                // black_perc: experiment.black_perc,
+                // hispanic_perc: experiment.hispanic_perc,
+                // asian_perc: experiment.asian_perc,
+                // other_ethnicity_perc: experiment.other_ethnicity_perc,
                 language: experiment.language,
                 language_secondary: experiment.language_secondary,
                 compensation: experiment.compensation,
@@ -285,11 +275,11 @@ export const flattenExperiment = (
             female_perc: experiment.female_perc,
             male_perc: experiment.male_perc,
             gender_other: experiment.gender_other,
-            white_perc: experiment.white_perc,
-            black_perc: experiment.black_perc,
-            hispanic_perc: experiment.hispanic_perc,
-            asian_perc: experiment.asian_perc,
-            other_ethnicity_perc: experiment.other_ethnicity_perc,
+            // white_perc: experiment.white_perc,
+            // black_perc: experiment.black_perc,
+            // hispanic_perc: experiment.hispanic_perc,
+            // asian_perc: experiment.asian_perc,
+            // other_ethnicity_perc: experiment.other_ethnicity_perc,
             language: experiment.language,
             language_secondary: experiment.language_secondary,
             compensation: experiment.compensation,
