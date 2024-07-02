@@ -124,7 +124,7 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
         </div>
         <div className='navbar-center text-center'>
           <div className='flex flex-row justify-center '>
-            <ul className='menu menu-xs menu-horizontal bg-base-200 gap-1 rounded-box'>
+            <ul className='menu menu-xs menu-horizontal bg-base-200 gap-1 rounded p-2'>
               <li>
                 <a
                   onClick={() => changeExpanded('experiment')}
@@ -167,7 +167,7 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
                 {rows.headersGroup.map((header, index) => (
                   <th
                     key={`${index}-group`}
-                    className={index % 2 === 0 ? 'bg-slate-200' : 'bg-slate-100'}
+                    className={index % 2 === 0 ? 'bg-slate-300' : 'bg-gray-300'}
                     colSpan={header.span}
                   >
                     {header.name}
