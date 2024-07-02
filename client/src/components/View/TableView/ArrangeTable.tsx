@@ -60,36 +60,105 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
     cells.forEach((cell) => cell.classList.remove('hover-column'))
   }
 
+  const handleExport = () => {
+    const tableData = flattenData(result, true, true, true)
+
+    const escapeCsvValue = (value: string | number) => {
+      if (typeof value === 'string') {
+        // Escape double quotes by doubling them
+        value = value.replace(/"/g, '""')
+        // Wrap the value in double quotes if it contains a comma, newline, or double quote
+        if (value.includes(',') || value.includes('\n') || value.includes('"')) {
+          value = `"${value}"`
+        }
+      }
+      return value
+    }
+
+    const csvData = [
+      tableData.headers.map(escapeCsvValue),
+      ...tableData.rows.map((row) => Object.values(row).map(escapeCsvValue)),
+    ]
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + csvData.map((e) => e.join(',')).join('\n')
+    const encodedUri = encodeURI(csvContent)
+
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+
+    const fileName = result.file_name?.replace('.pdf', '.csv') || 'data.csv'
+    link.setAttribute('download', fileName)
+    link.setAttribute('target', '_blank') // Open in new tab
+
+    document.body.appendChild(link) // Required for FF
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <>
-      <div className='flex flex-row justify-center pb-3'>
-        <ul className='menu menu-xs menu-horizontal bg-base-200 gap-1 rounded-box'>
-          <li>
-            <a
-              onClick={() => changeExpanded('experiment')}
-              className={expandedExperiment ? 'bg-success hover:bg-green-600' : ''}
-            >
-              Experiment
-            </a>
-          </li>
-          <li>
-            <a
-              onClick={() => changeExpanded('condition')}
-              className={expandedCondition ? 'bg-success hover:bg-green-600' : ''}
-            >
-              Condition
-            </a>
-          </li>
-          <li>
-            <a
-              onClick={() => changeExpanded('behavior')}
-              className={expandedBehavior ? 'bg-success hover:bg-green-600' : ''}
-            >
-              Behavior
-            </a>
-          </li>
-        </ul>
+      <div className='navbar bg-base-100'>
+        <div className='navbar-start z-10 pl-5'>
+          <div className='flex-none'>
+            <span className='normal-case text-xl '>
+              ATLAS {`  `}
+              <span className='text-xs'>
+                drag and drop a pdf{' '}
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
+                  className='size-6 h-4 w-4 inline-block ml-1'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15'
+                  />
+                </svg>
+              </span>
+            </span>
+          </div>
+        </div>
+        <div className='navbar-center text-center'>
+          <div className='flex flex-row justify-center '>
+            <ul className='menu menu-xs menu-horizontal bg-base-200 gap-1 rounded-box'>
+              <li>
+                <a
+                  onClick={() => changeExpanded('experiment')}
+                  className={expandedExperiment ? 'bg-success hover:bg-green-600' : ''}
+                >
+                  Experiment
+                </a>
+              </li>
+              <li>
+                <a
+                  onClick={() => changeExpanded('condition')}
+                  className={expandedCondition ? 'bg-success hover:bg-green-600' : ''}
+                >
+                  Condition
+                </a>
+              </li>
+              <li>
+                <a
+                  onClick={() => changeExpanded('behavior')}
+                  className={expandedBehavior ? 'bg-success hover:bg-green-600' : ''}
+                >
+                  Behavior
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className='navbar-end z-10'>
+          <button onClick={handleExport} className='btn btn-ghost badge badge-xs badge-primary'>
+            Export .csv
+          </button>
+        </div>
       </div>
+
       <main className='h-screen w-screen px-4'>
         <div className='overflow-x-auto'>
           <table className='table table-xs table-hover'>

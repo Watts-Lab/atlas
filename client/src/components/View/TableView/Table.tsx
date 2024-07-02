@@ -1,5 +1,4 @@
 import React, { useState, DragEvent, useEffect, useCallback } from 'react'
-import Header from '../../Builder/Header'
 import { useSocket } from '../../../context/Socket/UseSocket'
 import { API_URL } from '../../../service/api'
 import ArrageTable from './ArrangeTable'
@@ -96,7 +95,6 @@ const Table: React.FC = () => {
 
   return (
     <>
-      <Header fileName='Atlas' />
       {(isDragging || isUploading) && (
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center ${isUploading ? 'z-50' : ''}`}
