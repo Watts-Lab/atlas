@@ -61,7 +61,7 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
   }
 
   const handleExport = () => {
-    const tableData = flattenData(result, true, true, true)
+    const tableData = flattenData(result, expandedExperiment, expandedCondition, expandedBehavior)
 
     const escapeCsvValue = (value: string | number) => {
       if (typeof value === 'string') {
