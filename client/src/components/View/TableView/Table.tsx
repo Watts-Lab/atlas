@@ -14,7 +14,7 @@ const Table: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
 
-  const [data, setData] = useState<Result>(check_data)
+  const [data, setData] = useState<Result[]>([check_data])
 
   const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
   const [pathLength, setPathLength] = useState(0)
@@ -81,7 +81,7 @@ const Table: React.FC = () => {
       })
       if (response.ok) {
         const new_data = await response.json()
-        setData({ ...new_data })
+        setData((prev) => [...prev, new_data])
       } else {
         console.error('Upload failed')
       }
