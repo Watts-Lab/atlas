@@ -83,6 +83,90 @@ def build_feature_functions(
                                 "type": "string",
                                 "description": "Description of the experiment.",
                             },
+                            "participant_source": {
+                                "type": "string",
+                                "description": "Where do participants come from? mTurk, Prolific, students, retail workers, etc. Try to use just a few words to describe this. If it is an online panel, please write the name of the source: mTurk, Prolific, etc.",
+                            },
+                            "participant_source_category": {
+                                "type": "string",
+                                "description": "Where do participants come from? Pick one from this list.",
+                                "enum": [
+                                    "online panel",
+                                    "university students",
+                                    "high school or younger students",
+                                    "executive students",
+                                    "customers",
+                                    "employees",
+                                    "public or community",
+                                    "other",
+                                ],
+                            },
+                            "units_randomized": {
+                                "type": "string",
+                                "description": "What was randomized in the experiment? This might be individuals, teams, groups, schools, etc.",
+                            },
+                            "units_analyzed": {
+                                "type": "string",
+                                "description": "What was analyzed in the experiment? This may be the same as what was randomized (often, individual participants) but it may be a lower-level unit. For instance, restaurants may be the unit of randomization but orders placed might be the unit of analysis. Or schools may be the unit of randomization but students might be the unit of analysis.",
+                            },
+                            "sample_size_randomized": {
+                                "type": "number",
+                                "description": "What is the total sample size, at the unit of what was randomized?",
+                            },
+                            "sample_size_analyzed": {
+                                "type": "number",
+                                "description": "What is the total sample size, at the unit of what was analyzed? This should be after any exclusions, if any are mentioned. If the unit of randomization = the unit of analysis, this will often be the same number as above. If exclusions were made before analysis, this may be smaller.",
+                            },
+                            "sample_size_notes": {
+                                "type": "string",
+                                "description": "If anything was confusing or complicated about the sample size, please explain here. Otherwise, write 'NA'.",
+                            },
+                            "adults": {
+                                "type": "string",
+                                "description": "Is the target population adults (18 years old or older), children (<18 years old), or both?",
+                                "enum": ["adults", "children", "both"],
+                            },
+                            "age_mean": {
+                                "type": "number",
+                                "description": "What is the average age of participants? If not mentioned, leave '--'.",
+                            },
+                            "age_sd": {
+                                "type": "number",
+                                "description": "What is the standard deviation of the age of participants? If not mentioned, leave '--'.",
+                            },
+                            "female_perc": {
+                                "type": "number",
+                                "description": "What is the percentage of participants identified as female? give a number between 0 and 1, If not mentioned, leave '--'.",
+                            },
+                            "male_perc": {
+                                "type": "number",
+                                "description": "What is the percentage of participants identified as male? give a number between 0 and 1, If not mentioned, leave '--'.",
+                            },
+                            "gender_other": {
+                                "type": "number",
+                                "description": "What is the percentage of participants identified as neither female nor male? give a number between 0 and 1, If not mentioned, leave '--'.",
+                            },
+                            "language": {
+                                "type": "string",
+                                "description": "What is the primary language used to communicate with the participants in the study, in particular in the stimuli or interventions? If unclear, please explain. (Note if there is any communication as part of the intervention, there should be a primary language listed.)",
+                            },
+                            "language_secondary": {
+                                "type": "string",
+                                "description": "What is the secondary language used to communicate with the participants in the study? If none, write NA.",
+                            },
+                            "compensation": {
+                                "type": "string",
+                                "description": "Were the participants compensated at all? Often, online participants are paid for their time. Sometimes bonuses or lotteries are used as well. If they were compensated, please describe the compensation.",
+                            },
+                            "demographics_conditions": {
+                                "type": "string",
+                                "description": "Does the study provide enough information to capture the age, gender, and/or ethnicity of participants by condition? (This is in contrast to overall, which is captured above.) For example, it might have a table of these demographic features by condition. Note this is not just about the paper providing inferential statistics to show balance across conditions; it is about showing proportions or means and standard deviations by condition.",
+                                "enum": ["Y", "N"],
+                            },
+                            "population_other": {
+                                "type": "string",
+                                "description": "Anything else to mention about the participant population? Include any key attributes that are measured but not listed above, especially any that the researchers seem to indicate are important to describe the population.",
+                            },
                             "conditions": {},
                         },
                     },
@@ -323,4 +407,5 @@ def call_asssistant_api(file_path: str, sid: str, sio):
 
 
 if __name__ == "__main__":
-    build_feature_functions(get_all_features())
+    s = build_feature_functions(get_all_features())
+    print(json.dumps(s))

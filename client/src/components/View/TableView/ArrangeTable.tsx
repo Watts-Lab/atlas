@@ -63,7 +63,7 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
   const handleExport = () => {
     const tableData = flattenData(result, expandedExperiment, expandedCondition, expandedBehavior)
 
-    const escapeCsvValue = (value: string | number) => {
+    const escapeCsvValue = (value: string | number | null) => {
       if (typeof value === 'string') {
         // Escape double quotes by doubling them
         value = value.replace(/"/g, '""')
@@ -71,6 +71,9 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
         if (value.includes(',') || value.includes('\n') || value.includes('"')) {
           value = `"${value}"`
         }
+      }
+      if (value === null) {
+        value = '--'
       }
       return value
     }
