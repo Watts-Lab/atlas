@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Result, TableData, flattenData } from './hooks/data-handler'
 
 type ArrageTableProps = {
-  result: Result
+  result: Result[]
 }
 
 const ArrageTable = ({ result }: ArrageTableProps) => {
@@ -86,7 +86,7 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
     const link = document.createElement('a')
     link.setAttribute('href', encodedUri)
 
-    const fileName = result.file_name?.replace('.pdf', '.csv') || 'data.csv'
+    const fileName = 'data.csv'
     link.setAttribute('download', fileName)
     link.setAttribute('target', '_blank') // Open in new tab
 

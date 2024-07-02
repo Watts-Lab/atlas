@@ -29,7 +29,25 @@ export type TableData = {
 }
 
 export const flattenData = (
+  data: Result[],
+  expandedExperiment: boolean,
+  expandedCondition: boolean,
+  expandedBehavior: boolean,
+): TableData => {
+  const out = data.map((result, index) =>
+    flattenExperiment(result, index, expandedExperiment, expandedCondition, expandedBehavior),
+  )
+
+  const headers = out[0].headers
+  const headersGroup = out[0].headersGroup
+  const rows = out.flatMap((tableData) => tableData.rows)
+
+  return { headers, headersGroup, rows }
+}
+
+export const flattenExperiment = (
   data: Result,
+  experiment_id: number,
   expandedExperiment: boolean,
   expandedCondition: boolean,
   expandedBehavior: boolean,
@@ -64,7 +82,7 @@ export const flattenData = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.condition_behaviors.map((behavior, beh_index) => ({
-                id: `${exp_index}-${con_index}-${beh_index}`,
+                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
                 experiment_name: experiment.experiment_name,
                 experiment_description: experiment.experiment_description,
@@ -81,7 +99,7 @@ export const flattenData = (
           ) as KeyValuePairs[])
         : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
-              id: `${exp_index}-${con_index}`,
+              id: `${experiment_id}-${exp_index}-${con_index}`,
               file_name: data.file_name || '',
               experiment_name: experiment.experiment_name,
               experiment_description: experiment.experiment_description,
@@ -118,7 +136,7 @@ export const flattenData = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.condition_behaviors.map((behavior, beh_index) => ({
-                id: `${exp_index}-${con_index}-${beh_index}`,
+                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
 
                 experiment_name: experiment.experiment_name,
@@ -132,7 +150,7 @@ export const flattenData = (
             ),
           ) as KeyValuePairs[])
         : data.experiments.flatMap((experiment, exp_index) => ({
-            id: `${exp_index}`,
+            id: `${experiment_id}-${exp_index}`,
             file_name: data.file_name || '',
             experiment_name: experiment.experiment_name,
             experiment_description: experiment.experiment_description,
@@ -169,7 +187,7 @@ export const flattenData = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.condition_behaviors.map((behavior, beh_index) => ({
-                id: `${exp_index}-${con_index}-${beh_index}`,
+                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
                 experiments: experiment.experiment_name,
                 condition_name: condition.condition_name,
@@ -185,7 +203,7 @@ export const flattenData = (
           ) as KeyValuePairs[])
         : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
-              id: `${exp_index}-${con_index}`,
+              id: `${experiment_id}-${exp_index}-${con_index}`,
               file_name: data.file_name || '',
               experiments: experiment.experiment_name,
               condition_name: condition.condition_name,
@@ -220,7 +238,7 @@ export const flattenData = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.condition_behaviors.map((behavior, beh_index) => ({
-                id: `${exp_index}-${con_index}-${beh_index}`,
+                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
                 experiments: experiment.experiment_name,
                 conditions: condition.condition_name,
@@ -232,7 +250,7 @@ export const flattenData = (
             ),
           ) as KeyValuePairs[])
         : (data.experiments.flatMap((experiment, exp_index) => ({
-            id: `${exp_index}`,
+            id: `${experiment_id}-${exp_index}`,
             file_name: data.file_name || '',
             experiments: experiment.experiment_name,
             conditions: `${experiment.conditions.length} condition`,
