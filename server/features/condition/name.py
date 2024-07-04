@@ -25,7 +25,6 @@ class Feature(GPTFeature):
         super().__init__(
             feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
         )
-        print("Condition Name Feature initialized.", args, kwargs)
 
     def display(self) -> None:
         """

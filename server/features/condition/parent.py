@@ -24,13 +24,12 @@ class Feature(GPTFeature):
         super().__init__(
             feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
         )
-        print("Condition initialized.", args, kwargs)
 
     def display(self) -> None:
         """
         Display method for the Condition type class.
         """
-        print("This is the Condition class.")
+        print("features.conditions")
 
     def get_functional_object(self, prefix="") -> dict:
         return super().get_functional_object(prefix=prefix)
