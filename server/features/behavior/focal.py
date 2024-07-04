@@ -2,7 +2,7 @@
 This file contains the Behavior focal feature class.
 """
 
-from ..gpt_feature import GPTFeature
+from features.gpt_feature import GPTFeature
 
 
 class Feature(GPTFeature):

@@ -3,7 +3,7 @@ Describe the behavioral outcome in a few words.
 
 """
 
-from ..gpt_feature import GPTFeature
+from features.gpt_feature import GPTFeature
 
 
 class Feature(GPTFeature):
