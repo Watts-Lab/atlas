@@ -3,7 +3,7 @@ Condition message feature. This feature is responsible
 for returning the name of the conditions in the experiment.
 """
 
-from ..gpt_feature import GPTFeature
+from features.gpt_feature import GPTFeature
 
 
 class Feature(GPTFeature):
@@ -25,13 +25,12 @@ class Feature(GPTFeature):
         super().__init__(
             feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
         )
-        print("Condition message Feature initialized.", args, kwargs)
 
     def display(self) -> None:
         """
         Display method for the Condition message class.
         """
-        print("This is the Condition message class.")
+        print("features.condition.message")
 
     def get_functional_object(self, prefix="condition") -> dict:
         return super().get_functional_object(prefix=prefix)

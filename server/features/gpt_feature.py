@@ -9,7 +9,6 @@ class GPTFeature:
     def __init__(
         self, feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
     ):
-        print("Feature initialized.", args, kwargs)
         self.feature_name = feature_name
         self.feature_type = feature_type
         self.feature_prompt = feature_prompt

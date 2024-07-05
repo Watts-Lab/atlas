@@ -11,8 +11,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = OpenAI()
-
 
 class AssistantException(Exception):
     """
@@ -223,7 +221,7 @@ def build_feature_functions(
     return experiments_function_call
 
 
-def upload_file_to_vector_store(file_path: str) -> str:
+def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
     """
     Uploads a file to the vector store.
 
@@ -248,7 +246,10 @@ def upload_file_to_vector_store(file_path: str) -> str:
 
 
 def update_assistant(
-    assistant_id: str, vector_store, functions: List[Dict[str, Union[int, str]]]
+    client: OpenAI,
+    assistant_id: str,
+    vector_store,
+    functions: List[Dict[str, Union[int, str]]],
 ):
     """
     Updates the assistant with the new functions.
@@ -285,7 +286,35 @@ def check_output_format(output):
         raise AssistantException("Output format is incorrect")
 
 
+def create_temporary_assistant(client: OpenAI):
+    """
+    Creates a temporary assistant with the given functions.
+
+    Args:
+        - client: OpenAI client object.
+
+    Returns:
+        - The created assistant.
+    """
+
+    my_temporary_assistant = client.beta.assistants.create(
+        instructions=(
+            "You are a research assistnant for a team of scientists. "
+            "You are tasked with summarizing the key findings of a scientific paper. "
+            "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format."
+        ),
+        name="Atlas explorer",
+        model="gpt-4o",
+        temperature=1,
+    )
+
+    return my_temporary_assistant
+
+
 def call_asssistant_api(file_path: str, sid: str, sio):
+
+    client = OpenAI()
+
     try:
         sio.emit(
             "status",
@@ -309,7 +338,15 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             to=sid,
             namespace="/home",
         )
-        vector_store = upload_file_to_vector_store(file_path)
+        vector_store = upload_file_to_vector_store(client, file_path)
+
+        sio.emit(
+            "status",
+            {"status": "Creating an assistant for your task...", "progress": 12},
+            to=sid,
+            namespace="/home",
+        )
+        my_temporary_assistant = create_temporary_assistant(client)
 
         sio.emit(
             "status",
@@ -318,7 +355,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             namespace="/home",
         )
         updated_assistant = update_assistant(
-            "asst_2THkE8dZlIZDDCZvd3ZBjara", vector_store, functions
+            client, my_temporary_assistant.id, vector_store, functions
         )
 
         sio.emit(
@@ -331,7 +368,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             messages=[
                 {
                     "role": "user",
-                    "content": "define_conditions_and_behaviors",
+                    "content": "define_experiments_conditions_and_behaviors",
                 }
             ],
         )
@@ -342,6 +379,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             to=sid,
             namespace="/home",
         )
+
         run = client.beta.threads.runs.create_and_poll(
             thread_id=thread_message.id, assistant_id=updated_assistant.id
         )
@@ -352,9 +390,14 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             to=sid,
             namespace="/home",
         )
-        tool_outputs = json.loads(
-            run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
-        )
+
+        try:
+            tool_outputs = json.loads(
+                run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
+            )
+        except Exception as e:
+            print(e)
+            print(run)
 
         sio.emit(
             "status",
@@ -402,6 +445,8 @@ def call_asssistant_api(file_path: str, sid: str, sio):
                 print("File deletion failed")
 
         client.beta.threads.delete(thread_id=thread_message.id)
+
+        client.beta.assistants.delete(my_temporary_assistant.id)
 
     return tool_outputs
 

@@ -22,4 +22,4 @@ ENV FLASK_ENV production
 
 EXPOSE 80
 WORKDIR /app/api
-CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", ":80", "api:app"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "10", "-b", ":80", "api:app"]
