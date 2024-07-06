@@ -95,7 +95,7 @@ const Table: React.FC = () => {
 
   return (
     <>
-      {(isDragging || isUploading) && (
+      {isDragging && (
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center ${isUploading ? 'z-50' : ''}`}
         >
@@ -129,12 +129,23 @@ const Table: React.FC = () => {
         </div>
       )}
       <main
-        className={`h-screen w-screen px-4 ${isDragging || isUploading ? 'blur-sm' : ''}`}
+        className={`h-screen w-screen px-4 ${isDragging ? 'blur-sm' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         <ArrageTable result={data} />
+        {isUploading && (
+          <div className='toast toast-end'>
+            <div role='alert' className='alert shadow-lg w-96'>
+              <span className='loading loading-spinner loading-md'></span>
+              <div>
+                <h3 className='font-bold'>Processing paper</h3>
+                <div className='text-xs'>{status.status || 'Uploading...'}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </>
   )

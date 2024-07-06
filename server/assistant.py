@@ -391,13 +391,9 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             namespace="/home",
         )
 
-        try:
-            tool_outputs = json.loads(
-                run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
-            )
-        except Exception as e:
-            print(e)
-            print(run)
+        tool_outputs = json.loads(
+            run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
+        )
 
         sio.emit(
             "status",
