@@ -3,12 +3,11 @@ endpoint for running the assistant
 """
 
 import os
-import json
 from flask import jsonify, make_response, request
 from flask_restful import Resource
 
 
-from assistant import AssistantException, call_asssistant_api
+from gpt_assistant import AssistantException, call_asssistant_api
 
 
 UPLOAD_DIRECTORY = "../paper/"

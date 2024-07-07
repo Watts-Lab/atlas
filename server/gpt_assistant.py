@@ -56,10 +56,10 @@ def get_all_features() -> tuple[List[str], List[str]]:
             "features.experiments.condition.message",
         ],
         [
-            "features.experiments.behavior.name",
-            "features.experiments.behavior.description",
-            "features.experiments.behavior.priority",
-            "features.experiments.behavior.focal",
+            "features.experiments.condition.behavior.name",
+            "features.experiments.condition.behavior.description",
+            "features.experiments.condition.behavior.priority",
+            "features.experiments.condition.behavior.focal",
         ],
     )
 
