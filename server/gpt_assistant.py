@@ -2,10 +2,10 @@
 Functions to interact with the OpenAI API.
 """
 
-import json
 import importlib
+import json
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Dict, List
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -25,7 +25,7 @@ class AssistantException(Exception):
         return f"AssistantException: {self.message}"
 
 
-def get_all_features() -> tuple[List[str], List[str]]:
+def get_all_features() -> List[str]:
     """
     Gets all the available features.
 
@@ -33,204 +33,107 @@ def get_all_features() -> tuple[List[str], List[str]]:
     - List of all available features.
     """
 
-    # experiments_features = [
-    #     "features.experiments.name",
-    #     "features.experiments.description",
-    #     "features.experiments.source",
-    #     "features.experiments.source_category",
-    #     "features.experiments.units_randomized",
-    #     "features.experiments.units_analyzed",
-    #     "features.experiments.sample_size_randomized",
-    #     "features.experiments.sample_size_analyzed",
-    #     "features.experiments.sample_size_notes",
-    #     "features.experiments.adults",
-    #     "features.experiments.age_mean",
-    #     "features.experiments.age_sd",
-    # ]
+    experiments_features = [
+        "experiments.name",
+        "experiments.description",
+        "experiments.participant_source",
+        "experiments.participant_source_category",
+        "experiments.units_randomized",
+        "experiments.units_analyzed",
+        "experiments.sample_size_randomized",
+        "experiments.sample_size_analyzed",
+        "experiments.sample_size_notes",
+        "experiments.adults",
+        "experiments.age_mean",
+        "experiments.age_sd",
+        "experiments.female_perc",
+        "experiments.male_perc",
+        "experiments.gender_other",
+        "experiments.language",
+        "experiments.language_secondary",
+        "experiments.compensation",
+        "experiments.demographics_conditions",
+        "experiments.population_other",
+        "experiments.conditions.name",
+        "experiments.conditions.description",
+        "experiments.conditions.type",
+        "experiments.conditions.message",
+        "experiments.conditions.behaviors.name",
+        "experiments.conditions.behaviors.description",
+        "experiments.conditions.behaviors.priority",
+        "experiments.conditions.behaviors.focal",
+    ]
 
-    return (
-        [
-            "features.experiments.conditions.name",
-            "features.experiments.conditions.description",
-            "features.experiments.conditions.type",
-            "features.experiments.conditions.message",
-        ],
-        [
-            "features.experiments.conditions.behaviors.name",
-            "features.experiments.conditions.behaviors.description",
-            "features.experiments.conditions.behaviors.priority",
-            "features.experiments.conditions.behaviors.focal",
-        ],
-    )
+    sorted_features = sorted(experiments_features, key=lambda s: s.count("."))
+
+    return sorted_features
 
 
-def build_feature_functions(
-    feature_list: tuple[List[str], List[str]]
-) -> List[Dict[str, Union[int, str]]]:
+def build_parent_objects(features: List[str]) -> dict:
     """
-    Builds a list of dictionaries containing the feature functions.
+    Builds the parent objects for the given features.
+    """
+    nested_dict = {}
+
+    for feature in features:
+        keys = feature.split(".")
+        current_dict = nested_dict
+
+        for key in keys[:-1]:
+            if key not in current_dict:
+                feature_module = importlib.import_module(f"features.{feature.rsplit(".", 1)[0]}.parent")
+                feature_class = feature_module.Feature()
+                current_dict[key] = feature_class.get_functional_object_parent_claude()
+            current_dict = current_dict[key]['items']['properties']
+
+        feature_module = importlib.import_module(f"features.{feature}")
+        feature_class = feature_module.Feature()
+        current_dict[keys[-1]] = feature_class.get_functional_object_claude()
+
+
+    # add in the required keys
+    for feature in features:
+        keys = feature.split(".")
+        current_dict = nested_dict
+        for key in keys[:-1]:
+            if key in current_dict:
+                current_dict = current_dict[key]['items']
+            else:
+                if key not in current_dict['required']:
+                    current_dict['required'].append(key)
+                current_dict = current_dict['properties'][key]['items']
+
+        current_dict['required'].append(keys[-1])
+
+
+    return nested_dict
+
+
+def build_openai_feature_functions(feature_list: List[str]) -> dict:
+    """
+    Builds and returns a OPENAI function object.
 
     Args:
-    - feature_list: List of feature functions.
+        feature_list (List[str]): A list of features.
 
     Returns:
-    - List of dictionaries containing the feature functions.
+        dict: The OpenAI function object.
+
+    Raises:
+        None
     """
 
-    experiments_function_call = {
+    openai_function_object = {
         "name": "define_experiments_and_conditions_and_behaviors",
         "description": "Define the conditions and behaviors in each experiment. Each condition and behavior should be a separate object with specified properties and values under the experiments object.",
         "parameters": {
             "type": "object",
-            "properties": {
-                "experiments": {
-                    "type": "array",
-                    "description": "Array of experiments objects with detailed properties.",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "description": "Name of the experiment.",
-                            },
-                            "description": {
-                                "type": "string",
-                                "description": "Description of the experiment.",
-                            },
-                            "participant_source": {
-                                "type": "string",
-                                "description": "Where do participants come from? mTurk, Prolific, students, retail workers, etc. Try to use just a few words to describe this. If it is an online panel, please write the name of the source: mTurk, Prolific, etc.",
-                            },
-                            "participant_source_category": {
-                                "type": "string",
-                                "description": "Where do participants come from? Pick one from this list.",
-                                "enum": [
-                                    "online panel",
-                                    "university students",
-                                    "high school or younger students",
-                                    "executive students",
-                                    "customers",
-                                    "employees",
-                                    "public or community",
-                                    "other",
-                                ],
-                            },
-                            "units_randomized": {
-                                "type": "string",
-                                "description": "What was randomized in the experiment? This might be individuals, teams, groups, schools, etc.",
-                            },
-                            "units_analyzed": {
-                                "type": "string",
-                                "description": "What was analyzed in the experiment? This may be the same as what was randomized (often, individual participants) but it may be a lower-level unit. For instance, restaurants may be the unit of randomization but orders placed might be the unit of analysis. Or schools may be the unit of randomization but students might be the unit of analysis.",
-                            },
-                            "sample_size_randomized": {
-                                "type": "number",
-                                "description": "What is the total sample size, at the unit of what was randomized?",
-                            },
-                            "sample_size_analyzed": {
-                                "type": "number",
-                                "description": "What is the total sample size, at the unit of what was analyzed? This should be after any exclusions, if any are mentioned. If the unit of randomization = the unit of analysis, this will often be the same number as above. If exclusions were made before analysis, this may be smaller.",
-                            },
-                            "sample_size_notes": {
-                                "type": "string",
-                                "description": "If anything was confusing or complicated about the sample size, please explain here. Otherwise, write 'NA'.",
-                            },
-                            "adults": {
-                                "type": "string",
-                                "description": "Is the target population adults (18 years old or older), children (<18 years old), or both?",
-                                "enum": ["adults", "children", "both"],
-                            },
-                            "age_mean": {
-                                "type": "number",
-                                "description": "What is the average age of participants? If not mentioned, leave '--'.",
-                            },
-                            "age_sd": {
-                                "type": "number",
-                                "description": "What is the standard deviation of the age of participants? If not mentioned, leave '--'.",
-                            },
-                            "female_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as female? give a number between 0 and 1, If not mentioned, leave '--'.",
-                            },
-                            "male_perc": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as male? give a number between 0 and 1, If not mentioned, leave '--'.",
-                            },
-                            "gender_other": {
-                                "type": "number",
-                                "description": "What is the percentage of participants identified as neither female nor male? give a number between 0 and 1, If not mentioned, leave '--'.",
-                            },
-                            "language": {
-                                "type": "string",
-                                "description": "What is the primary language used to communicate with the participants in the study, in particular in the stimuli or interventions? If unclear, please explain. (Note if there is any communication as part of the intervention, there should be a primary language listed.)",
-                            },
-                            "language_secondary": {
-                                "type": "string",
-                                "description": "What is the secondary language used to communicate with the participants in the study? If none, write NA.",
-                            },
-                            "compensation": {
-                                "type": "string",
-                                "description": "Were the participants compensated at all? Often, online participants are paid for their time. Sometimes bonuses or lotteries are used as well. If they were compensated, please describe the compensation.",
-                            },
-                            "demographics_conditions": {
-                                "type": "string",
-                                "description": "Does the study provide enough information to capture the age, gender, and/or ethnicity of participants by condition? (This is in contrast to overall, which is captured above.) For example, it might have a table of these demographic features by condition. Note this is not just about the paper providing inferential statistics to show balance across conditions; it is about showing proportions or means and standard deviations by condition.",
-                                "enum": ["Y", "N"],
-                            },
-                            "population_other": {
-                                "type": "string",
-                                "description": "Anything else to mention about the participant population? Include any key attributes that are measured but not listed above, especially any that the researchers seem to indicate are important to describe the population.",
-                            },
-                            "conditions": {},
-                        },
-                    },
-                },
-            },
-            "required": [
-                "experiments",
-            ],
-        },
-    }
-    function_call = {
-        "type": "array",
-        "description": "Array of condition objects with detailed properties.",
-        "items": {
-            "type": "object",
-            "properties": {},
+            "properties": build_parent_objects(feature_list),
+            "required": ["experiments"],
         },
     }
 
-    for feature in feature_list[0]:
-        feature_module = importlib.import_module(feature)
-        feature_class = feature_module.Feature()
-        function_call["items"]["properties"] = {
-            **function_call["items"]["properties"],
-            **feature_class.get_functional_object_gpt(prefix=""),
-        }
-
-    function_call["items"]["properties"]["behaviors"] = {
-        "type": "array",
-        "description": "Array of behaviors objects with detailed properties.",
-        "items": {
-            "type": "object",
-            "properties": {},
-        },
-    }
-
-    for feature in feature_list[1]:
-        feature_module = importlib.import_module(feature)
-        feature_class = feature_module.Feature()
-
-        function_call["items"]["properties"]["behaviors"]["items"]["properties"] = {
-            **function_call["items"]["properties"]["behaviors"]["items"]["properties"],
-            **feature_class.get_functional_object_gpt(prefix=""),
-        }
-
-    experiments_function_call["parameters"]["properties"]["experiments"]["items"][
-        "properties"
-    ]["conditions"] = function_call
-
-    return experiments_function_call
+    return openai_function_object
 
 
 def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
@@ -261,14 +164,14 @@ def update_assistant(
     client: OpenAI,
     assistant_id: str,
     vector_store,
-    functions: List[Dict[str, Union[int, str]]],
+    function: Dict,
 ):
     """
-    Updates the assistant with the new functions.
+    Updates the assistant with the new function.
 
     Args:
     - assistant_id: ID of the assistant to update.
-    - functions: List of dictionaries containing the feature functions.
+    - function: List of dictionaries containing the feature function.
     """
 
     my_updated_assistant = client.beta.assistants.update(
@@ -276,7 +179,7 @@ def update_assistant(
         tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
         tools=[
             {"type": "file_search"},
-            {"type": "function", "function": functions},
+            {"type": "function", "function": function},
         ],
     )
 
@@ -353,7 +256,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             to=sid,
             namespace="/home",
         )
-        functions = build_feature_functions(feature_list)
+        functions = build_openai_feature_functions(feature_list)
 
         sio.emit(
             "status",
@@ -391,7 +294,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             messages=[
                 {
                     "role": "user",
-                    "content": "define_experiments_and_conditions_and_behaviors",
+                    "content": "use function define_experiments_and_conditions_and_behaviors",
                 }
             ],
         )
@@ -468,8 +371,3 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         client.beta.assistants.delete(my_temporary_assistant.id)
 
     return tool_outputs
-
-
-if __name__ == "__main__":
-    s = build_feature_functions(get_all_features())
-    print(json.dumps(s))

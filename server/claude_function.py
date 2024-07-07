@@ -6,7 +6,10 @@ import importlib
 import json
 from typing import List
 from dotenv import load_dotenv
+from pypdf import PdfReader
 import anthropic
+
+from gpt_assistant import AssistantException
 
 load_dotenv()
 
@@ -94,38 +97,163 @@ def build_parent_objects(features: List[str]) -> dict:
     return nested_dict
 
 
-if __name__ == "__main__":
-    f = get_all_features()
+def build_claude_feature_functions(feature_list: List[str]) -> dict:
+    """
+    Builds and returns a Claude function object.
+
+    Args:
+        feature_list (List[str]): A list of features.
+
+    Returns:
+        dict: The Claude function object.
+
+    Raises:
+        None
+    """
+    
     claude_function_object = {
         "name": "define_experiments_and_conditions_and_behaviors",
         "description": (
-            "Defines the experiments with their conditions and behaviors in each experiment. "
-            "Each condition and behavior should be a separate object with specified properties and values under the experiments object."
+            "Defines the experiments with their conditions and behaviors and each of their properties in each experiment. "
         ),
         "input_schema": {
             "type": "object",
-            "properties": build_parent_objects(f),
+            "properties": build_parent_objects(feature_list),
             "required": ["experiments"],
         },
     }
 
+    return claude_function_object
+
+
+
+def build_openai_feature_functions(feature_list: List[str]) -> dict:
+    """
+    Builds and returns a Claude function object.
+
+    Args:
+        feature_list (List[str]): A list of features.
+
+    Returns:
+        dict: The Claude function object.
+
+    Raises:
+        None
+    """
+    
+    openai_function_call = {
+        "type": "function",
+        "function": {
+            "name": "define_experiments_and_conditions_and_behaviors",
+            "description": "Defines the experiments with their conditions and behaviors and each of their properties in each experiment.",
+            "parameters": {
+                "type": "object",
+                "properties": build_parent_objects(feature_list),
+                "required": ["experiments"],
+            },
+        },
+    }
+    
+    return openai_function_call
+
+
+def convert_pdf_to_text(file_path: str) -> str:
+    """
+    Converts the PDF file to text.
+
+    Args:
+    - file_path: The path to the file.
+
+    Returns:
+    - The text extracted from the PDF.
+    """
+
+    reader = PdfReader(file_path)
+    text = ''.join(page.extract_text() for page in reader.pages)
+    return text
+
+
+def call_claude_api(file_path: str, sid: str, sio) -> dict:
+    """
+    Calls the Claude API.
+
+    Args:
+    - file_path: The path to the file.
+    - sid: The session ID.
+    - socketio: The socketio object.
+
+    Returns:
+    - The result from the API.
+    """
+
     client = anthropic.Anthropic()
 
-    i_paper = ""
-    i_paper += open(f"server/paper/A_24a_2022_EffectsOfDigital.md", "r").read()
+    try:
+        sio.emit(
+            "status",
+            {"status": "Fetching all features...", "progress": 0},
+            to=sid,
+            namespace="/home",
+        )
+        feature_list = get_all_features()
 
-    message = client.messages.create(
-        model="claude-3-5-sonnet-20240620",
-        max_tokens=4000,
-        temperature=0,
-        system="You are an assitant helping with exploring scientific papers.",
-        tools=[claude_function_object],
-        messages=[{
-            "role": 'user', "content":  i_paper
-        }],
-        tool_choice = {"type": "tool", "name": "define_experiments_and_conditions_and_behaviors"},
-    )
+        sio.emit(
+            "status",
+            {"status": "Building feature functions...", "progress": 10},
+            to=sid,
+            namespace="/home",
+        )
+        claude_function = build_claude_feature_functions(feature_list)
 
-    r = message.content[0].input
+        sio.emit(
+            "status",
+            {"status": "Converting pdf to text...", "progress": 30},
+            to=sid,
+            namespace="/home",
+        )
 
-    print(json.dumps(r, indent=4))
+        file_text = convert_pdf_to_text(file_path)
+        # full_text, images, out_meta = convert_single_pdf(file_path, models, langs=["English"])
+        # fname = os.path.basename(file_path)
+        # subfolder_path = save_markdown("paper/output", fname, full_text, images, out_meta)
+        # paper = ""
+        # paper += open(f"{subfolder_path}/{fname.replace(".pdf", ".md")}", "r").read()
+
+        sio.emit(
+            "status",
+            {"status": "Running assistant...", "progress": 40},
+            to=sid,
+            namespace="/home",
+        )
+
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20240620",
+            max_tokens=4000,
+            temperature=0,
+            system="You are an assitant helping with exploring scientific papers.",
+            tools=[claude_function],
+            messages=[{
+                "role": 'user', "content":  file_text
+            }],
+            tool_choice = {"type": "tool", "name": "define_experiments_and_conditions_and_behaviors"},
+        )
+
+
+    except json.JSONDecodeError as je:
+        print(je)
+        raise AssistantException("Assistant run failed - JSON Decode Error") from je
+    except TypeError as te:
+        print(te)
+        raise AssistantException("Assistant run failed - Type Error") from te
+    except Exception as e:
+        print(e)
+        raise AssistantException("Assistant run failed") from e
+    finally:
+        sio.emit(
+            "status",
+            {"status": "Cleaning up resources...", "progress": 70},
+            to=sid,
+            namespace="/home",
+        )
+
+    return message.content[0].input

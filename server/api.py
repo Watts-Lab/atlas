@@ -16,7 +16,6 @@ from controllers.assisstant import RunAssistant
 from controllers.features import GetFeatures
 from controllers.login import Login
 
-
 load_dotenv()
 
 app = Flask(__name__, static_folder="../build", static_url_path="/")
@@ -35,7 +34,9 @@ jwt = JWTManager(app)
 
 api.add_resource(GetFeatures, "/api/features")
 api.add_resource(
-    RunAssistant, "/api/run_assistant", resource_class_kwargs={"socketio": socketio}
+    RunAssistant,
+    "/api/run_assistant",
+    resource_class_kwargs={"socketio": socketio},
 )
 api.add_resource(Login, "/api/login")
 

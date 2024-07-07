@@ -156,15 +156,14 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
           </div>
         </div>
         <div className='navbar-end z-10'>
-          <select
+          {/* <select
             id='countries'
+            defaultValue={'gpt'}
             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
           >
-            <option value='GPT' selected>
-              GPT-4o
-            </option>
-            <option value='Claude'>Claude 3.5</option>
-          </select>
+            <option value='gpt'>GPT-4o</option>
+            <option value='claude'>Claude 3.5</option>
+          </select> */}
           <button onClick={handleExport} className='btn btn-ghost badge badge-xs badge-primary'>
             Export .csv
           </button>
