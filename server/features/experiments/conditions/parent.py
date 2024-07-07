@@ -14,12 +14,8 @@ class Feature(GPTFeature):
 
     def __init__(self, *args, **kwargs):
         feature_name = "conditions"
-        feature_type = "object"
-        feature_prompt = (
-            "Define the conditions in the experiment.  "
-            "Each condition should be a separate object with the following properties. "  # This could be moved to where aggregation is done
-            "Put each condition in a JSON object and answer the questions below for each condition."  # This could be moved to where aggregation is done
-        )
+        feature_type = "array"
+        feature_prompt = "Array of condition objects with detailed properties."
         feature_enum = None
         feature_description = "The conditions in the experiment."
         super().__init__(

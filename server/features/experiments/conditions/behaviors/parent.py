@@ -12,12 +12,8 @@ class Feature(GPTFeature):
 
     def __init__(self, *args, **kwargs):
         feature_name = "behaviors"
-        feature_type = "object"
-        feature_prompt = (
-            "Define the behaviors in the experiment.  "
-            "Each behavior should be a separate object with the following properties. "  # This could be moved to where aggregation is done
-            "Put each behavior in a JSON object and answer the questions below for each behavior."  # This could be moved to where aggregation is done
-        )
+        feature_type = "array"
+        feature_prompt = "Array of behaviors objects with detailed properties."
         feature_enum = None
         feature_description = "The behaviors in the experiment."
         super().__init__(

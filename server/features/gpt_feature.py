@@ -45,5 +45,36 @@ class GPTFeature:
 
         return res
 
+    def get_functional_object_claude(self, prefix=""):
+        """Returns a functional object representing the feature."""
+
+        res = {
+            "type": self.feature_type,
+            "description": self.feature_prompt,
+        }
+
+        if self.feature_enum:
+            res["enum"] = self.feature_enum
+
+        return res
+
+    def get_functional_object_parent_claude(self):
+        """Returns a functional object representing the feature as a parent."""
+
+        res = {
+            "type": self.feature_type,
+            "description": self.feature_prompt,
+            "items": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        }
+
+        if self.feature_enum:
+            res["enum"] = self.feature_enum
+
+        return res
+
     def __str__(self) -> str:
         return f"Feature {self.feature_name}"

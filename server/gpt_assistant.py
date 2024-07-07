@@ -50,16 +50,16 @@ def get_all_features() -> tuple[List[str], List[str]]:
 
     return (
         [
-            "features.experiments.condition.name",
-            "features.experiments.condition.description",
-            "features.experiments.condition.type",
-            "features.experiments.condition.message",
+            "features.experiments.conditions.name",
+            "features.experiments.conditions.description",
+            "features.experiments.conditions.type",
+            "features.experiments.conditions.message",
         ],
         [
-            "features.experiments.condition.behavior.name",
-            "features.experiments.condition.behavior.description",
-            "features.experiments.condition.behavior.priority",
-            "features.experiments.condition.behavior.focal",
+            "features.experiments.conditions.behaviors.name",
+            "features.experiments.conditions.behaviors.description",
+            "features.experiments.conditions.behaviors.priority",
+            "features.experiments.conditions.behaviors.focal",
         ],
     )
 
@@ -78,7 +78,7 @@ def build_feature_functions(
     """
 
     experiments_function_call = {
-        "name": "define_experiments_conditions_and_behaviors",
+        "name": "define_experiments_and_conditions_and_behaviors",
         "description": "Define the conditions and behaviors in each experiment. Each condition and behavior should be a separate object with specified properties and values under the experiments object.",
         "parameters": {
             "type": "object",
@@ -89,11 +89,11 @@ def build_feature_functions(
                     "items": {
                         "type": "object",
                         "properties": {
-                            "experiment_name": {
+                            "name": {
                                 "type": "string",
                                 "description": "Name of the experiment.",
                             },
-                            "experiment_description": {
+                            "description": {
                                 "type": "string",
                                 "description": "Description of the experiment.",
                             },
@@ -205,10 +205,10 @@ def build_feature_functions(
         feature_class = feature_module.Feature()
         function_call["items"]["properties"] = {
             **function_call["items"]["properties"],
-            **feature_class.get_functional_object_gpt(prefix="condition_"),
+            **feature_class.get_functional_object_gpt(prefix=""),
         }
 
-    function_call["items"]["properties"]["condition_behaviors"] = {
+    function_call["items"]["properties"]["behaviors"] = {
         "type": "array",
         "description": "Array of behaviors objects with detailed properties.",
         "items": {
@@ -221,13 +221,9 @@ def build_feature_functions(
         feature_module = importlib.import_module(feature)
         feature_class = feature_module.Feature()
 
-        function_call["items"]["properties"]["condition_behaviors"]["items"][
-            "properties"
-        ] = {
-            **function_call["items"]["properties"]["condition_behaviors"]["items"][
-                "properties"
-            ],
-            **feature_class.get_functional_object_gpt(prefix="behavior_"),
+        function_call["items"]["properties"]["behaviors"]["items"]["properties"] = {
+            **function_call["items"]["properties"]["behaviors"]["items"]["properties"],
+            **feature_class.get_functional_object_gpt(prefix=""),
         }
 
     experiments_function_call["parameters"]["properties"]["experiments"]["items"][
@@ -339,6 +335,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
     Returns:
     - The output of the assistant.
     """
+
     client = OpenAI()
 
     try:
@@ -394,7 +391,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             messages=[
                 {
                     "role": "user",
-                    "content": "define_experiments_conditions_and_behaviors",
+                    "content": "define_experiments_and_conditions_and_behaviors",
                 }
             ],
         )
