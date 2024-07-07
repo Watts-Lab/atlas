@@ -13,6 +13,7 @@ class GPTFeature:
         self.feature_type = feature_type
         self.feature_prompt = feature_prompt
         self.feature_enum = feature_enum if feature_enum is not None else []
+        self.feature_description = kwargs.get("feature_description", "")
 
     def display(self):
         """Displays a message indicating that this is the GPT Feature class."""
@@ -27,7 +28,7 @@ class GPTFeature:
             "feature_enum": self.feature_enum,
         }
 
-    def get_functional_object(self, prefix=""):
+    def get_functional_object_gpt(self, prefix=""):
         """Returns a functional object representing the feature."""
 
         feature_name = prefix + self.feature_name

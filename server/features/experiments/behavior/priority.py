@@ -23,15 +23,13 @@ class Feature(GPTFeature):
             "secondary",
             "none",
         ]
+        feature_description = "The priority of the behavior. meaning whether it is primary, secondary, or not labeled by the authors."
         super().__init__(
-            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+            feature_name,
+            feature_type,
+            feature_prompt,
+            feature_enum,
+            feature_description,
+            *args,
+            **kwargs
         )
-
-    def display(self) -> None:
-        """
-        Display method for the Behavior type class.
-        """
-        print("features.behavior.priority")
-
-    def get_functional_object(self, prefix="condition") -> dict:
-        return super().get_functional_object(prefix=prefix)

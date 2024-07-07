@@ -32,18 +32,34 @@ def get_all_features() -> tuple[List[str], List[str]]:
     Returns:
     - List of all available features.
     """
+
+    # experiments_features = [
+    #     "features.experiments.name",
+    #     "features.experiments.description",
+    #     "features.experiments.source",
+    #     "features.experiments.source_category",
+    #     "features.experiments.units_randomized",
+    #     "features.experiments.units_analyzed",
+    #     "features.experiments.sample_size_randomized",
+    #     "features.experiments.sample_size_analyzed",
+    #     "features.experiments.sample_size_notes",
+    #     "features.experiments.adults",
+    #     "features.experiments.age_mean",
+    #     "features.experiments.age_sd",
+    # ]
+
     return (
         [
-            "features.condition.name",
-            "features.condition.description",
-            "features.condition.type",
-            "features.condition.message",
+            "features.experiments.condition.name",
+            "features.experiments.condition.description",
+            "features.experiments.condition.type",
+            "features.experiments.condition.message",
         ],
         [
-            "features.behavior.name",
-            "features.behavior.description",
-            "features.behavior.priority",
-            "features.behavior.focal",
+            "features.experiments.behavior.name",
+            "features.experiments.behavior.description",
+            "features.experiments.behavior.priority",
+            "features.experiments.behavior.focal",
         ],
     )
 
@@ -189,7 +205,7 @@ def build_feature_functions(
         feature_class = feature_module.Feature()
         function_call["items"]["properties"] = {
             **function_call["items"]["properties"],
-            **feature_class.get_functional_object(prefix="condition_"),
+            **feature_class.get_functional_object_gpt(prefix="condition_"),
         }
 
     function_call["items"]["properties"]["condition_behaviors"] = {
@@ -211,7 +227,7 @@ def build_feature_functions(
             **function_call["items"]["properties"]["condition_behaviors"]["items"][
                 "properties"
             ],
-            **feature_class.get_functional_object(prefix="behavior_"),
+            **feature_class.get_functional_object_gpt(prefix="behavior_"),
         }
 
     experiments_function_call["parameters"]["properties"]["experiments"]["items"][
@@ -312,7 +328,17 @@ def create_temporary_assistant(client: OpenAI):
 
 
 def call_asssistant_api(file_path: str, sid: str, sio):
+    """
+    Calls the assistant API to run the assistant.
 
+    Args:
+    - file_path: Path to the file to upload.
+    - sid: Session ID.
+    - sio: Socket IO object.
+
+    Returns:
+    - The output of the assistant.
+    """
     client = OpenAI()
 
     try:
@@ -435,7 +461,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         # deleting the file
         for file_id in file_ids:
             deleted_file = client.files.delete(file_id)
-            if deleted_file.deleted == True:
+            if deleted_file.deleted is True:
                 print("File deleted successfully")
             else:
                 print("File deletion failed")

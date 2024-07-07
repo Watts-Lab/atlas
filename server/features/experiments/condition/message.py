@@ -22,15 +22,13 @@ class Feature(GPTFeature):
             "If it is a do-nothing intervention, select do-nothing.  "
         )
         feature_enum = ["Yes", "No", "Do-nothing"]
+        feature_description = "The message of the condition."
         super().__init__(
-            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+            feature_name,
+            feature_type,
+            feature_prompt,
+            feature_enum,
+            feature_description,
+            *args,
+            **kwargs
         )
-
-    def display(self) -> None:
-        """
-        Display method for the Condition message class.
-        """
-        print("features.condition.message")
-
-    def get_functional_object(self, prefix="condition") -> dict:
-        return super().get_functional_object(prefix=prefix)

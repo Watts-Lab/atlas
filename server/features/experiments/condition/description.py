@@ -23,15 +23,13 @@ class Feature(GPTFeature):
             'Specific vocabulary words naming techniques or concepts should appear under "condition_nudge". '
         )
         feature_enum = None
+        feature_description = "The description of the condition."
         super().__init__(
-            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+            feature_name,
+            feature_type,
+            feature_prompt,
+            feature_enum,
+            feature_description,
+            *args,
+            **kwargs
         )
-
-    def display(self) -> None:
-        """
-        Display method for the Condition Name class.
-        """
-        print("features.condition.description")
-
-    def get_functional_object(self, prefix="condition") -> dict:
-        return super().get_functional_object(prefix=prefix)

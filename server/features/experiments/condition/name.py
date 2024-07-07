@@ -16,20 +16,19 @@ class Feature(GPTFeature):
         feature_name = "name"
         feature_type = "string"
         feature_prompt = (
-            "Give each behavior a one or two word name to describe it. "
+            "Give each condition a one or two word name to describe it. "
             "Author's words: Where possible, use the label the research authors give it. "
-            "Look at tables/figures to see their naming conventions for the behavior and use those if they exist. "
+            "Look at tables/figures to see their naming conventions for the conditions and use those if they exist. "
+            "**Make sure the FIRST (1) condition is considered the CONTROL. This should be the condition you indicate is the focal comparator, in the results tab."
         )
         feature_enum = None
+        feature_description = "The name of the condition."
         super().__init__(
-            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+            feature_name,
+            feature_type,
+            feature_prompt,
+            feature_enum,
+            feature_description,
+            *args,
+            **kwargs
         )
-
-    def display(self) -> None:
-        """
-        Display method for the Condition Name class.
-        """
-        print("features.behavior.name")
-
-    def get_functional_object(self, prefix="behavior") -> dict:
-        return super().get_functional_object(prefix=prefix)
