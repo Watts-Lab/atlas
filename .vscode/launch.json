@@ -9,6 +9,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "flask",
+      "cwd": "${workspaceFolder}/server",
       "env": { "FLASK_APP": "server/api.py", "FLASK_DEBUG": "1" },
       "args": ["run", "--no-debugger", "--no-reload", "--port", "8000"],
       "jinja": true,
