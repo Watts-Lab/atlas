@@ -72,7 +72,11 @@ class RunAssistant(Resource):
                 response.status_code = 200
                 return response
             except AssistantException as e:
-                response_data = {"error": str(e)}
+                response_data = {
+                    "message": str(e),
+                    "file_name": file.filename,
+                    "experiments": {"experiment": []},
+                }
                 response = make_response(jsonify(response_data))
                 response.status_code = 500
                 return response

@@ -46,6 +46,32 @@ export type TableData = {
   rows: KeyValuePairs[]
 }
 
+export function flatten(
+  object: object,
+  array_key = Object.keys(object).find((key) => Array.isArray(object[key])),
+): unknown {
+  return Array.isArray(object)
+    ? object.flatMap((item) => flatten(item))
+    : array_key
+      ? object[array_key].flatMap((array_value) =>
+          flatten({
+            ...Object.keys(object)
+              .filter((key) => key != array_key)
+              .reduce((new_object, key) => ({ ...new_object, [key]: object[key] }), {}),
+            ...(typeof array_value == 'object'
+              ? Object.keys(array_value).reduce(
+                  (new_object, key) => ({
+                    ...new_object,
+                    [`${array_key} ${key}`]: array_value[key],
+                  }),
+                  {},
+                )
+              : { [array_key]: array_value }),
+          }),
+        )
+      : object
+}
+
 export const flattenData = (
   data: Result[],
   expandedExperiment: boolean,

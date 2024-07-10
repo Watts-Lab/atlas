@@ -81,15 +81,16 @@ def build_parent_objects(features: List[str]) -> dict:
 
         for key in keys[:-1]:
             if key not in current_dict:
-                feature_module = importlib.import_module(f"features.{feature.rsplit(".", 1)[0]}.parent")
+                feature_module = importlib.import_module(
+                    f"features.{feature.rsplit('.', 1)[0]}.parent"
+                )
                 feature_class = feature_module.Feature()
                 current_dict[key] = feature_class.get_functional_object_parent_claude()
-            current_dict = current_dict[key]['items']['properties']
+            current_dict = current_dict[key]["items"]["properties"]
 
         feature_module = importlib.import_module(f"features.{feature}")
         feature_class = feature_module.Feature()
         current_dict[keys[-1]] = feature_class.get_functional_object_claude()
-
 
     # add in the required keys
     for feature in features:
@@ -97,14 +98,13 @@ def build_parent_objects(features: List[str]) -> dict:
         current_dict = nested_dict
         for key in keys[:-1]:
             if key in current_dict:
-                current_dict = current_dict[key]['items']
+                current_dict = current_dict[key]["items"]
             else:
-                if key not in current_dict['required']:
-                    current_dict['required'].append(key)
-                current_dict = current_dict['properties'][key]['items']
+                if key not in current_dict["required"]:
+                    current_dict["required"].append(key)
+                current_dict = current_dict["properties"][key]["items"]
 
-        current_dict['required'].append(keys[-1])
-
+        current_dict["required"].append(keys[-1])
 
     return nested_dict
 

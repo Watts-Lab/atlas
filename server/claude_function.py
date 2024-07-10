@@ -13,6 +13,7 @@ from gpt_assistant import AssistantException
 
 load_dotenv()
 
+
 def get_all_features() -> List[str]:
     """
     Gets all the available features.
@@ -69,15 +70,16 @@ def build_parent_objects(features: List[str]) -> dict:
 
         for key in keys[:-1]:
             if key not in current_dict:
-                feature_module = importlib.import_module(f"features.{feature.rsplit(".", 1)[0]}.parent")
+                feature_module = importlib.import_module(
+                    f"features.{feature.rsplit('.', 1)[0]}.parent"
+                )
                 feature_class = feature_module.Feature()
                 current_dict[key] = feature_class.get_functional_object_parent_claude()
-            current_dict = current_dict[key]['items']['properties']
+            current_dict = current_dict[key]["items"]["properties"]
 
         feature_module = importlib.import_module(f"features.{feature}")
         feature_class = feature_module.Feature()
         current_dict[keys[-1]] = feature_class.get_functional_object_claude()
-
 
     # add in the required keys
     for feature in features:
@@ -85,14 +87,13 @@ def build_parent_objects(features: List[str]) -> dict:
         current_dict = nested_dict
         for key in keys[:-1]:
             if key in current_dict:
-                current_dict = current_dict[key]['items']
+                current_dict = current_dict[key]["items"]
             else:
-                if key not in current_dict['required']:
-                    current_dict['required'].append(key)
-                current_dict = current_dict['properties'][key]['items']
+                if key not in current_dict["required"]:
+                    current_dict["required"].append(key)
+                current_dict = current_dict["properties"][key]["items"]
 
-        current_dict['required'].append(keys[-1])
-
+        current_dict["required"].append(keys[-1])
 
     return nested_dict
 
@@ -110,7 +111,7 @@ def build_claude_feature_functions(feature_list: List[str]) -> dict:
     Raises:
         None
     """
-    
+
     claude_function_object = {
         "name": "define_experiments_and_conditions_and_behaviors",
         "description": (
@@ -126,7 +127,6 @@ def build_claude_feature_functions(feature_list: List[str]) -> dict:
     return claude_function_object
 
 
-
 def build_openai_feature_functions(feature_list: List[str]) -> dict:
     """
     Builds and returns a Claude function object.
@@ -140,7 +140,7 @@ def build_openai_feature_functions(feature_list: List[str]) -> dict:
     Raises:
         None
     """
-    
+
     openai_function_call = {
         "type": "function",
         "function": {
@@ -153,7 +153,7 @@ def build_openai_feature_functions(feature_list: List[str]) -> dict:
             },
         },
     }
-    
+
     return openai_function_call
 
 
@@ -169,7 +169,7 @@ def convert_pdf_to_text(file_path: str) -> str:
     """
 
     reader = PdfReader(file_path)
-    text = ''.join(page.extract_text() for page in reader.pages)
+    text = "".join(page.extract_text() for page in reader.pages)
     return text
 
 
@@ -232,12 +232,12 @@ def call_claude_api(file_path: str, sid: str, sio) -> dict:
             temperature=0,
             system="You are an assitant helping with exploring scientific papers.",
             tools=[claude_function],
-            messages=[{
-                "role": 'user', "content":  file_text
-            }],
-            tool_choice = {"type": "tool", "name": "define_experiments_and_conditions_and_behaviors"},
+            messages=[{"role": "user", "content": file_text}],
+            tool_choice={
+                "type": "tool",
+                "name": "define_experiments_and_conditions_and_behaviors",
+            },
         )
-
 
     except json.JSONDecodeError as je:
         print(je)
@@ -257,3 +257,30 @@ def call_claude_api(file_path: str, sid: str, sio) -> dict:
         )
 
     return message.content[0].input
+
+
+if __name__ == "__main__":
+
+    file_text = convert_pdf_to_text("paper/whiting-watts-2024.pdf")
+    # file_text = ""
+    # file_text += open("paper/A_24a_2022_EffectsOfDigital.md", "r").read()
+    client = anthropic.Anthropic()
+    claude_function = build_claude_feature_functions(get_all_features())
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20240620",
+        max_tokens=4000,
+        temperature=0,
+        system="You are an assitant helping with exploring scientific papers.",
+        tools=[claude_function],
+        messages=[{"role": "user", "content": file_text}],
+        tool_choice={
+            "type": "tool",
+            "name": "define_experiments_and_conditions_and_behaviors",
+        },
+    )
+
+    output_str = str(json.dumps(message.content[0].input))
+    # output_str = output_str.replace("<UNKNOWN>", '"--"')
+
+    print(message.content[0].input)
+    print(output_str)
