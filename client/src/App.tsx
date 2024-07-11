@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom'
 import Table from './components/View/TableView/Table'
 import { SocketProvider } from './context/Socket/SocketProvider'
 import Home from './pages/Home/Home'
+import Galaxy from './pages/Login/Galaxy'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path='/' element={<Table />} />
               <Route path='/login/:email/:magicLink' element={<Home loggingIn={true} />} />
               <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/galaxy' element={<Galaxy />} />
             </Routes>
           </SocketProvider>
         </WorkflowProvider>

@@ -23,3 +23,31 @@ table-hover td,
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
 }
+
+.container-gradient {
+  background-image: radial-gradient(1600px at 70% 120%, rgba(33, 39, 80, 1) 10%, #020409 100%);
+}
+
+.container-gradient-dark {
+  background-image: radial-gradient(1600px at 70% 120%, rgb(92, 107, 206) 10%, #02040950 100%);
+}
+
+.w-inherit {
+  width: inherit;
+}
+.h-inherit {
+  height: inherit;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
