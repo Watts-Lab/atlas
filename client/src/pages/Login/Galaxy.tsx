@@ -24,7 +24,7 @@ const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
     const giantColor = '180,184,240'
     const starColor = '226,225,142'
     const cometColor = '226,225,224'
-    const first = true
+    const cometDisabled = false
 
     const canva = canvasRef.current!
     const cleanup = createUniverse(
@@ -34,7 +34,7 @@ const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
       giantColor,
       starColor,
       cometColor,
-      first,
+      cometDisabled,
     )
 
     return () => {
