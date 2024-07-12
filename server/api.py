@@ -33,6 +33,11 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 jwt = JWTManager(app)
 
 
+@app.before_first_request
+def my_func():
+    print("before first request")
+
+
 api.add_resource(GetFeatures, "/api/features")
 api.add_resource(
     RunAssistant, "/api/run_assistant", resource_class_kwargs={"socketio": socketio}

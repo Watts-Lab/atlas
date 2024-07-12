@@ -28,5 +28,13 @@
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
   },
   "python.autoComplete.extraPaths": ["./server"],
-  "python.analysis.extraPaths": ["./server"]
+  "python.analysis.extraPaths": ["./server"],
+  "files.associations": {
+    ".env*": "dotenv"
+  },
+  "github.copilot.enable": {
+    "*": true,
+    // ...
+    "dotenv": false
+  }
 }
