@@ -1,62 +1,121 @@
-"""
-This module contains the Login class, which represents a resource for handling user login.
-"""
+"""User login module that handles login via magic links."""
 
-import json
-from flask import request, jsonify, make_response
-from flask_jwt_extended import create_access_token
-from flask_restful import Resource
+from datetime import datetime, timedelta, timezone, UTC
+from json import JSONDecodeError
+import os
+import secrets
+import jwt
+from dotenv import load_dotenv
 
-from resources.user import User
+from sanic import json
+
+from controllers.email_client import send_magic_link
+from db.models.users import User
 
 
-users = User()
-
-
-class Login(Resource):
+async def login_user(email: str):
     """
-    Represents a resource for handling user login.
-    Methods:
-    - post: Handles the POST request for user login.
+    Handles the POST request for user login.
     """
+    try:
+        if not email:
+            response_data = {"error": "Email is required."}
+            return json(body=response_data, status=400)
 
-    def post(self):
-        """
-        Handles the POST request for user login.
-        Returns:
-        - JSON response containing the status of the login:
-        - If successful, returns {"message": "User successfully logged in"}.
-        - If there is an error, returns {"error": "Invalid username or password"}.
-        """
-        try:
-            data = request.get_json()
-        except json.JSONDecodeError:
-            response_data = {"error": "Invalid JSON data."}
-            response = make_response(jsonify(response_data))
-            response.status_code = 400
-            return response
+        # Fetch user asynchronously
+        user = await User.find_one(User.email == email)
+        expiration_time = datetime.now(UTC) + timedelta(hours=1)
 
-        email = data["email"]
-        magic_link = data["magic_link"]
+        if user:
+            # Generate a new magic link
+            magic_link = secrets.token_urlsafe(64)
+            user.magic_link = magic_link
+            user.magic_link_expired = False
+            user.magic_link_expiration_date = expiration_time
+            user.updated_at = datetime.now(UTC)
+            await user.save()  # Save the User asynchronously
 
-        user = users.find_by_email(email)
-
-        print("user", user)
-
-        if user and user["magic_link"] == magic_link:
-            access_token = create_access_token(identity=user["username"])
-            response = make_response(
-                jsonify(
-                    {
-                        "message": "User successfully logged in",
-                        "access_token": access_token,
-                    }
-                )
-            )
-            response.status_code = 200
-            return response
+            # Send magic link via email
+            send_magic_link(email=email, token=magic_link)
+            response_data = {"message": "Magic link generated. Check your email."}
+            return json(body=response_data, status=200)
         else:
-            response_data = {"error": "Invalid username or password"}
-            response = make_response(jsonify(response_data))
-            response.status_code = 401
-            return response
+            # Create a new user and send magic link
+            new_user = User(
+                email=email,
+                magic_link=secrets.token_urlsafe(64),
+                magic_link_expired=False,
+                magic_link_expiration_date=expiration_time,
+                number_of_tokens=5000,
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+            await new_user.create()  # Create the User asynchronously
+
+            # Send magic link via email
+            send_magic_link(email=email, token=new_user.magic_link)
+            response_data = {
+                "message": "User created. Check your email for the magic link."
+            }
+            return json(body=response_data, status=200)
+
+    except JSONDecodeError:
+        response_data = {"error": "Invalid JSON data."}
+        return json(body=response_data, status=400)
+    except Exception as e:
+        response_data = {"error": "An error occurred.", "message": str(e)}
+        return json(body=response_data, status=500)
+
+
+async def validate_user(email: str, token: str):
+    """
+    Handles the POST request for validating the magic link.
+    """
+    load_dotenv()
+    try:
+        if not email or not token:
+            response_data = {"error": "Email and token are required."}
+            return json(body=response_data, status=400)
+
+        # Fetch user asynchronously
+        user = await User.find_one(User.email == email)
+
+        if user:
+            if user.magic_link == token and not user.magic_link_expired:
+                # Check if the magic link has expired
+                if datetime.now(UTC) < user.magic_link_expiration_date.replace(
+                    tzinfo=timezone.utc
+                ):
+                    # user.magic_link_expired = True
+                    user.updated_at = datetime.now(UTC)
+                    await user.save()  # Save the User asynchronously
+                    response_data = {"message": "Magic link validated."}
+                    header = {
+                        "Access-Control-Expose-Headers": "Authorization",
+                        "Authorization": jwt.encode(
+                            {
+                                "email": email,
+                                "token": token,
+                                "exp": datetime.now() + timedelta(hours=1),
+                            },
+                            os.getenv("JWT_SECRET"),
+                            algorithm="HS256",
+                        ),
+                    }
+                    return json(body=response_data, headers=header, status=200)
+                else:
+                    response_data = {"error": "Magic link has expired."}
+                    return json(body=response_data, status=400)
+            else:
+                response_data = {"error": "Invalid magic link."}
+                return json(body=response_data, status=400)
+        else:
+            response_data = {"error": "User not found."}
+            return json(body=response_data, status=404)
+
+    except JSONDecodeError:
+        response_data = {"error": "Invalid JSON data."}
+        return json(body=response_data, status=400)
+    except Exception as e:
+        response_data = {"error": "An error occurred.", "message": str(e)}
+        return json(body=response_data, status=500)

@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { createUniverse } from './stars-render'
 import { API_URL } from '../../service/api'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const Galaxy = () => {
+type Params = {
+  email?: string
+  magicLink?: string
+}
+
+const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const emailRef = useRef<HTMLInputElement | null>(null)
 
+  const params: Params = useParams()
+  const navigate = useNavigate()
+
   const [submitting, setSubmitting] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(loggingIn)
 
   useEffect(() => {
     const starDensity = 0.216
@@ -31,6 +41,25 @@ const Galaxy = () => {
       cleanup()
     }
   }, [])
+
+  useEffect(() => {
+    if (loggingIn) {
+      setIsLoggingIn(true)
+      fetch(`${API_URL}/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
+      }).then((res) => {
+        if (res.ok) {
+          console.log(res)
+          localStorage.setItem('token', res.headers.get('Authorization')!)
+          navigate('/dashboard')
+        }
+      })
+    }
+  }, [loggingIn])
 
   const submitEmail = async (e: React.FormEvent) => {
     setSubmitting(true)
@@ -66,6 +95,9 @@ const Galaxy = () => {
               Sign up now to get started.
             </p>
 
+            {isLoggingIn ? (
+              <p className='text-slate-200 pt-4 fade-in'>Authenticating... Please wait.</p>
+            ) : null}
             <form onSubmit={submitEmail} className='flex flex-col justify-center items-center'>
               {submitting ? (
                 <p className='text-slate-200 pt-4 fade-in'>Check your email for the magic link!</p>

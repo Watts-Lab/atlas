@@ -1,88 +1,124 @@
-""" This module contains the Flask RESTful API endpoint for the workflow editor. """
+""" This module contains the Sanic RESTful API endpoint for the workflow editor. """
 
-import os
 import argparse
+import os
+from sanic import Sanic, response
+from sanic.request import Request
+from sanic.response import json
+from sanic_jwt import Initialize
+from sanic_cors import CORS
 from dotenv import load_dotenv
-
-
-from flask import Flask, request
-from flask_jwt_extended import JWTManager
-from flask_restful import Api
-from flask_socketio import SocketIO
-from flask_cors import CORS
-
-
+import socketio
 from controllers.assisstant import RunAssistant
 from controllers.features import GetFeatures
-from controllers.login import Login
-
+from controllers.login import login_user, validate_user
+from db.database import init_db
 
 load_dotenv()
 
-app = Flask(__name__, static_folder="../build", static_url_path="/")
-api = Api(app)
+app = Sanic(__name__)
 
+# Load configuration
+app.config.SECRET = os.getenv("SOCKET_SECRET")
+app.config.JWT_SECRET = os.getenv("JWT_SECRET")
+
+# Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-app.config["SECRET_KEY"] = os.getenv("SOCKET_SECRET")
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
-app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+sio = socketio.AsyncServer(async_mode="sanic", logger=True, cors_allowed_origins=[])
 
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-jwt = JWTManager(app)
+sio.attach(app)
 
 
-@app.before_first_request
-def my_func():
-    print("before first request")
+# Initialize database
+@app.listener("before_server_start")
+async def attach_db(app, loop):
+    await init_db()
 
 
-api.add_resource(GetFeatures, "/api/features")
-api.add_resource(
-    RunAssistant, "/api/run_assistant", resource_class_kwargs={"socketio": socketio}
-)
-api.add_resource(Login, "/api/login")
+# Define JWT authentication
+async def authenticate(request):
+    email = request.json.get("email", None)
+    print(email)
+    if email:
+        user = await login_user(email)
+        return user
+    return None
 
 
-@socketio.on("connect", namespace="/home")
-def handle_connect():
-    """event listener when client connects"""
-    print("client connected", request.sid)
+Initialize(app, authenticate=authenticate)
+
+# # Define API resources
+# app.add_route(GetFeatures.as_view(), "/api/features")
+# app.add_route(RunAssistant.as_view(), "/api/run_assistant")
 
 
-@socketio.on("disconnect", namespace="/home")
-def handle_disconnect():
-    """event listener when client disconnects"""
-    print("client disconnected", request.sid)
+# TODO: add login rate limiter
+@app.route("/api/login", methods=["POST"])
+async def login(request: Request):
+    if request.method == "POST":
+        data = request.json
+        email = data.get("email")
+        return await login_user(email)
 
 
-@socketio.on("status")
+@app.route("/api/validate", methods=["POST"])
+async def validate(request: Request):
+    if request.method == "POST":
+        data = request.json
+        email = data.get("email")
+        token = data.get("magic_link")
+        return await validate_user(email=email, token=token)
+
+
+@sio.on("connect", namespace="/home")
+async def handle_connect(sid, _environ, _auth):
+    print("connect ", sid)
+
+
+@sio.on("disconnect", namespace="/home")
+async def handle_disconnect(sid):
+    print("disconnect ", sid)
+
+
+@sio.on("status", namespace="/home")
 def handle_message(data):
     """event listener when client types a message"""
-    print("data from the front end: ", str(data), request.sid)
+    print("data from the front end: ", str(data))
 
 
+# Regular routes
 @app.route("/")
-def index():
+async def index(_request: Request):
     """Serves the index.html file."""
-    return app.send_static_file("index.html")
+    return await response.file(
+        os.path.join(app.config.FALLBACK_STATIC_DIR, "index.html")
+    )
 
 
-@app.errorhandler(404)
-def not_found(e):
+@app.exception(404)
+async def not_found(_request, _exception):
     """reroute to index.html for all other routes"""
-    return app.send_static_file("index.html")
+    return await response.file(
+        os.path.join(app.config.FALLBACK_STATIC_DIR, "index.html")
+    )
+
+
+# Utility to parse command line arguments
+def parse_args():
+    """
+    Parse command line arguments.
+    """
+    parser = argparse.ArgumentParser(description="Atlas Sanic RESTful API endpoint.")
+    parser.add_argument(
+        "-p", "--port", help="Port for the server.", type=int, default=80
+    )
+    parser.add_argument(
+        "-d", "--debug", help="Debug mode on or off.", type=bool, default=False
+    )
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
-    # getting list of command line arguments
-    parser = argparse.ArgumentParser(description="Flask RESTful api end point.")
-    parser.add_argument("-p", "--port", help="Port for the server.", type=int)
-    parser.add_argument("-d", "--debug", help="Debug mode on or off.", type=bool)
-    args = parser.parse_args()
-    # setting default values
-    port = args.port if args.port else 80
-    debug = args.debug if args.debug else False
-    # app.run(host="0.0.0.0", port=port, debug=debug)
-    socketio.run(app, host="0.0.0.0", port=port, debug=debug)
+    args = parse_args()
+    app.run(host="0.0.0.0", port=args.port, debug=args.debug)
