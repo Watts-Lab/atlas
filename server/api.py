@@ -6,20 +6,14 @@ from sanic import Sanic, response
 from sanic.request import Request
 from sanic_jwt import Initialize
 from sanic_cors import CORS
-from dotenv import load_dotenv
 import socketio
-from controllers.assisstant import RunAssistant
-from controllers.features import GetFeatures
+from config.app_config import AppConfig
+from controllers.assisstant import run_assistant
 from controllers.login import login_user, validate_user
-from db.database import init_db
+from database.database import init_db
 
-load_dotenv()
 
-app = Sanic(__name__)
-
-# Load configuration
-app.config.SECRET = os.getenv("SOCKET_SECRET")
-app.config.JWT_SECRET = os.getenv("JWT_SECRET")
+app = Sanic("Atlas", config=AppConfig())
 
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -31,7 +25,7 @@ sio.attach(app)
 
 # Initialize database
 @app.before_server_start
-async def attach_db(app, loop):
+async def attach_db(_app, _loop):
     """
     Initialize the database connection.
     """
@@ -67,7 +61,7 @@ async def login(request: Request):
     if request.method == "POST":
         data = request.json
         email = data.get("email")
-        return await login_user(email)
+        return await login_user(email=email)
 
 
 @app.route("/api/validate", methods=["POST"])
@@ -80,6 +74,17 @@ async def validate(request: Request):
         email = data.get("email")
         token = data.get("magic_link")
         return await validate_user(email=email, token=token)
+
+
+@app.route("/api/run_assistant", methods=["POST"])
+async def run_assistant_endpoint(request: Request):
+    """
+    Handles the POST request for running the assistant.
+    """
+    if request.method == "POST":
+        file = request.form.get("file")
+        sid = request.form.get("sid")
+        return await run_assistant(sid=sid, file=file, sio=sio)
 
 
 @sio.on("connect", namespace="/home")

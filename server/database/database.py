@@ -9,8 +9,8 @@ from beanie import init_beanie
 import motor
 import certifi
 
-from db.models.users import User
-from db.models.results import Result
+from database.models.users import User
+from database.models.results import Result
 
 
 load_dotenv()

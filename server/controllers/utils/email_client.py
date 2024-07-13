@@ -7,8 +7,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import boto3
+from boto3.exceptions import Boto3Error
 from dotenv import load_dotenv
 from jinja2 import Template
+
+from sanic import Sanic
+
 
 load_dotenv()
 
@@ -16,6 +20,9 @@ load_dotenv()
 def send_ses_email(
     subject, body_text, body_html, sender_email, recipient_emails, attachment=None
 ):
+    """
+    Send an email using AWS SES.
+    """
     # Create a multipart/mixed parent container
     msg = MIMEMultipart("mixed")
     msg["Subject"] = subject
@@ -52,18 +59,26 @@ def send_ses_email(
 
     # Try to send the email.
     try:
-        response = client.send_raw_email(
+        _response = client.send_raw_email(
             Source=sender_email,
             Destinations=recipient_emails,
             RawMessage={"Data": msg.as_string()},
         )
-    except Exception as e:
+
+    except Boto3Error as e:
         print(e)
         return False
     return True
 
 
 def send_magic_link(email: str, token: str):
+    """
+    Send a magic link to the user's email.
+    """
+
+    # current app instance
+    app = Sanic.get_app("Atlas")
+
     subject = "Your link to Atlas!"
     body_text = "Please click the link below to sign in to your account."
 
@@ -161,7 +176,7 @@ def send_magic_link(email: str, token: str):
 
     link_template = Template(body_html)
     body_html_send = link_template.render(
-        token=f"http://localhost:5173/login/{email}/{token}"
+        token=f"{app.config.BASE_URL}/login/{email}/{token}"
     )
     sender_email = "noreply@scaledhumanity.org"
     recipient_emails = [email]
