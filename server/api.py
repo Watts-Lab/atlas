@@ -31,7 +31,7 @@ sio.attach(app)
 
 
 # Initialize database
-@app.listener("before_server_start")
+@app.before_server_start
 async def attach_db(app, loop):
     await init_db()
 
