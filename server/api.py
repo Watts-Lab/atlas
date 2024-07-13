@@ -14,6 +14,8 @@ from database.database import init_db
 
 app = Sanic("Atlas", config=AppConfig())
 
+app.static("/", "./build")
+
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -89,11 +91,10 @@ def handle_message(data):
 
 # Regular routes
 @app.route("/")
-async def index(_request: Request):
-    """Serves the index.html file."""
-    return await response.file(
-        os.path.join(app.config.FALLBACK_STATIC_DIR, "index.html")
-    )
+@app.route("/<param>")
+async def route(req, param=None):
+    """"""
+    return response.text(param if param else "homepage")
 
 
 @app.exception(404)
