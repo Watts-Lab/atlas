@@ -4,7 +4,6 @@ import argparse
 import os
 from sanic import Sanic, response
 from sanic.request import Request
-from sanic.response import json
 from sanic_jwt import Initialize
 from sanic_cors import CORS
 from dotenv import load_dotenv
@@ -33,11 +32,17 @@ sio.attach(app)
 # Initialize database
 @app.before_server_start
 async def attach_db(app, loop):
+    """
+    Initialize the database connection.
+    """
     await init_db()
 
 
 # Define JWT authentication
 async def authenticate(request):
+    """
+    Authenticate the user.
+    """
     email = request.json.get("email", None)
     print(email)
     if email:
@@ -56,6 +61,9 @@ Initialize(app, authenticate=authenticate)
 # TODO: add login rate limiter
 @app.route("/api/login", methods=["POST"])
 async def login(request: Request):
+    """
+    Handles the POST request for logging in the user.
+    """
     if request.method == "POST":
         data = request.json
         email = data.get("email")
@@ -64,6 +72,9 @@ async def login(request: Request):
 
 @app.route("/api/validate", methods=["POST"])
 async def validate(request: Request):
+    """
+    Handles the POST request for validating the magic link.
+    """
     if request.method == "POST":
         data = request.json
         email = data.get("email")
@@ -73,11 +84,17 @@ async def validate(request: Request):
 
 @sio.on("connect", namespace="/home")
 async def handle_connect(sid, _environ, _auth):
+    """
+    event listener when client connects to the socket
+    """
     print("connect ", sid)
 
 
 @sio.on("disconnect", namespace="/home")
 async def handle_disconnect(sid):
+    """
+    event listener when client disconnects from the socket
+    """
     print("disconnect ", sid)
 
 
