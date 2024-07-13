@@ -17,7 +17,6 @@ RUN mkdir ./api
 COPY server ./api
 RUN pip install --upgrade pip
 RUN pip install -r ./api/requirements.txt
-RUN pip install gunicorn eventlet
 ENV FLASK_ENV production
 
 EXPOSE 80

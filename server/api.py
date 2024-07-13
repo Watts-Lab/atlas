@@ -4,7 +4,6 @@ import argparse
 import os
 from sanic import Sanic, response
 from sanic.request import Request
-from sanic_jwt import Initialize
 from sanic_cors import CORS
 import socketio
 from config.app_config import AppConfig
@@ -32,27 +31,6 @@ async def attach_db(_app, _loop):
     await init_db()
 
 
-# Define JWT authentication
-async def authenticate(request):
-    """
-    Authenticate the user.
-    """
-    email = request.json.get("email", None)
-    print(email)
-    if email:
-        user = await login_user(email)
-        return user
-    return None
-
-
-Initialize(app, authenticate=authenticate)
-
-# # Define API resources
-# app.add_route(GetFeatures.as_view(), "/api/features")
-# app.add_route(RunAssistant.as_view(), "/api/run_assistant")
-
-
-# TODO: add login rate limiter
 @app.route("/api/login", methods=["POST"])
 async def login(request: Request):
     """
@@ -82,7 +60,7 @@ async def run_assistant_endpoint(request: Request):
     Handles the POST request for running the assistant.
     """
     if request.method == "POST":
-        file = request.form.get("file")
+        file = request.files.get("file")
         sid = request.form.get("sid")
         return await run_assistant(sid=sid, file=file, sio=sio)
 
@@ -136,11 +114,11 @@ def parse_args():
         "-p", "--port", help="Port for the server.", type=int, default=80
     )
     parser.add_argument(
-        "-d", "--debug", help="Debug mode on or off.", type=bool, default=False
+        "-d", "--dev", help="Dev mode on or off.", type=bool, default=False
     )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    app.run(host="0.0.0.0", port=args.port, debug=args.debug)
+    app.run(host="0.0.0.0", port=args.port, dev=args.dev)

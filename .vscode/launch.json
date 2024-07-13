@@ -5,14 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python Debugger: Flask",
+      "name": "Python: Debug Atlas server ",
       "type": "debugpy",
       "request": "launch",
-      "module": "flask",
-      "env": { "FLASK_APP": "server/api.py", "FLASK_DEBUG": "1" },
-      "args": ["run", "--no-debugger", "--no-reload", "--port", "8000"],
-      "jinja": true,
-      "autoStartBrowser": false
+      "program": "${workspaceFolder}/server/api.py",
+      "console": "integratedTerminal",
+      "args": ["--port", "8000", "--dev", "true"]
     }
   ]
 }

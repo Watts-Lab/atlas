@@ -23,8 +23,8 @@ export class Star {
 
   reset() {
     const { getRandInterval, getProbability } = this.constructor as typeof Star
-    this.giant = getProbability(3)
-    this.comet = this.giant || this.first ? false : getProbability(10)
+    this.giant = getProbability(5)
+    this.comet = this.giant || this.first ? false : getProbability(3)
     this.x = getRandInterval(0, this.width - 10)
     this.y = getRandInterval(0, this.height)
     this.r = getRandInterval(1.1, 2.6)
@@ -67,10 +67,10 @@ export class Star {
 
     if (this.giant) {
       universe.fillStyle = `rgba(${this.colors.giantColor},${this.opacity})`
-      universe.arc(this.x, this.y, 2, 0, 2 * Math.PI, false)
+      universe.arc(this.x, this.y, 3, 0, 2 * Math.PI, false)
     } else if (this.comet) {
       universe.fillStyle = `rgba(${this.colors.cometColor},${this.opacity})`
-      universe.arc(this.x, this.y, 1.5, 0, 2 * Math.PI, false)
+      universe.arc(this.x, this.y, 2.5, 0, 2 * Math.PI, false)
 
       for (let i = 0; i < 30; i++) {
         universe.fillStyle = `rgba(${this.colors.cometColor},${this.opacity - (this.opacity / 20) * i})`

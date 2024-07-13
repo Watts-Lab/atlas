@@ -8,6 +8,8 @@ from datetime import datetime
 from typing import Dict, List, Union
 from openai import OpenAI
 from dotenv import load_dotenv
+from sanic.request.form import File
+import socketio
 
 load_dotenv()
 
@@ -221,7 +223,7 @@ def build_feature_functions(
     return experiments_function_call
 
 
-def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
+def upload_file_to_vector_store(client: OpenAI, file: File, sid: str) -> str:
     """
     Uploads a file to the vector store.
 
@@ -231,6 +233,12 @@ def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
     Returns:
     - URL to the uploaded file.
     """
+
+    file_path = f"paper/{sid}{file.name}"
+
+    with open(file_path, "wb") as f:
+        f.write(file.body)
+    f.close()
 
     file_info = client.files.create(file=open(file_path, "rb"), purpose="assistants")
 
@@ -311,12 +319,12 @@ def create_temporary_assistant(client: OpenAI):
     return my_temporary_assistant
 
 
-def call_asssistant_api(file_path: str, sid: str, sio):
+async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
 
     client = OpenAI()
 
     try:
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Fetching all features...", "progress": 0},
             to=sid,
@@ -324,7 +332,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         )
         feature_list = get_all_features()
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Building feature functions...", "progress": 5},
             to=sid,
@@ -332,15 +340,15 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         )
         functions = build_feature_functions(feature_list)
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Uploading file to vector store...", "progress": 10},
             to=sid,
             namespace="/home",
         )
-        vector_store = upload_file_to_vector_store(client, file_path)
+        vector_store = upload_file_to_vector_store(client=client, file=file, sid=sid)
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Creating an assistant for your task...", "progress": 12},
             to=sid,
@@ -348,7 +356,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         )
         my_temporary_assistant = create_temporary_assistant(client)
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Updating assistant...", "progress": 15},
             to=sid,
@@ -358,7 +366,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             client, my_temporary_assistant.id, vector_store, functions
         )
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Creating thread message...", "progress": 30},
             to=sid,
@@ -368,12 +376,12 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             messages=[
                 {
                     "role": "user",
-                    "content": "define_experiments_conditions_and_behaviors",
+                    "content": "run function define_experiments_conditions_and_behaviors",
                 }
             ],
         )
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Running assistant...", "progress": 40},
             to=sid,
@@ -384,7 +392,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             thread_id=thread_message.id, assistant_id=updated_assistant.id
         )
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Getting tool outputs...", "progress": 50},
             to=sid,
@@ -395,7 +403,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
             run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
         )
 
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Checking output format...", "progress": 60},
             to=sid,
@@ -413,7 +421,7 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         print(e)
         raise AssistantException("Assistant run failed") from e
     finally:
-        sio.emit(
+        await sio.emit(
             "status",
             {"status": "Cleaning up resources...", "progress": 70},
             to=sid,

@@ -21,7 +21,9 @@ class AppConfig(Config):
         JWT_EXP_DELTA_SECONDS (int): The expiration time for JWT tokens in seconds.
     """
 
-    BASE_URL = os.getenv("BASE_URL")
+    BASE_URL = os.getenv(
+        "FLASK_ENV" == "development" and "BASE_URL_DEV" or "BASE_URL_PROD"
+    )
     SECRET = os.getenv("SOCKET_SECRET")
     JWT_SECRET = os.getenv("JWT_SECRET")
     JWT_ALGORITHM = "HS256"

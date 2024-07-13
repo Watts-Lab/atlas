@@ -20,7 +20,7 @@ const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
 
   useEffect(() => {
     const starDensity = 0.216
-    const speedCoeff = 0.05
+    const speedCoeff = 0.03
     const giantColor = '180,184,240'
     const starColor = '226,225,142'
     const cometColor = '226,225,224'
