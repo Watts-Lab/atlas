@@ -3,15 +3,15 @@ endpoint for running the assistant
 """
 
 import os
-import json
 from flask import jsonify, make_response, request
 from flask_restful import Resource
 
 
-from assistant import AssistantException, call_asssistant_api
+from claude_function import call_claude_api
+from gpt_assistant import AssistantException, call_asssistant_api
 
 
-UPLOAD_DIRECTORY = "../paper/"
+UPLOAD_DIRECTORY = "paper/"
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
@@ -36,6 +36,7 @@ class RunAssistant(Resource):
         - If there is an error, returns {"error": "No file part"} or {"error": "No selected file"}.
         """
         sid = request.form.get("sid")
+        model = request.form.get("model") or "gpt"
 
         if "file" not in request.files:
             return jsonify({"error": "No file part"})
@@ -46,14 +47,12 @@ class RunAssistant(Resource):
             file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
             file.save(file_path)
             try:
-                result = call_asssistant_api(file_path, sid, self.socketio)
-
-                # print("result : ", json.dumps(result))
-                self.socketio.emit(
-                    "status",
-                    {"status": "Fetching all features...", "progress": 0},
-                    to=sid,
-                )
+                if model == "gpt":
+                    result = call_asssistant_api(file_path, sid, self.socketio)
+                elif model == "claude":
+                    result = call_claude_api(file_path, sid, self.socketio)
+                else:
+                    return jsonify({"error": "Invalid model"})
 
                 response_data = {
                     "message": "File successfully uploaded",
@@ -73,7 +72,11 @@ class RunAssistant(Resource):
                 response.status_code = 200
                 return response
             except AssistantException as e:
-                response_data = {"error": str(e)}
+                response_data = {
+                    "message": str(e),
+                    "file_name": file.filename,
+                    "experiments": {"experiment": []},
+                }
                 response = make_response(jsonify(response_data))
                 response.status_code = 500
                 return response

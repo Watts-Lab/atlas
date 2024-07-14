@@ -22,15 +22,13 @@ class Feature(GPTFeature):
             "focal",
             "not focal",
         ]
+        feature_description = "The focal behavior in the experiment."
         super().__init__(
-            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+            feature_name,
+            feature_type,
+            feature_prompt,
+            feature_enum,
+            feature_description,
+            *args,
+            **kwargs
         )
-
-    def display(self) -> None:
-        """
-        Display method for the Behavior type class.
-        """
-        print("features.behavior.focal")
-
-    def get_functional_object(self, prefix="condition") -> dict:
-        return super().get_functional_object(prefix=prefix)

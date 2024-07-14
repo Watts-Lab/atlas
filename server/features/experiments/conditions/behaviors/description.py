@@ -21,15 +21,13 @@ class Feature(GPTFeature):
             "If their description is not clear enough on its own, or is very verbose, please paraphrase here."
         )
         feature_enum = None
+        feature_description = "The description of the condition."
         super().__init__(
-            feature_name, feature_type, feature_prompt, feature_enum, *args, **kwargs
+            feature_name,
+            feature_type,
+            feature_prompt,
+            feature_enum,
+            feature_description,
+            *args,
+            **kwargs
         )
-
-    def display(self) -> None:
-        """
-        Display method for the Condition Name class.
-        """
-        print("features.behavior.description")
-
-    def get_functional_object(self, prefix="condition") -> dict:
-        return super().get_functional_object(prefix=prefix)

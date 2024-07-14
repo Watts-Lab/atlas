@@ -72,6 +72,7 @@ const Table: React.FC = () => {
     const formData = new FormData()
     formData.append('file', files[0])
     formData.append('sid', socket?.id || '')
+    formData.append('model', 'gpt')
 
     try {
       const response = await fetch(`${API_URL}/run_assistant`, {
