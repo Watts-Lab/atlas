@@ -313,7 +313,7 @@ def create_temporary_assistant(client: OpenAI):
         ),
         name="Atlas explorer",
         model="gpt-4o",
-        temperature=1,
+        temperature=0,
     )
 
     return my_temporary_assistant

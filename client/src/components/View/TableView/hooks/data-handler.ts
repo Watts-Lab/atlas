@@ -380,16 +380,23 @@ export const flattenExperiment = (
               })),
             ),
           ) as KeyValuePairs[])
-        : (data.experiments.flatMap((experiment, exp_index) => ({
-            id: `${experiment_id}-${exp_index}`,
-            file_name: data.file_name || '',
-            experiments: experiment.experiment_name,
-            conditions: `${experiment.conditions.length} condition`,
-            behaviors: `${experiment.conditions.reduce(
-              (acc, condition) => acc + condition.condition_behaviors.length,
-              0,
-            )} behavior`,
-          })) as KeyValuePairs[])
+        : ([
+            {
+              id: `${experiment_id}`,
+              file_name: data.file_name || '',
+              experiments: `${data.experiments.length} experiment(s)`,
+              conditions: `${data.experiments.flatMap((exp) => exp.conditions).length} condition(s)`,
+              behaviors: `${data.experiments.reduce(
+                (acc, exp) =>
+                  acc +
+                  exp.conditions.reduce(
+                    (condAcc, condition) => condAcc + condition.condition_behaviors.length,
+                    0,
+                  ),
+                0,
+              )} behavior(s)`,
+            },
+          ] as KeyValuePairs[])
 
       const headersGroup = expandedBehavior
         ? [

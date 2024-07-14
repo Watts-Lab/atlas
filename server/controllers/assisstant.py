@@ -37,7 +37,7 @@ async def run_assistant(sid: str, file: File, sio: socketio.AsyncServer):
                 print("File removed from local storage successfully")
             else:
                 # If it fails, inform the user.
-                print(f"Error: {f"paper/{sid}{file.name}"} file not found")
+                print(f"Error: paper/{sid}{file.name} file not found")
 
             return json_response(body=response_data, status=200)
         except AssistantException as e:

@@ -14,8 +14,6 @@ from database.database import init_db
 
 app = Sanic("Atlas", config=AppConfig())
 
-app.static("/", "./build")
-
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -87,22 +85,6 @@ async def handle_disconnect(sid):
 def handle_message(data):
     """event listener when client types a message"""
     print("data from the front end: ", str(data))
-
-
-# Regular routes
-@app.route("/")
-@app.route("/<param>")
-async def route(req, param=None):
-    """"""
-    return response.text(param if param else "homepage")
-
-
-@app.exception(404)
-async def not_found(_request, _exception):
-    """reroute to index.html for all other routes"""
-    return await response.file(
-        os.path.join(app.config.FALLBACK_STATIC_DIR, "index.html")
-    )
 
 
 # Utility to parse command line arguments
