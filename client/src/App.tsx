@@ -13,9 +13,9 @@ function App() {
         <WorkflowProvider>
           <SocketProvider>
             <Routes>
-              <Route path='/' element={<Table />} />
-              <Route path='/login' element={<Galaxy />} />
+              <Route path='/' element={<Galaxy />} />
               <Route path='/login/:email/:magicLink' element={<Galaxy loggingIn={true} />} />
+              <Route path='/table' element={<Table />} />
               <Route path='/dashboard' element={<Dashboard />} />
             </Routes>
           </SocketProvider>

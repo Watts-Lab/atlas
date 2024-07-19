@@ -55,7 +55,7 @@ const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
         if (res.ok) {
           console.log(res)
           localStorage.setItem('token', res.headers.get('Authorization')!)
-          navigate('/dashboard')
+          navigate('/table')
         }
       })
     }
