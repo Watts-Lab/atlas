@@ -29,6 +29,9 @@
   },
   "python.autoComplete.extraPaths": ["./server"],
   "python.analysis.extraPaths": ["./server"],
+  "pylint.path": ["${workspaceFolder}/.venv/bin/python", "-m", "pylint"],
+  "pylint.args": ["--rcfile", "${workspaceFolder}/server/.pylintrc"]
+  "python.analysis.extraPaths": ["./server"],
   "files.associations": {
     ".env*": "dotenv"
   },

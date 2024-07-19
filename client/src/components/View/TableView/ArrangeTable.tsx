@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Result, TableData, flattenData } from './hooks/data-handler'
 
 type ArrageTableProps = {
   result: Result[]
+  handleBackend: (file: File) => void
 }
 
-const ArrageTable = ({ result }: ArrageTableProps) => {
+const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
   const [expandedExperiment, setExpandedExperiment] = useState<boolean>(false)
   const [expandedCondition, setExpandedCondition] = useState<boolean>(false)
   const [expandedBehavior, setExpandedBehavior] = useState<boolean>(false)
@@ -98,10 +99,24 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
     document.body.removeChild(link)
   }
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      handleBackend(file)
+    }
+  }
+
   return (
     <>
       <div className='navbar bg-base-100 flex flex-col sm:flex-row'>
-        <div className='navbar-start z-10 pl-5'>
+        <div className='navbar-start z-10 md:pl-5'>
           <div className='flex-none'>
             <span className='normal-case text-xl '>
               ATLAS {`  `}
@@ -155,8 +170,32 @@ const ArrageTable = ({ result }: ArrageTableProps) => {
             </ul>
           </div>
         </div>
-        <div className='navbar-end z-10'>
-          <button onClick={handleExport} className='btn btn-ghost badge badge-xs badge-primary'>
+        <div className='md:navbar-end z-10 max-sm:pt-4'>
+          {/* <select
+            id='countries'
+            defaultValue={'gpt'}
+            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+          >
+            <option value='gpt'>GPT-4o</option>
+            <option value='claude'>Claude 3.5</option>
+          </select> */}
+          <button
+            onClick={handleButtonClick}
+            className='btn btn-sm btn-ghost border border-teal-100'
+          >
+            Browse file
+          </button>
+          <input
+            type='file'
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+            accept='application/pdf'
+          />
+          <button
+            onClick={handleExport}
+            className='btn btn-sm btn-ghost badge badge-xs badge-primary'
+          >
             Export .csv
           </button>
         </div>

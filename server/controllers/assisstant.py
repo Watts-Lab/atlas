@@ -10,7 +10,7 @@ import socketio
 from assistant import AssistantException, call_asssistant_api
 
 
-UPLOAD_DIRECTORY = "../paper/"
+UPLOAD_DIRECTORY = "paper/"
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)

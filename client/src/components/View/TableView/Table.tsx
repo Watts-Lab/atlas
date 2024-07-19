@@ -2,8 +2,8 @@ import React, { useState, DragEvent, useEffect, useCallback } from 'react'
 import { useSocket } from '../../../context/Socket/UseSocket'
 import { API_URL } from '../../../service/api'
 import ArrageTable from './ArrangeTable'
-import { Result } from './hooks/data-handler'
-import { check_data } from './hooks/mock-data'
+import { flattenData, Result } from './hooks/data-handler'
+import { check_data, get_failed_data } from './hooks/mock-data'
 
 type RunStatus = {
   status: string
@@ -61,17 +61,13 @@ const Table: React.FC = () => {
     return pathLength - (pathLength * status.progress) / 100
   }
 
-  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    setIsDragging(false)
+  const handleBackend = async (file: File) => {
     setIsUploading(true)
 
-    const files = e.dataTransfer.files
     const formData = new FormData()
-    formData.append('file', files[0])
+    formData.append('file', file)
     formData.append('sid', socket?.id || '')
+    formData.append('model', 'gpt')
 
     try {
       const response = await fetch(`${API_URL}/run_assistant`, {
@@ -81,8 +77,15 @@ const Table: React.FC = () => {
       })
       if (response.ok) {
         const new_data = await response.json()
-        setData((prev) => [...prev, new_data])
+        try {
+          flattenData([new_data], true, true, true)
+          setData((prev) => [...prev, new_data])
+        } catch (error) {
+          setData((prev) => [...prev, get_failed_data(file.name)])
+          console.error('Error parsing data:', error)
+        }
       } else {
+        setData((prev) => [...prev, get_failed_data(file.name)])
         console.error('Upload failed')
       }
     } catch (error) {
@@ -91,6 +94,17 @@ const Table: React.FC = () => {
       setIsUploading(false)
       setStatus({ status: '', progress: 0 })
     }
+  }
+
+  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setIsDragging(false)
+
+    const files = e.dataTransfer.files
+
+    await handleBackend(files[0])
   }
 
   return (
@@ -134,7 +148,7 @@ const Table: React.FC = () => {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <ArrageTable result={data} />
+        <ArrageTable result={data} handleBackend={handleBackend} />
         {isUploading && (
           <div className='toast toast-end'>
             <div role='alert' className='alert shadow-lg w-96'>

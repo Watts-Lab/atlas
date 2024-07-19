@@ -13,6 +13,7 @@ class GPTFeature:
         self.feature_type = feature_type
         self.feature_prompt = feature_prompt
         self.feature_enum = feature_enum if feature_enum is not None else []
+        self.feature_description = kwargs.get("feature_description", "")
 
     def display(self):
         """Displays a message indicating that this is the GPT Feature class."""
@@ -27,7 +28,7 @@ class GPTFeature:
             "feature_enum": self.feature_enum,
         }
 
-    def get_functional_object(self, prefix=""):
+    def get_functional_object_gpt(self, prefix=""):
         """Returns a functional object representing the feature."""
 
         feature_name = prefix + self.feature_name
@@ -41,6 +42,37 @@ class GPTFeature:
 
         if self.feature_enum:
             res[feature_name]["enum"] = self.feature_enum
+
+        return res
+
+    def get_functional_object_claude(self, prefix=""):
+        """Returns a functional object representing the feature."""
+
+        res = {
+            "type": self.feature_type,
+            "description": self.feature_prompt,
+        }
+
+        if self.feature_enum:
+            res["enum"] = self.feature_enum
+
+        return res
+
+    def get_functional_object_parent_claude(self):
+        """Returns a functional object representing the feature as a parent."""
+
+        res = {
+            "type": self.feature_type,
+            "description": self.feature_prompt,
+            "items": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        }
+
+        if self.feature_enum:
+            res["enum"] = self.feature_enum
 
         return res
 

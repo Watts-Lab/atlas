@@ -1,6 +1,6 @@
 export interface Condition {
   [key: string]: number | string | Behavior[]
-  condition_behaviors: Behavior[]
+  behaviors: Behavior[]
 }
 
 export interface Behavior {
@@ -8,8 +8,8 @@ export interface Behavior {
 }
 
 export interface Experiment {
-  experiment_name: string
-  experiment_description: string
+  name: string
+  description: string
   participant_source: string
   participant_source_category: string
   units_randomized: string
@@ -121,11 +121,11 @@ export const flattenExperiment = (
       const rows = expandedBehavior
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
-              condition.condition_behaviors.map((behavior, beh_index) => ({
+              condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
-                experiment_name: experiment.experiment_name,
-                experiment_description: experiment.experiment_description,
+                experiment_name: experiment.name,
+                experiment_description: experiment.description,
                 participant_source: experiment.participant_source,
                 participant_source_category: experiment.participant_source_category,
                 units_randomized: experiment.units_randomized,
@@ -149,14 +149,14 @@ export const flattenExperiment = (
                 compensation: experiment.compensation,
                 demographics_conditions: experiment.demographics_conditions,
                 population_other: experiment.population_other,
-                condition_name: condition.condition_name,
-                condition_description: condition.condition_description,
-                condition_type: condition.condition_type,
-                condition_message: condition.condition_message,
-                behavior_name: behavior.behavior_name,
-                behavior_description: behavior.behavior_description,
-                behavior_priority: behavior.behavior_priority,
-                behavior_focal: behavior.behavior_focal,
+                condition_name: condition.name,
+                condition_description: condition.description,
+                condition_type: condition.type,
+                condition_message: condition.message,
+                behavior_name: behavior.name,
+                behavior_description: behavior.description,
+                behavior_priority: behavior.priority,
+                behavior_focal: behavior.focal,
               })),
             ),
           ) as KeyValuePairs[])
@@ -164,8 +164,8 @@ export const flattenExperiment = (
             experiment.conditions.map((condition, con_index) => ({
               id: `${experiment_id}-${exp_index}-${con_index}`,
               file_name: data.file_name || '',
-              experiment_name: experiment.experiment_name,
-              experiment_description: experiment.experiment_description,
+              experiment_name: experiment.name,
+              experiment_description: experiment.description,
               participant_source: experiment.participant_source,
               participant_source_category: experiment.participant_source_category,
               units_randomized: experiment.units_randomized,
@@ -189,11 +189,11 @@ export const flattenExperiment = (
               compensation: experiment.compensation,
               demographics_conditions: experiment.demographics_conditions,
               population_other: experiment.population_other,
-              condition_name: condition.condition_name,
-              condition_description: condition.condition_description,
-              condition_type: condition.condition_type,
-              condition_message: condition.condition_message,
-              behaviors: `${condition.condition_behaviors.length} behavior`,
+              condition_name: condition.name,
+              condition_description: condition.description,
+              condition_type: condition.type,
+              condition_message: condition.message,
+              behaviors: `${condition.behaviors.length} behavior`,
             })),
           ) as KeyValuePairs[])
 
@@ -221,11 +221,11 @@ export const flattenExperiment = (
       const rows = expandedBehavior
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
-              condition.condition_behaviors.map((behavior, beh_index) => ({
+              condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
-                experiment_name: experiment.experiment_name,
-                experiment_description: experiment.experiment_description,
+                experiment_name: experiment.name,
+                experiment_description: experiment.description,
                 participant_source: experiment.participant_source,
                 participant_source_category: experiment.participant_source_category,
                 units_randomized: experiment.units_randomized,
@@ -249,19 +249,19 @@ export const flattenExperiment = (
                 compensation: experiment.compensation,
                 demographics_conditions: experiment.demographics_conditions,
                 population_other: experiment.population_other,
-                conditions: condition.condition_name,
-                behavior_name: behavior.behavior_name,
-                behavior_description: behavior.behavior_description,
-                behavior_priority: behavior.behavior_priority,
-                behavior_focal: behavior.behavior_focal,
+                conditions: condition.name,
+                behavior_name: behavior.name,
+                behavior_description: behavior.description,
+                behavior_priority: behavior.priority,
+                behavior_focal: behavior.focal,
               })),
             ),
           ) as KeyValuePairs[])
         : data.experiments.flatMap((experiment, exp_index) => ({
             id: `${experiment_id}-${exp_index}`,
             file_name: data.file_name || '',
-            experiment_name: experiment.experiment_name,
-            experiment_description: experiment.experiment_description,
+            experiment_name: experiment.name,
+            experiment_description: experiment.description,
             participant_source: experiment.participant_source,
             participant_source_category: experiment.participant_source_category,
             units_randomized: experiment.units_randomized,
@@ -287,7 +287,7 @@ export const flattenExperiment = (
             population_other: experiment.population_other,
             conditions: `${experiment.conditions.length} condition`,
             behaviors: `${experiment.conditions.reduce(
-              (acc, condition) => acc + condition.condition_behaviors.length,
+              (acc, condition) => acc + condition.behaviors.length,
               0,
             )} behavior`,
           }))
@@ -317,18 +317,18 @@ export const flattenExperiment = (
       const rows = expandedBehavior
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
-              condition.condition_behaviors.map((behavior, beh_index) => ({
+              condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
-                experiments: experiment.experiment_name,
-                condition_name: condition.condition_name,
-                condition_description: condition.condition_description,
-                condition_type: condition.condition_type,
-                condition_message: condition.condition_message,
-                behavior_name: behavior.behavior_name,
-                behavior_description: behavior.behavior_description,
-                behavior_priority: behavior.behavior_priority,
-                behavior_focal: behavior.behavior_focal,
+                experiments: experiment.name,
+                condition_name: condition.name,
+                condition_description: condition.description,
+                condition_type: condition.type,
+                condition_message: condition.message,
+                behavior_name: behavior.name,
+                behavior_description: behavior.description,
+                behavior_priority: behavior.priority,
+                behavior_focal: behavior.focal,
               })),
             ),
           ) as KeyValuePairs[])
@@ -336,12 +336,12 @@ export const flattenExperiment = (
             experiment.conditions.map((condition, con_index) => ({
               id: `${experiment_id}-${exp_index}-${con_index}`,
               file_name: data.file_name || '',
-              experiments: experiment.experiment_name,
-              condition_name: condition.condition_name,
-              condition_description: condition.condition_description,
-              condition_type: condition.condition_type,
-              condition_message: condition.condition_message,
-              behaviors: `${condition.condition_behaviors.length} behavior`,
+              experiments: experiment.name,
+              condition_name: condition.name,
+              condition_description: condition.description,
+              condition_type: condition.type,
+              condition_message: condition.message,
+              behaviors: `${condition.behaviors.length} behavior`,
             })),
           ) as KeyValuePairs[])
 
@@ -368,15 +368,15 @@ export const flattenExperiment = (
       const rows = expandedBehavior
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
-              condition.condition_behaviors.map((behavior, beh_index) => ({
+              condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
                 file_name: data.file_name || '',
-                experiments: experiment.experiment_name,
-                conditions: condition.condition_name,
-                behavior_name: behavior.behavior_name,
-                behavior_description: behavior.behavior_description,
-                behavior_priority: behavior.behavior_priority,
-                behavior_focal: behavior.behavior_focal,
+                experiments: experiment.name,
+                conditions: condition.name,
+                behavior_name: behavior.name,
+                behavior_description: behavior.description,
+                behavior_priority: behavior.priority,
+                behavior_focal: behavior.focal,
               })),
             ),
           ) as KeyValuePairs[])
@@ -390,7 +390,7 @@ export const flattenExperiment = (
                 (acc, exp) =>
                   acc +
                   exp.conditions.reduce(
-                    (condAcc, condition) => condAcc + condition.condition_behaviors.length,
+                    (condAcc, condition) => condAcc + condition.conditions.length,
                     0,
                   ),
                 0,
