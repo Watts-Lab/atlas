@@ -77,3 +77,49 @@ export const check_data: Result = {
     },
   ],
 }
+
+export function get_failed_data(name: string): Result {
+  return {
+    file_name: name,
+    experiments: [
+      {
+        adults: '--',
+        age_mean: '--',
+        age_sd: '--',
+        compensation: '--',
+        conditions: [
+          {
+            behaviors: [
+              {
+                description: '--',
+                focal: '--',
+                name: '--',
+                priority: '--',
+              },
+            ],
+            description: '--',
+            message: '--',
+            name: '--',
+            type: '--',
+          },
+        ],
+        demographics_conditions: '--',
+        description: '--',
+        name: 'failed',
+        female_perc: '--',
+        gender_other: '--',
+        language: '--',
+        language_secondary: '--',
+        male_perc: '--',
+        participant_source: '--',
+        participant_source_category: '--',
+        population_other: '--',
+        sample_size_analyzed: 0,
+        sample_size_notes: '--',
+        sample_size_randomized: 0,
+        units_analyzed: '--',
+        units_randomized: '--',
+      },
+    ],
+  }
+}

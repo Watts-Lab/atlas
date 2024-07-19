@@ -309,10 +309,6 @@ def call_asssistant_api(file_path: str, sid: str, sio):
         run = client.beta.threads.runs.create_and_poll(
             thread_id=thread_message.id,
             assistant_id=updated_assistant.id,
-            tool_choice={
-                "type": "function",
-                "function": {"name": "define_experiments_and_conditions_and_behaviors"},
-            },
         )
 
         sio.emit(
