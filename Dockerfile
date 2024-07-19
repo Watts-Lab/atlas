@@ -9,7 +9,7 @@ ENV NODE_ENV production
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
-FROM public.ecr.aws/docker/library/python:3.10
+FROM public.ecr.aws/docker/library/python:3.11
 WORKDIR /app
 COPY --from=build-step /app/dist ./build
 

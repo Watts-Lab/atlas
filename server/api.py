@@ -1,9 +1,9 @@
 """ This module contains the Sanic RESTful API endpoint for the workflow editor. """
 
 import argparse
-import os
-from sanic import Sanic, response
+from sanic import Sanic
 from sanic.request import Request
+from sanic.worker.manager import WorkerManager
 from sanic_cors import CORS
 import socketio
 from config.app_config import AppConfig
@@ -11,6 +11,7 @@ from controllers.assisstant import run_assistant
 from controllers.login import login_user, validate_user
 from database.database import init_db
 
+WorkerManager.THRESHOLD = 600
 
 app = Sanic("Atlas", config=AppConfig())
 

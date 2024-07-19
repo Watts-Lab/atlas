@@ -389,7 +389,8 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
         )
 
         run = client.beta.threads.runs.create_and_poll(
-            thread_id=thread_message.id, assistant_id=updated_assistant.id
+            thread_id=thread_message.id,
+            assistant_id=updated_assistant.id,
         )
 
         await sio.emit(
