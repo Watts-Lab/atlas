@@ -12,7 +12,7 @@ env:
   AWS_REGION: us-east-1 # AWS region
   ECR_REPOSITORY_BACKEND: atlas-backend
   ECR_REPOSITORY_FRONTEND: atlas-frontend
-  ECS_SERVICE: atlas-multi-container # Amazon ECS service name
+  ECS_SERVICE: atlas-orchestration-service # Amazon ECS service name
   ECS_CLUSTER: atlas-dev # Amazon ECS cluster name
   ECS_TASK_DEFINITION: .aws/task-definition-multi.json # Amazon ECS task definition
   CONTAINER_NAME_BACKEND: backend
