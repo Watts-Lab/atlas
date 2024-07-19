@@ -390,7 +390,7 @@ export const flattenExperiment = (
                 (acc, exp) =>
                   acc +
                   exp.conditions.reduce(
-                    (condAcc, condition) => condAcc + condition.conditions.length,
+                    (condAcc, condition) => condAcc + condition.behaviors.length,
                     0,
                   ),
                 0,
