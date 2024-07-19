@@ -6,7 +6,8 @@ on:
     branches: [login-window]
     types:
       - completed
-
+  push:
+    branches: [login-window]
 env:
   AWS_REGION: us-east-1 # AWS region
   ECR_REPOSITORY_BACKEND: atlas-backend
