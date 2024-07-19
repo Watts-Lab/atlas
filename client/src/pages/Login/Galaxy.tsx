@@ -80,6 +80,7 @@ const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
       .then(await new Promise((resolve) => setTimeout(resolve, 3000)))
       .finally(() => {
         setSubmitting(false)
+        navigate('/table')
       })
   }
 
