@@ -18,7 +18,11 @@ app = Sanic("Atlas", config=AppConfig())
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-sio = socketio.AsyncServer(async_mode="sanic", logger=True, cors_allowed_origins=[])
+sio = socketio.AsyncServer(
+    async_mode="sanic",
+    logger=True,
+    cors_allowed_origins=[],
+)
 
 sio.attach(app)
 
