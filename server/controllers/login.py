@@ -86,7 +86,9 @@ async def validate_user(email: str, token: str):
                 ):
                     # user.magic_link_expired = True
                     user.updated_at = datetime.now(UTC)
+                    user.magic_link_expired = True
                     await user.save()  # Save the User asynchronously
+
                     response_data = {"message": "Magic link validated."}
                     header = {
                         "Access-Control-Expose-Headers": "Authorization",

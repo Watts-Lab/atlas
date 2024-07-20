@@ -181,7 +181,4 @@ def send_magic_link(email: str, token: str):
     sender_email = "noreply@scaledhumanity.org"
     recipient_emails = [email]
 
-    # Send the email
-    print("Sending magic link to", email, "with token", token)
-
     send_ses_email(subject, body_text, body_html_send, sender_email, recipient_emails)
