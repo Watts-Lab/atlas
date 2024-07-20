@@ -30,5 +30,13 @@
   "python.autoComplete.extraPaths": ["./server"],
   "python.analysis.extraPaths": ["./server"],
   "pylint.path": ["${workspaceFolder}/.venv/bin/python", "-m", "pylint"],
-  "pylint.args": ["--rcfile", "${workspaceFolder}/server/.pylintrc"]
+  "pylint.args": ["--rcfile", "${workspaceFolder}/server/.pylintrc"],
+  "files.associations": {
+    ".env*": "dotenv"
+  },
+  "github.copilot.enable": {
+    "*": true,
+    // ...
+    "dotenv": false
+  }
 }

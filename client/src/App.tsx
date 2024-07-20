@@ -4,7 +4,7 @@ import { ReactFlowProvider } from 'reactflow'
 import { Routes, Route } from 'react-router-dom'
 import Table from './components/View/TableView/Table'
 import { SocketProvider } from './context/Socket/SocketProvider'
-import Home from './pages/Home/Home'
+import Galaxy from './pages/Login/Galaxy'
 
 function App() {
   return (
@@ -13,8 +13,9 @@ function App() {
         <WorkflowProvider>
           <SocketProvider>
             <Routes>
-              <Route path='/' element={<Table />} />
-              <Route path='/login/:email/:magicLink' element={<Home loggingIn={true} />} />
+              <Route path='/' element={<Galaxy />} />
+              <Route path='/login/:email/:magicLink' element={<Galaxy loggingIn={true} />} />
+              <Route path='/table' element={<Table />} />
               <Route path='/dashboard' element={<Dashboard />} />
             </Routes>
           </SocketProvider>

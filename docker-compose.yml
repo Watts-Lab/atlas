@@ -1,0 +1,18 @@
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+
+  client:
+    container_name: client
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - 3000:80
+    depends_on:
+      - backend

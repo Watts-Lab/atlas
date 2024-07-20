@@ -4,6 +4,7 @@ import icon from '../../icons/icon.svg'
 
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { API_URL } from '../../service/api'
 
 type HomeProps = {
   loggingIn?: boolean
@@ -29,7 +30,7 @@ const Home = ({ loggingIn }: HomeProps) => {
       setLoading(true)
 
       try {
-        const response = await fetch('http://localhost:8000/api/login', {
+        const response = await fetch(`${API_URL}/api/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
