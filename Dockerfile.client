@@ -1,14 +1,14 @@
 # Build step #1: build the React front end
 FROM --platform=linux/amd64 public.ecr.aws/bitnami/node:20 AS build-step
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 COPY client/package*.json ./
 RUN npm ci
 COPY client/ ./
-ENV NODE_ENV production
+ENV NODE_ENV=production
 RUN npm run build
 
-# Build step #2: build the API with the client as static files
+# Build step #2: build the Nginx server with the React front end
 FROM --platform=linux/amd64 public.ecr.aws/nginx/nginx:stable-alpine
 
 COPY --from=build-step /app/dist /usr/share/nginx/html

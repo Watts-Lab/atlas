@@ -7,10 +7,10 @@ RUN pip install --upgrade pip
 RUN pip install -r ./api/requirements.txt
 ENV PYTHON_ENV=production
 
-# EXPOSE 8000
 EXPOSE 8000 8001 8002 
 WORKDIR /app/api
-# CMD ["python3", "-m", "sanic", "api.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+
+# Spawn 3 single worker instances of the Sanic server
 CMD WORKER_ID=1 python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 & \
     WORKER_ID=2 python3 -m sanic api.app --host 0.0.0.0 --port 8001 --workers 1 & \
     WORKER_ID=3 python3 -m sanic api.app --host 0.0.0.0 --port 8002 --workers 1 & \
