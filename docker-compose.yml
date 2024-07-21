@@ -10,6 +10,11 @@ services:
       - PYTHON_ENV=development
     volumes:
       - ./server:/app/api
+    command: >
+      sh -c "WORKER_ID=1 python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 & 
+      WORKER_ID=2 python3 -m sanic api.app --host 0.0.0.0 --port 8001 --workers 1 & 
+      WORKER_ID=3 python3 -m sanic api.app --host 0.0.0.0 --port 8002 --workers 1 & 
+      wait"
     
   client:
     container_name: client
@@ -23,4 +28,6 @@ services:
     volumes:
       - ./client/dist:/usr/share/nginx/html
       - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
+    command: >
+      sh -c "nginx -g 'daemon off;'"
 
