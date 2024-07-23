@@ -12,7 +12,9 @@ Parents frame the unit of analysis for a feature, for example, "`effect_size` of
 ### Projects — coming soon
 Projects are built from a bundle of features and papers (or a rule for including papers). 
 #### Inclusion criteria
-An optional bundle of features with an aggregation function that returns `true` or `false`, determining if a given paper is included in a project or not. If no inclusion criteria are provided, projects only include explicitly added papers.
+Effectively a saved search that returns papers. The papers can then be added to a project individually, as a group. Updates to the results of the search instigate notifications to inform the user.
+### Papers — more coming soon
+### Users — more coming soon
 
 ## Contributing
 Please submit a PR improving Atlas or adding new feature columns.
