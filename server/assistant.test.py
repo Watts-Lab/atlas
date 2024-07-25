@@ -1,9 +1,17 @@
+"""
+This file contains the tests for the assistant API.
+"""
+
 import unittest
 from unittest.mock import Mock, patch
-from .gpt_assistant import call_asssistant_api
+from workers.gpt_assistant import call_asssistant_api
 
 
 class TestAssistantAPI(unittest.TestCase):
+    """
+    Test the assistant API.
+    """
+
     @patch("assistant.get_all_features")
     @patch("assistant.build_feature_functions")
     @patch("assistant.upload_file_to_vector_store")
@@ -31,6 +39,9 @@ class TestAssistantAPI(unittest.TestCase):
         mock_build_feature_functions,
         mock_get_all_features,
     ):
+        """
+        Test the call_assistant_api function.
+        """
         # Mock the necessary dependencies
         mock_get_all_features.return_value = (
             ["features.condition.name"],

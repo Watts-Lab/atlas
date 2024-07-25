@@ -8,13 +8,13 @@ services:
       - .env
     environment:
       - PYTHON_ENV=development
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
     volumes:
       - ./server:/app/api
     command: >
-      sh -c "WORKER_ID=1 python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 & 
-      WORKER_ID=2 python3 -m sanic api.app --host 0.0.0.0 --port 8001 --workers 1 & 
-      WORKER_ID=3 python3 -m sanic api.app --host 0.0.0.0 --port 8002 --workers 1 & 
-      wait"
+      sh -c "python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 --dev"
     
   client:
     container_name: client
@@ -31,3 +31,51 @@ services:
     command: >
       sh -c "nginx -g 'daemon off;'"
 
+  redis:
+    container_name: redis
+    image: public.ecr.aws/docker/library/redis:latest
+    ports:
+      - 6379:6379
+    depends_on:
+      - backend
+      - client
+  
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    environment:
+      - PYTHON_ENV=development
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - C_FORCE_ROOT=false
+    volumes:
+      - ./server:/app/api
+    command: bash -c "celery -A celery_worker.celery worker --loglevel=info"
+    depends_on:
+      - backend
+      - redis
+
+  celery_flower:
+    container_name: celery_flower
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    environment:
+      - PYTHON_ENV=development
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - C_FORCE_ROOT=false
+    volumes:
+      - ./server:/app/api
+    command: bash -c "celery -A celery_worker.celery flower --port=5555"
+    ports:
+      - 5556:5555
+    depends_on:
+      - backend
+      - redis

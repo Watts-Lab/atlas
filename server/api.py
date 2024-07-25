@@ -1,15 +1,18 @@
 """ This module contains the Sanic RESTful API endpoint for the workflow editor. """
 
 import argparse
-from sanic import Sanic
+from sanic import Sanic, json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_cors import CORS
-import socketio
 from config.app_config import AppConfig
 from controllers.assisstant import run_assistant
 from controllers.login import login_user, validate_user
 from database.database import init_db
+import socketio
+
+from celery_worker import create_task
+from celery.result import EagerResult
 
 WorkerManager.THRESHOLD = 600
 
@@ -18,10 +21,12 @@ app = Sanic("Atlas", config=AppConfig())
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+mgr = socketio.AsyncRedisManager("redis://redis:6379/0")
 sio = socketio.AsyncServer(
     async_mode="sanic",
     logger=True,
     cors_allowed_origins=[],
+    client_manager=mgr,
 )
 
 sio.attach(app)
@@ -45,6 +50,28 @@ async def login(request: Request):
         data = request.json
         email = data.get("email")
         return await login_user(email=email)
+
+
+@app.route("/api/task", methods=["GET", "POST"])
+async def task_handler(request: Request):
+    """
+    Handles the POST request for logging in the user.
+    """
+    if request.method == "POST":
+        file = request.files.get("file")
+        print("file name", file.name)
+
+        file_path = f"paper/{file.name}"
+        with open(file_path, "wb") as f:
+            f.write(file.body)
+        f.close()
+
+        task: EagerResult = create_task.delay(file_path)
+        return json_response({"TASK": task.id})
+    elif request.method == "GET":
+        task_id = request.json.get("task_id")
+        task = create_task.AsyncResult(task_id)
+        return json_response({"TASK": task.result})
 
 
 @app.route("/api/validate", methods=["POST"])

@@ -7,7 +7,7 @@ from sanic import json as json_response
 from sanic.request.form import File
 import socketio
 
-from gpt_assistant import AssistantException, call_asssistant_api
+from workers.gpt_assistant import AssistantException, call_asssistant_api
 
 
 UPLOAD_DIRECTORY = "paper/"
