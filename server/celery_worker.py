@@ -22,7 +22,9 @@ def create_task(paper_path: str):
     """
     Task to create a task.
     """
-    external_sio = socketio.RedisManager("redis://redis:6379/0", write_only=True)
+    external_sio = socketio.RedisManager(
+        os.getenv("CELERY_BROKER_URL"), write_only=True
+    )
     print("Task created.", paper_path)
 
     external_sio.emit("task_created", {"task": "Task created."})

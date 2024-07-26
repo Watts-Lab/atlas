@@ -5,7 +5,7 @@ This file is responsible for initializing the database connection and the beanie
 import os
 from dotenv import load_dotenv
 from beanie import init_beanie
-import motor
+from motor.motor_asyncio import AsyncIOMotorClient
 import certifi
 
 from database.models.users import User
@@ -20,7 +20,10 @@ async def init_db():
     load_dotenv()
     ca = certifi.where()
     # Create Motor client
-    client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("DB_URI"), tlsCAFile=ca)
+    client = AsyncIOMotorClient(os.getenv("DB_URI"), tlsCAFile=ca)
+
+    await client.admin.command("ping")
+    print("Connected to the database.")
 
     # Init beanie with the Product document class
     await init_beanie(database=client.atlas_main, document_models=[User, Result])

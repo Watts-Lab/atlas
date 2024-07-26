@@ -24,7 +24,6 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 mgr = socketio.AsyncRedisManager("redis://redis:6379/0")
 sio = socketio.AsyncServer(
     async_mode="sanic",
-    logger=True,
     cors_allowed_origins=[],
     client_manager=mgr,
 )
