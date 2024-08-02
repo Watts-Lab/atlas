@@ -1,6 +1,8 @@
 """ This module contains the Sanic RESTful API endpoint for the workflow editor. """
 
 import argparse
+import os
+from dotenv import load_dotenv
 from sanic import Sanic, json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
@@ -14,6 +16,9 @@ import socketio
 from celery_worker import create_task
 from celery.result import EagerResult
 
+
+load_dotenv()
+
 WorkerManager.THRESHOLD = 600
 
 app = Sanic("Atlas", config=AppConfig())
@@ -21,7 +26,10 @@ app = Sanic("Atlas", config=AppConfig())
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-mgr = socketio.AsyncRedisManager("redis://redis:6379/0")
+redis_broker_url = os.getenv("CELERY_BROKER_URL")
+redis_result_backend = os.getenv("CELERY_RESULT_BACKEND")
+
+mgr = socketio.AsyncRedisManager(redis_broker_url)
 sio = socketio.AsyncServer(
     async_mode="sanic",
     cors_allowed_origins=[],
