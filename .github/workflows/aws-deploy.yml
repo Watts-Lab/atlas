@@ -3,9 +3,13 @@ name: Deploy to Amazon ECS
 on:
   workflow_run:
     workflows: ["Run Tests (Frontend)"]
-    branches: [main, 75-task-queue-for-api-calls]
+    branches: [main]
     types:
       - completed
+  push:
+    branches:
+      - "75-task-queue-for-api-calls"
+
 env:
   AWS_REGION: us-east-1 # AWS region
   ECR_REPOSITORY_BACKEND: atlas-backend
