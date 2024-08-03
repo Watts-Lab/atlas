@@ -11,7 +11,7 @@
     "lint:fix": "eslint --fix ./src/",
     "preview": "vite preview",
     "test": "vitest run",
-    "docker": "docker build --watch",
+    "docker": "vite build --watch",
     "coverage": "vitest run --coverage",
     "cypress:open": "cypress open"
   },
