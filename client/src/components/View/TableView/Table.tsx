@@ -41,7 +41,6 @@ const Table: React.FC = () => {
 
   const onMessage = useCallback(
     (data: { status: string; progress: number; task_id: string; done: boolean }) => {
-      console.log(data)
       setStatus({
         status: data.status,
         progress: Number(data.progress),
@@ -125,10 +124,9 @@ const Table: React.FC = () => {
       })
       if (response.ok) {
         const new_data = await response.json()
-        console.log(`Task ID: ${new_data.task_id}`)
+        console.info(`Task ID: ${new_data.task_id}`)
       } else {
         setData((prev) => [...prev, get_failed_data(file.name)])
-        console.error('Upload failed')
       }
     } catch (error) {
       console.error('Error uploading file:', error)
