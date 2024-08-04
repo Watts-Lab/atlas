@@ -8,7 +8,8 @@ from typing import List
 from dotenv import load_dotenv
 import anthropic
 
-from workers.gpt_assistant import AssistantException
+from gpt_assistant import AssistantException
+
 
 load_dotenv()
 

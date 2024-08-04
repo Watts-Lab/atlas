@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import Dict, List
 from openai import OpenAI
 from dotenv import load_dotenv
-from sanic.request.form import File
 import socketio
 
 load_dotenv()
@@ -141,7 +140,7 @@ def build_openai_feature_functions(feature_list: List[str]) -> dict:
     return openai_function_object
 
 
-def upload_file_to_vector_store(client: OpenAI, file: File, sid: str) -> str:
+def upload_file_to_vector_store(client: OpenAI, file_path: str, sid: str) -> str:
     """
     Uploads a file to the vector store.
 
@@ -151,12 +150,6 @@ def upload_file_to_vector_store(client: OpenAI, file: File, sid: str) -> str:
     Returns:
     - URL to the uploaded file.
     """
-
-    file_path = f"paper/{sid}{file.name}"
-
-    with open(file_path, "wb") as f:
-        f.write(file.body)
-    f.close()
 
     file_info = client.files.create(file=open(file_path, "rb"), purpose="assistants")
 
@@ -237,7 +230,9 @@ def create_temporary_assistant(client: OpenAI):
     return my_temporary_assistant
 
 
-async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
+def call_asssistant_api(
+    file_path: str, sid: str, sio: socketio.RedisManager, task_id: str
+):
     """
     Calls the Assistant API to perform a task using OpenAI's GPT-3 model.
 
@@ -253,41 +248,69 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
     client = OpenAI()
 
     try:
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Fetching all features...", "progress": 0},
+            {
+                "status": "Fetching all features...",
+                "progress": 0,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
+
         feature_list = get_all_features()
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Building feature functions...", "progress": 5},
+            {
+                "status": "Building feature functions...",
+                "progress": 5,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
         functions = build_openai_feature_functions(feature_list)
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Uploading file to vector store...", "progress": 10},
+            {
+                "status": "Uploading file to vector store...",
+                "progress": 10,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
-        vector_store = upload_file_to_vector_store(client=client, file=file, sid=sid)
+        vector_store = upload_file_to_vector_store(
+            client=client, file_path=file_path, sid=sid
+        )
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Creating an assistant for your task...", "progress": 12},
+            {
+                "status": "Creating an assistant for your task...",
+                "progress": 12,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
         my_temporary_assistant = create_temporary_assistant(client)
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Updating assistant...", "progress": 15},
+            {
+                "status": "Updating assistant...",
+                "progress": 15,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
@@ -295,9 +318,14 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
             client, my_temporary_assistant.id, vector_store, functions
         )
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Creating thread message...", "progress": 30},
+            {
+                "status": "Creating thread message...",
+                "progress": 30,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
@@ -310,9 +338,14 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
             ],
         )
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Running assistant...", "progress": 40},
+            {
+                "status": "Running assistant...",
+                "progress": 40,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
@@ -322,9 +355,14 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
             assistant_id=updated_assistant.id,
         )
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Getting tool outputs...", "progress": 50},
+            {
+                "status": "Getting tool outputs...",
+                "progress": 50,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
@@ -333,9 +371,14 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
             run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
         )
 
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Checking output format...", "progress": 60},
+            {
+                "status": "Checking output format...",
+                "progress": 60,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )
@@ -351,9 +394,14 @@ async def call_asssistant_api(file: File, sid: str, sio: socketio.AsyncServer):
         print(e)
         raise AssistantException("Assistant run failed") from e
     finally:
-        await sio.emit(
+        sio.emit(
             "status",
-            {"status": "Cleaning up resources...", "progress": 70},
+            {
+                "status": "Cleaning up resources...",
+                "progress": 70,
+                "task_id": task_id,
+                "done": False,
+            },
             to=sid,
             namespace="/home",
         )

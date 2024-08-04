@@ -8,6 +8,8 @@ import { check_data, get_failed_data } from './hooks/mock-data'
 type RunStatus = {
   status: string
   progress: number
+  task_id: string
+  done: boolean
 }
 
 const Table: React.FC = () => {
@@ -16,7 +18,12 @@ const Table: React.FC = () => {
 
   const [data, setData] = useState<Result[]>([check_data])
 
-  const [status, setStatus] = useState<RunStatus>({ status: '', progress: 0 })
+  const [status, setStatus] = useState<RunStatus>({
+    status: '',
+    progress: 0,
+    task_id: '',
+    done: false,
+  })
   const [pathLength, setPathLength] = useState(0)
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -32,9 +39,24 @@ const Table: React.FC = () => {
 
   const socket = useSocket()
 
-  const onMessage = useCallback((data: { status: string; progress: number }) => {
-    setStatus({ status: data.status, progress: Number(data.progress) })
-  }, [])
+  const onMessage = useCallback(
+    (data: { status: string; progress: number; task_id: string; done: boolean }) => {
+      console.log(data)
+      setStatus({
+        status: data.status,
+        progress: Number(data.progress),
+        task_id: data.task_id,
+        done: data.done,
+      })
+
+      if (data.done) {
+        getResults(data.task_id).then(() => {
+          setIsUploading(false)
+        })
+      }
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!socket) {
@@ -61,6 +83,32 @@ const Table: React.FC = () => {
     return pathLength - (pathLength * status.progress) / 100
   }
 
+  const getResults = async (task_id: string) => {
+    const response = await fetch(
+      `${API_URL}/run_assistant?task_id=${task_id}
+      `,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    if (response.ok) {
+      const new_data = await response.json()
+      try {
+        flattenData([new_data], true, true, true)
+        setData((prev) => [...prev, new_data])
+      } catch (error) {
+        setData((prev) => [...prev, get_failed_data(task_id)])
+        console.error('Error parsing data:', error)
+      }
+    } else {
+      console.error('Error fetching results')
+    }
+  }
+
   const handleBackend = async (file: File) => {
     setIsUploading(true)
 
@@ -77,13 +125,7 @@ const Table: React.FC = () => {
       })
       if (response.ok) {
         const new_data = await response.json()
-        try {
-          flattenData([new_data], true, true, true)
-          setData((prev) => [...prev, new_data])
-        } catch (error) {
-          setData((prev) => [...prev, get_failed_data(file.name)])
-          console.error('Error parsing data:', error)
-        }
+        console.log(`Task ID: ${new_data.task_id}`)
       } else {
         setData((prev) => [...prev, get_failed_data(file.name)])
         console.error('Upload failed')
@@ -91,8 +133,7 @@ const Table: React.FC = () => {
     } catch (error) {
       console.error('Error uploading file:', error)
     } finally {
-      setIsUploading(false)
-      setStatus({ status: '', progress: 0 })
+      setStatus({ status: '', progress: 0, task_id: '', done: false })
     }
   }
 

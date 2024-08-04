@@ -2,18 +2,18 @@
 
 import argparse
 import os
+from celery import Celery
 from dotenv import load_dotenv
 from sanic import Sanic, json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_cors import CORS
 from config.app_config import AppConfig
-from controllers.assisstant import run_assistant
 from controllers.login import login_user, validate_user
 from database.database import init_db
 import socketio
 
-from celery_worker import create_task
+from celery_worker import get_paper_info, run_assistant, celery
 from celery.result import EagerResult
 
 
@@ -59,28 +59,6 @@ async def login(request: Request):
         return await login_user(email=email)
 
 
-@app.route("/api/task", methods=["GET", "POST"])
-async def task_handler(request: Request):
-    """
-    Handles the POST request for logging in the user.
-    """
-    if request.method == "POST":
-        file = request.files.get("file")
-        print("file name", file.name)
-
-        file_path = f"paper/{file.name}"
-        with open(file_path, "wb") as f:
-            f.write(file.body)
-        f.close()
-
-        task: EagerResult = create_task.delay(file_path)
-        return json_response({"TASK": task.id})
-    elif request.method == "GET":
-        task_id = request.json.get("task_id")
-        task = create_task.AsyncResult(task_id)
-        return json_response({"TASK": task.result})
-
-
 @app.route("/api/validate", methods=["POST"])
 async def validate(request: Request):
     """
@@ -93,15 +71,46 @@ async def validate(request: Request):
         return await validate_user(email=email, token=token)
 
 
-@app.route("/api/run_assistant", methods=["POST"])
+@app.route("/api/task", methods=["GET", "POST"])
+async def task_handler(request: Request):
+    """
+    Handles the POST request for logging in the user.
+    """
+    if request.method == "POST":
+        file = request.files.get("file")
+        file_path = f"paper/{file.name}"
+        with open(file_path, "wb") as f:
+            f.write(file.body)
+
+        task: EagerResult = get_paper_info.delay(file_path)
+        return json_response({"TASK": task.id})
+    elif request.method == "GET":
+        task_id = request.json.get("task_id")
+        task = get_paper_info.AsyncResult(task_id)
+        return json_response({"TASK": task.result})
+
+
+@app.route("/api/run_assistant", methods=["POST", "GET"])
 async def run_assistant_endpoint(request: Request):
     """
     Handles the POST request for running the assistant.
     """
     if request.method == "POST":
+        # Get the file and the socket id
         file = request.files.get("file")
         sid = request.form.get("sid")
-        return await run_assistant(sid=sid, file=file, sio=sio)
+
+        file_path = f"paper/{sid}-{file.name}"
+        with open(file_path, "wb") as f:
+            f.write(file.body)
+
+        task: EagerResult = run_assistant.delay(file_path, sid)
+        return json_response({"task_id": task.id})
+
+    elif request.method == "GET":
+        task_id = request.args.get("task_id")
+        task = run_assistant.AsyncResult(task_id)
+        return json_response(task.result)
 
 
 @sio.on("connect", namespace="/home")

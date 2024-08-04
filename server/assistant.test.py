@@ -4,7 +4,8 @@ This file contains the tests for the assistant API.
 
 import unittest
 from unittest.mock import Mock, patch
-from workers.gpt_assistant import call_asssistant_api
+
+from gpt_assistant import call_asssistant_api
 
 
 class TestAssistantAPI(unittest.TestCase):
