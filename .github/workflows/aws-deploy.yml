@@ -6,6 +6,7 @@ on:
     branches: [main]
     types:
       - completed
+
 env:
   AWS_REGION: us-east-1 # AWS region
   ECR_REPOSITORY_BACKEND: atlas-backend
@@ -15,6 +16,7 @@ env:
   ECS_TASK_DEFINITION: .aws/task-definition.json # Amazon ECS task definition
   CONTAINER_NAME_BACKEND: backend
   CONTAINER_NAME_FRONTEND: frontend
+  CONTAINER_NAME_CELERY: celery
 
 permissions:
   id-token: write
@@ -68,12 +70,18 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME_BACKEND }}
           image: ${{ steps.build-backend-image.outputs.image }}
-
+      - name: Fill in the new image ID in the Amazon ECS task definition for backend
+        id: render-celery-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-backend-container.outputs.task-definition }}
+          container-name: ${{ env.CONTAINER_NAME_CELERY }}
+          image: ${{ steps.build-backend-image.outputs.image }}
       - name: Fill in the new image ID in the Amazon ECS task definition for frontend
         id: render-frontend-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ steps.render-backend-container.outputs.task-definition }}
+          task-definition: ${{ steps.render-celery-container.outputs.task-definition }}
           container-name: ${{ env.CONTAINER_NAME_FRONTEND }}
           image: ${{ steps.build-front-image.outputs.image }}
 

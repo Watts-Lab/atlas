@@ -1,0 +1,15 @@
+POST http://localhost:3000/api/task HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Emotion and the Framing of Risky Choice"
+}
+
+###
+
+GET http://localhost:3000/api/task HTTP/1.1
+content-type: application/json
+
+{
+    "task_id": "81671dcb-98c8-40d5-97b6-89b3a95b0591"
+}

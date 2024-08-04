@@ -6,10 +6,10 @@ import importlib
 import json
 from typing import List
 from dotenv import load_dotenv
-from pypdf import PdfReader
 import anthropic
 
 from gpt_assistant import AssistantException
+
 
 load_dotenv()
 
@@ -157,22 +157,6 @@ def build_openai_feature_functions(feature_list: List[str]) -> dict:
     return openai_function_call
 
 
-def convert_pdf_to_text(file_path: str) -> str:
-    """
-    Converts the PDF file to text.
-
-    Args:
-    - file_path: The path to the file.
-
-    Returns:
-    - The text extracted from the PDF.
-    """
-
-    reader = PdfReader(file_path)
-    text = "".join(page.extract_text() for page in reader.pages)
-    return text
-
-
 def call_claude_api(file_path: str, sid: str, sio) -> dict:
     """
     Calls the Claude API.
@@ -212,7 +196,7 @@ def call_claude_api(file_path: str, sid: str, sio) -> dict:
             namespace="/home",
         )
 
-        file_text = convert_pdf_to_text(file_path)
+        file_text = f"TODO: Convert PDF to text for {file_path}"
         # full_text, images, out_meta = convert_single_pdf(file_path, models, langs=["English"])
         # fname = os.path.basename(file_path)
         # subfolder_path = save_markdown("paper/output", fname, full_text, images, out_meta)
@@ -257,30 +241,3 @@ def call_claude_api(file_path: str, sid: str, sio) -> dict:
         )
 
     return message.content[0].input
-
-
-if __name__ == "__main__":
-
-    file_text = convert_pdf_to_text("paper/whiting-watts-2024.pdf")
-    # file_text = ""
-    # file_text += open("paper/A_24a_2022_EffectsOfDigital.md", "r").read()
-    client = anthropic.Anthropic()
-    claude_function = build_claude_feature_functions(get_all_features())
-    message = client.messages.create(
-        model="claude-3-5-sonnet-20240620",
-        max_tokens=4000,
-        temperature=0,
-        system="You are an assitant helping with exploring scientific papers.",
-        tools=[claude_function],
-        messages=[{"role": "user", "content": file_text}],
-        tool_choice={
-            "type": "tool",
-            "name": "define_experiments_and_conditions_and_behaviors",
-        },
-    )
-
-    output_str = str(json.dumps(message.content[0].input))
-    # output_str = output_str.replace("<UNKNOWN>", '"--"')
-
-    print(message.content[0].input)
-    print(output_str)
