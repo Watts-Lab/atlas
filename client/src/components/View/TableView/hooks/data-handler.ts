@@ -32,7 +32,9 @@ export interface Experiment {
 }
 
 export interface Result {
-  file_name?: string
+  task_id: string
+  status: 'success' | 'failed' | 'inprogress'
+  file_name: string
   experiments: Experiment[]
 }
 
@@ -113,7 +115,6 @@ export const flattenExperiment = (
 
   if (expandedExperiment) {
     if (expandedCondition) {
-      // expandedExperiment && expandedCondition
       const headers = expandedBehavior
         ? [...defaultHeaders, ...experimentHeaders, ...conditionHeaders, ...behaviorHeaders]
         : [...defaultHeaders, ...experimentHeaders, ...conditionHeaders, 'behaviors']
@@ -123,7 +124,8 @@ export const flattenExperiment = (
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
-                file_name: data.file_name || '',
+                file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+                status: data.status,
                 experiment_name: experiment.name,
                 experiment_description: experiment.description,
                 participant_source: experiment.participant_source,
@@ -139,11 +141,6 @@ export const flattenExperiment = (
                 female_perc: experiment.female_perc,
                 male_perc: experiment.male_perc,
                 gender_other: experiment.gender_other,
-                // white_perc: experiment.white_perc,
-                // black_perc: experiment.black_perc,
-                // hispanic_perc: experiment.hispanic_perc,
-                // asian_perc: experiment.asian_perc,
-                // other_ethnicity_perc: experiment.other_ethnicity_perc,
                 language: experiment.language,
                 language_secondary: experiment.language_secondary,
                 compensation: experiment.compensation,
@@ -163,7 +160,8 @@ export const flattenExperiment = (
         : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
               id: `${experiment_id}-${exp_index}-${con_index}`,
-              file_name: data.file_name || '',
+              file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+              status: data.status,
               experiment_name: experiment.name,
               experiment_description: experiment.description,
               participant_source: experiment.participant_source,
@@ -223,7 +221,8 @@ export const flattenExperiment = (
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
-                file_name: data.file_name || '',
+                file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+                status: data.status,
                 experiment_name: experiment.name,
                 experiment_description: experiment.description,
                 participant_source: experiment.participant_source,
@@ -259,7 +258,8 @@ export const flattenExperiment = (
           ) as KeyValuePairs[])
         : data.experiments.flatMap((experiment, exp_index) => ({
             id: `${experiment_id}-${exp_index}`,
-            file_name: data.file_name || '',
+            file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+            status: data.status,
             experiment_name: experiment.name,
             experiment_description: experiment.description,
             participant_source: experiment.participant_source,
@@ -275,11 +275,6 @@ export const flattenExperiment = (
             female_perc: experiment.female_perc,
             male_perc: experiment.male_perc,
             gender_other: experiment.gender_other,
-            // white_perc: experiment.white_perc,
-            // black_perc: experiment.black_perc,
-            // hispanic_perc: experiment.hispanic_perc,
-            // asian_perc: experiment.asian_perc,
-            // other_ethnicity_perc: experiment.other_ethnicity_perc,
             language: experiment.language,
             language_secondary: experiment.language_secondary,
             compensation: experiment.compensation,
@@ -319,7 +314,8 @@ export const flattenExperiment = (
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
-                file_name: data.file_name || '',
+                file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+                status: data.status,
                 experiments: experiment.name,
                 condition_name: condition.name,
                 condition_description: condition.description,
@@ -335,7 +331,8 @@ export const flattenExperiment = (
         : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
               id: `${experiment_id}-${exp_index}-${con_index}`,
-              file_name: data.file_name || '',
+              file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+              status: data.status,
               experiments: experiment.name,
               condition_name: condition.name,
               condition_description: condition.description,
@@ -370,7 +367,8 @@ export const flattenExperiment = (
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
                 id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
-                file_name: data.file_name || '',
+                file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+                status: data.status,
                 experiments: experiment.name,
                 conditions: condition.name,
                 behavior_name: behavior.name,
@@ -383,7 +381,8 @@ export const flattenExperiment = (
         : ([
             {
               id: `${experiment_id}`,
-              file_name: data.file_name || '',
+              file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
+              status: data.status,
               experiments: `${data.experiments.length} experiment(s)`,
               conditions: `${data.experiments.flatMap((exp) => exp.conditions).length} condition(s)`,
               behaviors: `${data.experiments.reduce(

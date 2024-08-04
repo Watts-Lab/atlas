@@ -3,7 +3,7 @@ import { Result, TableData, flattenData } from './hooks/data-handler'
 
 type ArrageTableProps = {
   result: Result[]
-  handleBackend: (file: File) => void
+  handleBackend: (file: FileList) => void
 }
 
 const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
@@ -107,9 +107,9 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
   }
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      handleBackend(file)
+    const files = event.target.files
+    if (files) {
+      handleBackend(files)
     }
   }
 
@@ -191,6 +191,7 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
             onChange={handleFileChange}
             style={{ display: 'none' }}
             accept='application/pdf'
+            multiple
           />
           <button
             onClick={handleExport}
@@ -230,17 +231,23 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
           <tbody>
             {rows.rows.map((row, rowIndex) =>
               row ? (
-                <tr key={rowIndex} className='hover:bg-gray-100'>
-                  {Object.values(row).map((value, colIndex) => (
-                    <td
-                      key={colIndex}
-                      data-col={colIndex}
-                      onMouseEnter={() => handleMouseEnter(colIndex)}
-                      onMouseLeave={() => handleMouseLeave(colIndex)}
-                    >
-                      {value}
-                    </td>
-                  ))}
+                <tr
+                  key={rowIndex}
+                  className={`hover:bg-gray-100 ${row.status === 'inprogress' ? 'skeleton' : ''}`}
+                >
+                  {Object.entries(row).map((value, colIndex) => {
+                    if (value[0] === 'status') return
+                    return (
+                      <td
+                        key={colIndex}
+                        data-col={colIndex}
+                        onMouseEnter={() => handleMouseEnter(colIndex)}
+                        onMouseLeave={() => handleMouseLeave(colIndex)}
+                      >
+                        {value[1]}
+                      </td>
+                    )
+                  })}
                 </tr>
               ) : null,
             )}

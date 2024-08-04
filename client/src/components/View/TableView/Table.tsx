@@ -12,19 +12,24 @@ type RunStatus = {
   done: boolean
 }
 
+type PaperProcessingStatus = {
+  file_name: string
+  task_id: string
+  status: 'success' | 'failed' | 'inprogress'
+}
+
 const Table: React.FC = () => {
+  // State
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-
   const [data, setData] = useState<Result[]>([check_data])
-
   const [status, setStatus] = useState<RunStatus>({
     status: '',
     progress: 0,
     task_id: '',
     done: false,
   })
-  const [pathLength, setPathLength] = useState(0)
+  const [isProcessing, setIsProcessing] = useState<PaperProcessingStatus[]>([])
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -49,9 +54,17 @@ const Table: React.FC = () => {
       })
 
       if (data.done) {
-        getResults(data.task_id).then(() => {
-          setIsUploading(false)
-        })
+        getResults(data.task_id)
+          .then(() => {
+            setIsUploading(false)
+          })
+          .finally(() => {
+            setIsProcessing((prev) =>
+              prev.map((obj) =>
+                obj.task_id === data.task_id ? { ...obj, status: 'success' } : obj,
+              ),
+            )
+          })
       }
     },
     [],
@@ -69,19 +82,6 @@ const Table: React.FC = () => {
     }
   }, [socket, onMessage])
 
-  useEffect(() => {
-    // Ensure the path element exists before trying to get its length
-    const path = document.querySelector<SVGPathElement>('#uploadPath')
-    if (path) {
-      const length = path.getTotalLength()
-      setPathLength(length)
-    }
-  }, [status])
-
-  const getStrokeDashoffset = () => {
-    return pathLength - (pathLength * status.progress) / 100
-  }
-
   const getResults = async (task_id: string) => {
     const response = await fetch(
       `${API_URL}/run_assistant?task_id=${task_id}
@@ -98,35 +98,53 @@ const Table: React.FC = () => {
       const new_data = await response.json()
       try {
         flattenData([new_data], true, true, true)
-        setData((prev) => [...prev, new_data])
+        setData((prev) => prev.map((obj) => (obj.task_id === task_id ? new_data : obj)))
       } catch (error) {
-        setData((prev) => [...prev, get_failed_data(task_id)])
+        setData((prev) =>
+          prev.map((obj) =>
+            obj.task_id === task_id ? get_failed_data(task_id, false, task_id) : obj,
+          ),
+        )
         console.error('Error parsing data:', error)
+      } finally {
+        setStatus({ status: '', progress: 0, task_id: '', done: false })
       }
     } else {
       console.error('Error fetching results')
     }
   }
 
-  const handleBackend = async (file: File) => {
+  const handleBackend = async (files: FileList) => {
     setIsUploading(true)
 
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('sid', socket?.id || '')
-    formData.append('model', 'gpt')
+    const data = new FormData()
+    for (const file of files) {
+      data.append('files[]', file, file.name)
+    }
+    data.append('sid', socket?.id || '')
+    data.append('model', 'gpt')
 
     try {
       const response = await fetch(`${API_URL}/run_assistant`, {
         method: 'POST',
-        body: formData,
+        body: data,
         headers: {},
       })
       if (response.ok) {
-        const new_data = await response.json()
-        console.info(`Task ID: ${new_data.task_id}`)
+        const new_data: { [key: string]: string } = await response.json()
+        Object.entries(new_data).forEach(([key, value]) => {
+          setIsProcessing((prev) => [
+            ...prev,
+            {
+              file_name: key,
+              task_id: value,
+              status: 'inprogress',
+            },
+          ])
+          setData((prev) => [...prev, get_failed_data(key, true, value)])
+        })
       } else {
-        setData((prev) => [...prev, get_failed_data(file.name)])
+        setData((prev) => [...prev, get_failed_data(files[0].name, false)])
       }
     } catch (error) {
       console.error('Error uploading file:', error)
@@ -143,7 +161,7 @@ const Table: React.FC = () => {
 
     const files = e.dataTransfer.files
 
-    await handleBackend(files[0])
+    await handleBackend(files)
   }
 
   return (
@@ -173,8 +191,6 @@ const Table: React.FC = () => {
               strokeLinecap='round'
               strokeLinejoin='round'
               d='M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z'
-              strokeDasharray={pathLength}
-              strokeDashoffset={getStrokeDashoffset()}
             />
           </svg>
           <span className='loading loading-dots loading-lg text-gray-400'></span>
@@ -188,14 +204,18 @@ const Table: React.FC = () => {
         onDrop={handleDrop}
       >
         <ArrageTable result={data} handleBackend={handleBackend} />
-        {isUploading && (
+        {isProcessing.filter((obj) => obj.status === 'inprogress').length > 0 && (
           <div className='toast toast-end'>
             <div role='alert' className='alert shadow-lg w-96'>
               <span className='loading loading-spinner loading-md'></span>
               <div>
-                <h3 className='font-bold'>Processing paper</h3>
+                <h3 className='font-bold'>Processing papers</h3>
                 <div className='text-xs'>{status.status || 'Uploading...'}</div>
               </div>
+              <span className=''>
+                {isProcessing.filter((obj) => obj.status === 'success').length}/
+                {isProcessing.length}
+              </span>
             </div>
           </div>
         )}

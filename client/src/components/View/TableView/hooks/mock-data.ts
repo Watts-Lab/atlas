@@ -2,6 +2,8 @@ import { Result } from './data-handler'
 
 // Sample usage
 export const check_data: Result = {
+  task_id: 'task_id',
+  status: 'success',
   file_name:
     'whiting-watts-2024-a-framework-for-quantifying-individual-and-collective-common-sense.pdf',
   experiments: [
@@ -78,8 +80,10 @@ export const check_data: Result = {
   ],
 }
 
-export function get_failed_data(name: string): Result {
+export function get_failed_data(name: string, inProgress: boolean, task_id: string = ''): Result {
   return {
+    task_id: task_id,
+    status: inProgress ? 'inprogress' : 'failed',
     file_name: name,
     experiments: [
       {
@@ -105,7 +109,7 @@ export function get_failed_data(name: string): Result {
         ],
         demographics_conditions: '--',
         description: '--',
-        name: 'failed',
+        name: '--',
         female_perc: '--',
         gender_other: '--',
         language: '--',

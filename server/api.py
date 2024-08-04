@@ -97,15 +97,22 @@ async def run_assistant_endpoint(request: Request):
     """
     if request.method == "POST":
         # Get the file and the socket id
-        file = request.files.get("file")
+        files = request.files.getlist("files[]")
         sid = request.form.get("sid")
 
-        file_path = f"paper/{sid}-{file.name}"
-        with open(file_path, "wb") as f:
-            f.write(file.body)
+        gpt_process = {}
 
-        task: EagerResult = run_assistant.delay(file_path, sid)
-        return json_response({"task_id": task.id})
+        for file in files:
+            file_path = f"paper/{sid}-{file.name}"
+            with open(file_path, "wb") as f:
+                f.write(file.body)
+
+        for file in files:
+            file_path = f"paper/{sid}-{file.name}"
+            task: EagerResult = run_assistant.delay(file_path, sid)
+            gpt_process[file.name] = task.id
+
+        return json_response(gpt_process)
 
     elif request.method == "GET":
         task_id = request.args.get("task_id")
