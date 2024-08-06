@@ -54,17 +54,11 @@ const Table: React.FC = () => {
       })
 
       if (data.done) {
-        getResults(data.task_id)
-          .then(() => {
-            setIsUploading(false)
-          })
-          .finally(() => {
-            setIsProcessing((prev) =>
-              prev.map((obj) =>
-                obj.task_id === data.task_id ? { ...obj, status: 'success' } : obj,
-              ),
-            )
-          })
+        getResults(data.task_id).then(() => {
+          setIsProcessing((prev) =>
+            prev.map((obj) => (obj.task_id === data.task_id ? { ...obj, status: 'success' } : obj)),
+          )
+        })
       }
     },
     [],
@@ -113,6 +107,14 @@ const Table: React.FC = () => {
       console.error('Error fetching results')
     }
   }
+
+  useEffect(() => {
+    if (isProcessing.filter((obj) => obj.status === 'inprogress').length === 0) {
+      setIsUploading(false)
+    } else {
+      setIsUploading(true)
+    }
+  }, [isProcessing])
 
   const handleBackend = async (files: FileList) => {
     setIsUploading(true)
@@ -204,7 +206,7 @@ const Table: React.FC = () => {
         onDrop={handleDrop}
       >
         <ArrageTable result={data} handleBackend={handleBackend} />
-        {isProcessing.filter((obj) => obj.status === 'inprogress').length > 0 && (
+        {isUploading && (
           <div className='toast toast-end'>
             <div role='alert' className='alert shadow-lg w-96'>
               <span className='loading loading-spinner loading-md'></span>
