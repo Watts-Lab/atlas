@@ -2,26 +2,64 @@
 
 import argparse
 import os
-from celery import Celery
+from celery.result import EagerResult
 from dotenv import load_dotenv
+import jwt
 from sanic import Sanic, json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_cors import CORS
+from sanic_jwt import initialize, exceptions
 from config.app_config import AppConfig
 from controllers.login import login_user, validate_user
 from database.database import init_db
+from database.models.users import User
 import socketio
 
-from celery_worker import get_paper_info, run_assistant, celery
-from celery.result import EagerResult
+from celery_worker import get_paper_info, run_assistant
 
 
 load_dotenv()
 
 WorkerManager.THRESHOLD = 600
 
+
+async def authenticate(request: Request, *args, **kwargs):
+    """
+    Authenticate the user.
+    """
+    token = request.credentials.token
+    decoded_token = jwt.decode(token, app.config.JWT_SECRET, algorithms=["HS256"])
+    email = decoded_token.get("email")
+    user = User.find_one(User.email == email).run()
+    if user:
+        return user.to_dict()
+    else:
+        raise exceptions.AuthenticationFailed("User not found.")
+
+
+async def retrieve_user(request: Request, payload, *args, **kwargs):
+    """
+    Retrieve the user.
+    """
+    if payload:
+        user_id = payload.get("user_id", None)
+        user = User.find_one(id=user_id).run()
+        return user.to_dict()
+    else:
+        return None
+
+
+# Initialize the Sanic app
 app = Sanic("Atlas", config=AppConfig())
+sanicjwt = initialize(
+    app,
+    authenticate=authenticate,
+    retrieve_user=retrieve_user,
+    url_prefix="/api/auth",
+    secret=app.config.JWT_SECRET,
+)
+
 
 # Initialize CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -45,7 +83,18 @@ async def attach_db(_app, _loop):
     """
     Initialize the database connection.
     """
-    await init_db()
+    init_db()
+
+
+@app.route("/api/protected", methods=["GET"])
+@sanicjwt.protected()
+async def protected_route(request: Request):
+    """
+    A protected route.
+    """
+    print("userrrrr", request.app)
+    print("request to api/protedced aaaaaa", request)
+    return json_response({"protected": True})
 
 
 @app.route("/api/login", methods=["POST"])

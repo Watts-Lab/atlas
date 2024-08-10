@@ -1,31 +1,31 @@
 """
-Results model.
+Papers model.
 """
 
 from datetime import datetime
+from typing import List
 from bunnet import Document, Link
 
+from database.models.results import Result
 from database.models.users import User
 
 
-class Result(Document):
+class Papers(Document):
     """
-    Result model.
+    Papers model.
     """
 
     user: Link[User]
-    json_response: dict
-    prompt_token: int
-    completion_token: int
-    quality: float
-    feature_list: list
-    run_id: str
+    title: str
+    run_ids: List[str]
+    truth_ids: List[Link[Result]]
+    s3_url: str
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()
 
     class Settings:
         """
-        Settings for the User model.
+        Settings for the Papers model.
         """
 
-        name = "results"
+        name = "papers"

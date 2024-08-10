@@ -21,7 +21,7 @@ async def login_user(email: str):
             return json_response(body=response_data, status=400)
 
         # Fetch user asynchronously
-        user = await User.find_one(User.email == email)
+        user = User.find_one(User.email == email).run()
         expiration_time = datetime.now(UTC) + timedelta(hours=1)
 
         if user:
@@ -31,7 +31,7 @@ async def login_user(email: str):
             user.magic_link_expired = False
             user.magic_link_expiration_date = expiration_time
             user.updated_at = datetime.now(UTC)
-            await user.save()  # Save the User asynchronously
+            user.save()  # Save the User asynchronously
 
             # Send magic link via email
             send_magic_link(email=email, token=magic_link)
@@ -48,7 +48,7 @@ async def login_user(email: str):
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
         )
-        await new_user.create()  # Create the User asynchronously
+        new_user.create()  # Create the User asynchronously
 
         # Send magic link via email
         send_magic_link(email=email, token=new_user.magic_link)
@@ -76,7 +76,7 @@ async def validate_user(email: str, token: str):
             return json_response(body=response_data, status=400)
 
         # Fetch user asynchronously
-        user = await User.find_one(User.email == email)
+        user = User.find_one(User.email == email).run()
 
         if user:
             if user.magic_link == token and not user.magic_link_expired:
@@ -87,7 +87,7 @@ async def validate_user(email: str, token: str):
                     # user.magic_link_expired = True
                     user.updated_at = datetime.now(UTC)
                     user.magic_link_expired = True
-                    await user.save()  # Save the User asynchronously
+                    user.save()  # Save the User asynchronously
 
                     response_data = {"message": "Magic link validated."}
                     header = {

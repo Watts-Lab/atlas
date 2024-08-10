@@ -3,7 +3,6 @@ endpoint for running the assistant
 """
 
 import os
-from sanic import json as json_response
 import socketio
 
 from gpt_assistant import AssistantException, call_asssistant_api
@@ -29,9 +28,9 @@ def run_assistant_api(
         file_name = file_path.replace("paper/", "").replace(f"{sid}-", "")
 
         response_data = {
-            "message": "File successfully uploaded",
+            "message": "Success",
             "file_name": file_name,
-            "experiments": result["experiments"],
+            "output": result,
         }
 
         if os.path.isfile(file_path):
@@ -43,5 +42,9 @@ def run_assistant_api(
 
         return response_data
     except AssistantException as e:
-        response_data = {"error": str(e)}
+        response_data = {
+            "message": "Failed",
+            "file_name": "failed",
+            "output": str(e),
+        }
         return response_data

@@ -140,7 +140,7 @@ def build_openai_feature_functions(feature_list: List[str]) -> dict:
     return openai_function_object
 
 
-def upload_file_to_vector_store(client: OpenAI, file_path: str, sid: str) -> str:
+def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
     """
     Uploads a file to the vector store.
 
@@ -223,11 +223,37 @@ def create_temporary_assistant(client: OpenAI):
             "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format."
         ),
         name="Atlas explorer",
-        model="gpt-4o",
+        model="gpt-4o-2024-08-06",
         temperature=1,
     )
 
     return my_temporary_assistant
+
+
+def emit_status(
+    sio: socketio.RedisManager, status: str, progress: int, task_id: str, sid: str
+):
+    """
+    Emits a status message to the client.
+
+    Args:
+    - sio: The socketio server.
+    - status: The status message to send.
+    - progress: The progress percentage.
+    - task_id: The task ID.
+    """
+
+    sio.emit(
+        "status",
+        {
+            "status": status,
+            "progress": progress,
+            "task_id": task_id,
+            "done": False,
+        },
+        to=sid,
+        namespace="/home",
+    )
 
 
 def call_asssistant_api(
@@ -248,87 +274,70 @@ def call_asssistant_api(
     client = OpenAI()
 
     try:
-        sio.emit(
-            "status",
-            {
-                "status": "Fetching all features...",
-                "progress": 0,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+
+        emit_status(
+            sio=sio,
+            status="Fetching all features...",
+            progress=0,
+            task_id=task_id,
+            sid=sid,
         )
 
         feature_list = get_all_features()
 
-        sio.emit(
-            "status",
-            {
-                "status": "Building feature functions...",
-                "progress": 5,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+        emit_status(
+            sio=sio,
+            status="Building feature functions...",
+            progress=5,
+            task_id=task_id,
+            sid=sid,
         )
+
         functions = build_openai_feature_functions(feature_list)
 
-        sio.emit(
-            "status",
-            {
-                "status": "Uploading file to vector store...",
-                "progress": 10,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
-        )
-        vector_store = upload_file_to_vector_store(
-            client=client, file_path=file_path, sid=sid
+        emit_status(
+            sio=sio,
+            status="Uploading file to vector store...",
+            progress=10,
+            task_id=task_id,
+            sid=sid,
         )
 
-        sio.emit(
-            "status",
-            {
-                "status": "Creating an assistant for your task...",
-                "progress": 12,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+        vector_store = upload_file_to_vector_store(
+            client=client,
+            file_path=file_path,
         )
+
+        emit_status(
+            sio=sio,
+            status="Creating an assistant for your task...",
+            progress=12,
+            task_id=task_id,
+            sid=sid,
+        )
+
         my_temporary_assistant = create_temporary_assistant(client)
 
-        sio.emit(
-            "status",
-            {
-                "status": "Updating assistant...",
-                "progress": 15,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+        emit_status(
+            sio=sio,
+            status="Updating assistant...",
+            progress=15,
+            task_id=task_id,
+            sid=sid,
         )
+
         updated_assistant = update_assistant(
             client, my_temporary_assistant.id, vector_store, functions
         )
 
-        sio.emit(
-            "status",
-            {
-                "status": "Creating thread message...",
-                "progress": 30,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+        emit_status(
+            sio=sio,
+            status="Running assistant...",
+            progress=20,
+            task_id=task_id,
+            sid=sid,
         )
+
         thread_message = client.beta.threads.create(
             messages=[
                 {
@@ -338,50 +347,23 @@ def call_asssistant_api(
             ],
         )
 
-        sio.emit(
-            "status",
-            {
-                "status": "Running assistant...",
-                "progress": 40,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
-        )
-
         run = client.beta.threads.runs.create_and_poll(
             thread_id=thread_message.id,
             assistant_id=updated_assistant.id,
         )
 
-        sio.emit(
-            "status",
-            {
-                "status": "Getting tool outputs...",
-                "progress": 50,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+        emit_status(
+            sio=sio,
+            status="Checking assistant run...",
+            progress=40,
+            task_id=task_id,
+            sid=sid,
         )
 
         tool_outputs = json.loads(
             run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
         )
 
-        sio.emit(
-            "status",
-            {
-                "status": "Checking output format...",
-                "progress": 60,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
-        )
         check_output_format(tool_outputs)
 
     except json.JSONDecodeError as je:
@@ -392,19 +374,16 @@ def call_asssistant_api(
         raise AssistantException("Assistant run failed - Type Error") from te
     except Exception as e:
         print(e)
-        raise AssistantException("Assistant run failed") from e
+        raise AssistantException(run.to_json()) from e
     finally:
-        sio.emit(
-            "status",
-            {
-                "status": "Cleaning up resources...",
-                "progress": 70,
-                "task_id": task_id,
-                "done": False,
-            },
-            to=sid,
-            namespace="/home",
+        emit_status(
+            sio=sio,
+            status="Cleaning up resources...",
+            progress=70,
+            task_id=task_id,
+            sid=sid,
         )
+
         # deleting the vector store
         vector_store_files = client.beta.vector_stores.files.list(
             vector_store_id=vector_store.id
@@ -430,4 +409,8 @@ def call_asssistant_api(
 
         client.beta.assistants.delete(my_temporary_assistant.id)
 
-    return tool_outputs
+    return {
+        "result": tool_outputs,
+        "prompt_token": 5419,
+        "completion_token": 91,
+    }
