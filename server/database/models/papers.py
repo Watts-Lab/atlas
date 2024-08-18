@@ -10,7 +10,7 @@ from database.models.results import Result
 from database.models.users import User
 
 
-class Papers(Document):
+class Paper(Document):
     """
     Papers model.
     """

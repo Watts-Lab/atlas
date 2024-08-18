@@ -36,7 +36,7 @@ class User(Document):
         Convert the User object to a dictionary.
         """
         return {
-            "user_id": str(self.id),
+            "id": str(self.id),
             "email": self.email,
             "username": self.email,
             "magic_link": self.magic_link,

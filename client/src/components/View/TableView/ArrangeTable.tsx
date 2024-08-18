@@ -197,7 +197,7 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
             onClick={handleExport}
             className='btn btn-sm btn-ghost badge badge-xs badge-primary'
           >
-            Export .csv
+            Export CSV
           </button>
         </div>
       </div>

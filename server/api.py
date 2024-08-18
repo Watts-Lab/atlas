@@ -9,10 +9,11 @@ from sanic import Sanic, json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_cors import CORS
-from sanic_jwt import initialize, exceptions
 from config.app_config import AppConfig
 from controllers.login import login_user, validate_user
+from controllers.project import create_project
 from database.database import init_db
+from database.models.projects import Project
 from database.models.users import User
 import socketio
 
@@ -23,42 +24,8 @@ load_dotenv()
 
 WorkerManager.THRESHOLD = 600
 
-
-async def authenticate(request: Request, *args, **kwargs):
-    """
-    Authenticate the user.
-    """
-    token = request.credentials.token
-    decoded_token = jwt.decode(token, app.config.JWT_SECRET, algorithms=["HS256"])
-    email = decoded_token.get("email")
-    user = User.find_one(User.email == email).run()
-    if user:
-        return user.to_dict()
-    else:
-        raise exceptions.AuthenticationFailed("User not found.")
-
-
-async def retrieve_user(request: Request, payload, *args, **kwargs):
-    """
-    Retrieve the user.
-    """
-    if payload:
-        user_id = payload.get("user_id", None)
-        user = User.find_one(id=user_id).run()
-        return user.to_dict()
-    else:
-        return None
-
-
 # Initialize the Sanic app
 app = Sanic("Atlas", config=AppConfig())
-sanicjwt = initialize(
-    app,
-    authenticate=authenticate,
-    retrieve_user=retrieve_user,
-    url_prefix="/api/auth",
-    secret=app.config.JWT_SECRET,
-)
 
 
 # Initialize CORS
@@ -86,15 +53,76 @@ async def attach_db(_app, _loop):
     init_db()
 
 
-@app.route("/api/protected", methods=["GET"])
-@sanicjwt.protected()
-async def protected_route(request: Request):
+@app.route("/api/projects", methods=["GET", "POST"])
+async def project(request: Request):
     """
     A protected route.
     """
-    print("userrrrr", request.app)
-    print("request to api/protedced aaaaaa", request)
-    return json_response({"protected": True})
+    try:
+        user_jwt = jwt.decode(
+            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        )
+        user = User.find_one(User.email == user_jwt.get("email")).run()
+        if not user:
+            return json_response({"error": "User not found."}, status=404)
+
+        if request.method == "POST":
+            project_name = "New Project"
+            project_description = "New Project"
+            new_project = create_project(project_name, project_description, user)
+            return json_response(
+                {"message": "Project created.", "project_id": new_project}
+            )
+        elif request.method == "GET":
+
+            project_id = request.args.get("project_id")
+            print("project_id ", project_id)
+            user_project = Project.get(project_id).run()
+            if not user_project:
+                return json_response({"error": "Project not found."}, status=404)
+            project_dict = user_project.model_dump(
+                mode="json", exclude=["user"], serialize_as_any=True
+            )
+            project_dict["slug"] = str(project_dict["slug"])
+            project_dict["created_at"] = str(project_dict["created_at"])
+            project_dict["updated_at"] = str(project_dict["updated_at"])
+            if user_project:
+                return json_response({"project": project_dict})
+            else:
+                return json_response({"error": "Project not found."}, status=404)
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
+    except Exception as e:
+        return json_response({"error": str(e)}, status=500)
+
+
+@app.route("/api/user/projects", methods=["GET"])
+async def user_projects(request: Request):
+    """
+    A protected route.
+    """
+    try:
+        user_jwt = jwt.decode(
+            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        )
+        user = User.find_one(User.email == user_jwt.get("email")).run()
+        if not user:
+            return json_response({"error": "User not found."}, status=404)
+
+        elif request.method == "GET":
+            project = Project.find(Project.user == user).to_list()
+            if project:
+                return json_response({"project": project})
+            else:
+                return json_response({"error": "Project not found."}, status=404)
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
 
 
 @app.route("/api/login", methods=["POST"])

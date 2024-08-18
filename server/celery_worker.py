@@ -5,7 +5,7 @@ Celery configuration.
 import os
 import sys
 from celery import Celery, Task
-from celery.signals import worker_process_init
+from celery.signals import worker_process_init, worker_process_shutdown
 from dotenv import load_dotenv
 import requests
 import socketio
@@ -13,7 +13,7 @@ import boto3
 
 from controllers.assisstant import run_assistant_api
 from database.database import init_db
-from database.models.papers import Papers
+from database.models.papers import Paper
 from database.models.results import Result
 from database.models.users import User
 from utils.assistant_retriever import Assistant
@@ -49,6 +49,16 @@ def init_celery_worker(**kwargs):
         DB_INITIALIZED = True
 
 
+@worker_process_shutdown.connect
+def shutdown_celery_worker(**kwargs):
+    """
+    Shutdown the Beanie/MongoDB connection for each worker process.
+    """
+    global DB_INITIALIZED
+    if DB_INITIALIZED:
+        DB_INITIALIZED = False
+
+
 @celery.task(bind=True, name="get_paper_info")
 def get_paper_info(paper_path: str):
     """
@@ -72,13 +82,13 @@ def get_paper_info(paper_path: str):
     return paper_info
 
 
-def save_paper_info(paper_info: dict) -> Papers:
+def save_paper_info(paper_info: dict) -> Paper:
     """
     Save the paper info to the database.
     """
     user = User.find_one(User.email == "amirhossein.nakhaei@rwth-aachen.de").run()
 
-    new_paper = Papers(
+    new_paper = Paper(
         user=user,
         title=paper_info["title"],
         run_ids=[paper_info["run_id"]],

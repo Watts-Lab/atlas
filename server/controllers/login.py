@@ -96,7 +96,7 @@ async def validate_user(email: str, token: str):
                             {
                                 "email": email,
                                 "token": token,
-                                "exp": datetime.now() + timedelta(hours=1),
+                                "exp": datetime.now(UTC) + timedelta(hours=6),
                             },
                             app.config.JWT_SECRET,
                             algorithm="HS256",

@@ -18,7 +18,7 @@ type PaperProcessingStatus = {
   status: 'success' | 'failed' | 'inprogress'
 }
 
-const Table: React.FC = () => {
+const Table = () => {
   // State
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
