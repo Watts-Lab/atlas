@@ -1,7 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { API_URL } from '../../service/api'
-import Header from '../../components/Builder/Header'
+import Contenteditable from './Contenteditable'
+import { debounce } from 'lodash'
+import TableView from '../../components/View/TableView/TableView'
+import { check_data } from '../../components/View/TableView/hooks/mock-data'
+import { Result } from '../../components/View/TableView/hooks/data-handler'
 
 type ProjectDetails = {
   name: string
@@ -19,12 +23,55 @@ const ProjectView = () => {
 
   const [loading, setLoading] = useState<boolean>(false)
 
+  const [projectResults, setProjectResults] = useState<Result[]>([check_data])
   const [project, setProject] = useState<ProjectDetails>({
     name: '',
     id: '',
     created_at: '',
     updated_at: '',
   })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [token, _setToken] = useState<string>(localStorage.getItem('token') || '')
+
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  const updateProjectName = useCallback(
+    debounce(async (updatedName: string) => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort() // Cancel the previous fetch call
+      }
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+
+      const token = localStorage.getItem('token') || ''
+      if (!token) {
+        return
+      }
+      try {
+        const response = await fetch(`${API_URL}/projects?project_id=${params.project_id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ project_name: updatedName }),
+          signal: controller.signal,
+        })
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        const response_data = await response.json()
+        setProject((prevProject) => ({
+          ...prevProject,
+          name: response_data.project.title,
+        }))
+      } catch (error: unknown) {
+        console.error('Error:', error)
+      }
+    }, 1000),
+    [params.project_id],
+  )
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,13 +96,14 @@ const ProjectView = () => {
         }
 
         const response_data = await response.json()
-        console.log(response_data)
         setProject({
           name: response_data.project.title,
           id: response_data.project.id,
           created_at: response_data.project.created_at,
           updated_at: response_data.project.updated_at,
         })
+
+        setProjectResults(response_data.results)
       } catch (error: unknown) {
         console.error('Error:', error)
         return null
@@ -69,31 +117,30 @@ const ProjectView = () => {
 
   return (
     <main className={`h-screen w-screen px-4 ${loading ? 'blur-sm' : ''}`}>
-      <Header fileName={project.name} />
       <div className='navbar bg-base-100 flex flex-col sm:flex-row'>
         <div className='navbar-start z-10 md:pl-5'>
           <div className='flex-none'>
-            <div
+            <Contenteditable
               className='normal-case text-xl'
-              contentEditable='true'
-              onBlur={(e) => {
-                e.preventDefault()
-                setProject({ ...project, name: e.currentTarget.textContent || '' })
+              value={project.name}
+              onChange={(updatedContent) => {
+                setProject({ ...project, name: updatedContent })
+                updateProjectName(updatedContent)
               }}
-            >
-              {project.name}
-            </div>
+            />
           </div>
         </div>
         <div className='navbar-center text-center'>
           <div className='flex flex-row justify-center '>{project.id}</div>
         </div>
-        <div className='md:navbar-end z-10 max-sm:pt-4'>
-          <button className='btn btn-sm btn-ghost border border-teal-100'>Browse file</button>
-          <input type='file' style={{ display: 'none' }} accept='application/pdf' multiple />
-          <button className='btn btn-sm btn-ghost badge badge-xs badge-primary'>Export .csv</button>
-        </div>
+        <div className='md:navbar-end z-10 max-sm:pt-4'></div>
       </div>
+      <hr></hr>
+      <TableView
+        project_id={params.project_id || ''}
+        project_results={projectResults}
+        token={token}
+      />
     </main>
   )
 }

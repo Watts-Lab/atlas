@@ -2,6 +2,7 @@
 Celery configuration.
 """
 
+import hashlib
 import os
 import sys
 from celery import Celery, Task
@@ -14,6 +15,7 @@ import boto3
 from controllers.assisstant import run_assistant_api
 from database.database import init_db
 from database.models.papers import Paper
+from database.models.projects import Project
 from database.models.results import Result
 from database.models.users import User
 from utils.assistant_retriever import Assistant
@@ -82,11 +84,11 @@ def get_paper_info(paper_path: str):
     return paper_info
 
 
-def save_paper_info(paper_info: dict) -> Paper:
+def save_paper_info(paper_info: dict, user_email: str) -> Paper:
     """
     Save the paper info to the database.
     """
-    user = User.find_one(User.email == "amirhossein.nakhaei@rwth-aachen.de").run()
+    user = User.find_one(User.email == user_email).run()
 
     new_paper = Paper(
         user=user,
@@ -94,9 +96,128 @@ def save_paper_info(paper_info: dict) -> Paper:
         run_ids=[paper_info["run_id"]],
         truth_ids=[],
         s3_url=paper_info["s3_url"],
+        file_hash=paper_info["hash"],
     )
 
     return new_paper.create()
+
+
+@celery.task(bind=True, name="add_paper")
+def add_paper(
+    self: Task, paper_path: str, socket_id: str, user_email: str, project_id: str
+):
+    """
+    Task to create a task.
+    """
+
+    external_sio = socketio.RedisManager(
+        os.getenv("CELERY_BROKER_URL"), write_only=True
+    )
+
+    task_id = self.request.id
+
+    external_sio.emit(
+        "status",
+        {
+            "status": "Starting assistant...",
+            "progress": 0,
+            "task_id": task_id,
+            "done": False,
+        },
+        to=socket_id,
+        namespace="/home",
+    )
+
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=AWS_S3_KEY,
+        aws_secret_access_key=AWS_S3_SECRET,
+    )
+
+    with open(paper_path, "rb") as f:
+        file_hash = hashlib.md5(f.read()).hexdigest()
+
+    print(f"File hash: {file_hash}")
+
+    try:
+        s3.upload_file(
+            paper_path,
+            AWS_S3_BUCKET,
+            f"{user_email}/{paper_path}",
+            ExtraArgs=None,
+            Callback=None,
+            Config=None,
+        )
+
+        res = {
+            "title": paper_path.replace("paper/", "").replace(f"{socket_id}-", ""),
+            "run_id": task_id,
+            "s3_url": f"https://{AWS_S3_BUCKET}.s3.amazonaws.com/{user_email}/{paper_path}",
+            "hash": str(file_hash),
+        }
+
+        # Save the paper info to the database
+        new_paper = save_paper_info(paper_info=res, user_email=user_email)
+
+        update_project: Project = Project.get(project_id).run()
+        if not update_project:
+            print("Project not found.")
+        else:
+            update_project.papers.append(new_paper)
+            update_project.save()
+
+        print(f"File uploaded to S3: {new_paper.id}")
+    except Exception as e:
+        print(f"Error uploading file to S3: {e}")
+
+    open_ai_res = run_assistant_api(
+        file_path=paper_path, sid=socket_id, sio=external_sio, task_id=task_id
+    )
+
+    result_obj = Result(
+        user=User.find_one(User.email == user_email).run(),
+        json_response=open_ai_res["output"]["result"],
+        prompt_token=open_ai_res["output"]["prompt_token"],
+        completion_token=open_ai_res["output"]["completion_token"],
+        quality=0.9,
+        feature_list=default_experiments_features,
+        run_id=task_id,
+    )
+
+    external_sio.emit(
+        "status",
+        {
+            "status": "Saving results to database...",
+            "progress": 90,
+            "task_id": task_id,
+            "done": False,
+        },
+        to=socket_id,
+        namespace="/home",
+    )
+
+    result = result_obj.create()
+
+    new_paper.truth_ids.append(result)
+    new_paper.save()
+
+    external_sio.emit(
+        "status",
+        {
+            "status": "Finishing up...",
+            "progress": 100,
+            "task_id": task_id,
+            "done": True,
+        },
+        to=socket_id,
+        namespace="/home",
+    )
+
+    return {
+        "message": "Success",
+        "file_name": open_ai_res["file_name"],
+        "experiments": open_ai_res["output"]["result"]["experiments"],
+    }
 
 
 @celery.task(bind=True, name="run_assistant")
@@ -142,11 +263,13 @@ def run_assistant(self: Task, paper_path: str, socket_id: str):
         res = {
             "title": paper_path.replace("paper/", "").replace(f"{socket_id}-", ""),
             "run_id": task_id,
-            "s3_url": f"https://{AWS_S3_BUCKET}.s3.amazonaws.com/amirhossein.nakhaei@rwth-aachen.de/{paper_path}",
+            "s3_url": f"https://{AWS_S3_BUCKET}.s3.amazonaws.com/{paper_path}",
         }
 
         # Save the paper info to the database
-        new_paper = save_paper_info(res)
+        new_paper = save_paper_info(
+            paper_info=res, user_email="amirhossein.nakhaei@rwth-aachen.de"
+        )
 
         print(f"File uploaded to S3: {res}")
     except Exception as e:

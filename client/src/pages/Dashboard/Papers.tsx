@@ -1,9 +1,8 @@
-type Paper = {
-  fileName: string
+export type Paper = {
+  id: string
   title: string
-  doi: string
-  authors: string
-  status: string
+  file_hash: string
+  updated_at: string
 }
 
 type PaperProps = {
@@ -11,7 +10,21 @@ type PaperProps = {
 }
 
 const Papers = ({ papers }: PaperProps) => {
-  console.log('Error logging in:', papers)
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return 'Invalid date'
+    }
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }).format(date)
+  }
+
   return (
     <>
       {/* <!-- Papers Section --> */}
@@ -25,51 +38,46 @@ const Papers = ({ papers }: PaperProps) => {
                   className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'
                   title='File Name'
                 >
-                  File Name
+                  Id
                 </th>
-                <th
-                  className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'
-                  title='Title of the paper from GPT agent'
-                >
-                  Title
-                </th>
+
                 <th
                   className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'
                   title='Digital Object Identifier from crossref'
                 >
-                  DOI
+                  Name
                 </th>
                 <th
                   className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'
                   title='Authors of the paper'
                 >
-                  Authors
+                  Hash
                 </th>
                 <th
                   className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'
                   title='Status of the paper (Done, In Progress, Not Started)'
                 >
-                  Status
+                  Created At
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
-                  paper1.pdf
-                </td>
-                <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
-                  Exploring AI
-                </td>
-                <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
-                  10.1234/ai.2024
-                </td>
-                <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
-                  John Doe, Jane Smith
-                </td>
-                <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>Done</td>
-              </tr>
-              {/* Add more paper rows as needed */}
+              {papers.map((paper) => (
+                <tr key={paper.id}>
+                  <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
+                    {paper.id}
+                  </td>
+                  <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
+                    {paper.title}
+                  </td>
+                  <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
+                    {paper.file_hash}
+                  </td>
+                  <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300'>
+                    {formatDate(paper.updated_at)}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

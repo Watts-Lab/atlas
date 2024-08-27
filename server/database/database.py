@@ -27,5 +27,5 @@ def init_db():
 
     # Init beanie with the Product document class
     init_bunnet(
-        database=client.atlas_main, document_models=[User, Result, Paper, Project]
+        database=client.atlas_main, document_models=[User, Paper, Result, Project]
     )

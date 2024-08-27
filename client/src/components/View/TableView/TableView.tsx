@@ -3,7 +3,7 @@ import { useSocket } from '../../../context/Socket/UseSocket'
 import { API_URL } from '../../../service/api'
 import ArrageTable from './ArrangeTable'
 import { flattenData, Result } from './hooks/data-handler'
-import { check_data, get_failed_data } from './hooks/mock-data'
+import { get_failed_data } from './hooks/mock-data'
 
 type RunStatus = {
   status: string
@@ -18,11 +18,17 @@ type PaperProcessingStatus = {
   status: 'success' | 'failed' | 'inprogress'
 }
 
-const Table = () => {
+type TableViewProps = {
+  project_id: string
+  project_results: Result[]
+  token: string
+}
+
+const TableView = ({ project_id, project_results, token }: TableViewProps) => {
   // State
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-  const [data, setData] = useState<Result[]>([check_data])
+  const [data, setData] = useState<Result[]>(project_results)
   const [status, setStatus] = useState<RunStatus>({
     status: '',
     progress: 0,
@@ -30,6 +36,10 @@ const Table = () => {
     done: false,
   })
   const [isProcessing, setIsProcessing] = useState<PaperProcessingStatus[]>([])
+
+  useEffect(() => {
+    setData(project_results)
+  }, [project_results])
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -125,12 +135,15 @@ const Table = () => {
     }
     data.append('sid', socket?.id || '')
     data.append('model', 'gpt')
+    data.append('project_id', project_id)
 
     try {
-      const response = await fetch(`${API_URL}/run_assistant`, {
+      const response = await fetch(`${API_URL}/add_paper`, {
         method: 'POST',
         body: data,
-        headers: {},
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
       if (response.ok) {
         const new_data: { [key: string]: string } = await response.json()
@@ -200,7 +213,7 @@ const Table = () => {
         </div>
       )}
       <main
-        className={`h-screen w-screen px-4 ${isDragging ? 'blur-sm' : ''}`}
+        className={`h-screen ${isDragging ? 'blur-sm' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -226,4 +239,4 @@ const Table = () => {
   )
 }
 
-export default Table
+export default TableView

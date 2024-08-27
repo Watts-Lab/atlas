@@ -5,9 +5,9 @@ Papers model.
 from datetime import datetime
 from typing import List
 from uuid import UUID, uuid4
-from bunnet import Document, Link
+from bunnet import Document, Link, PydanticObjectId
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from database.models.papers import Paper
 from database.models.users import User
@@ -20,6 +20,7 @@ class Project(Document):
 
     user: Link[User]
     title: str
+    description: str = "Created on " + str(datetime.now())
     slug: UUID = Field(default_factory=uuid4)
     papers: List[Link[Paper]] = []
     features: List[str] = (
@@ -38,6 +39,27 @@ class Project(Document):
         """
 
         name = "projects"
+
+
+class ProjectView(BaseModel):
+    """
+    Project view model.
+    """
+
+    id: PydanticObjectId
+    title: str
+    description: str
+    papers: List[Link[Paper]]
+    updated_at: datetime
+
+    class Settings:
+        projection = {
+            "id": "$_id",
+            "title": 1,
+            "description": 1,
+            "papers": "$papers.count",
+            "updated_at": 1,
+        }
 
 
 class ProjectVersion(Document):

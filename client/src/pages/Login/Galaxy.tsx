@@ -53,7 +53,6 @@ const Galaxy = ({ loggingIn }: { loggingIn?: boolean }) => {
         body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
       }).then((res) => {
         if (res.ok) {
-          console.log(res)
           localStorage.setItem('token', res.headers.get('Authorization')!)
           navigate('/table')
         }

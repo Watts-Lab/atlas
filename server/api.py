@@ -1,6 +1,7 @@
 """ This module contains the Sanic RESTful API endpoint for the workflow editor. """
 
 import argparse
+import json
 import os
 from celery.result import EagerResult
 from dotenv import load_dotenv
@@ -13,11 +14,13 @@ from config.app_config import AppConfig
 from controllers.login import login_user, validate_user
 from controllers.project import create_project
 from database.database import init_db
-from database.models.projects import Project
+from database.models.papers import Paper, PaperView
+from database.models.projects import Project, ProjectView
+from database.models.results import Result
 from database.models.users import User
 import socketio
 
-from celery_worker import get_paper_info, run_assistant
+from celery_worker import run_assistant, add_paper
 
 
 load_dotenv()
@@ -53,7 +56,7 @@ async def attach_db(_app, _loop):
     init_db()
 
 
-@app.route("/api/projects", methods=["GET", "POST"])
+@app.route("/api/projects", methods=["GET", "POST", "PUT"])
 async def project(request: Request):
     """
     A protected route.
@@ -74,10 +77,8 @@ async def project(request: Request):
                 {"message": "Project created.", "project_id": new_project}
             )
         elif request.method == "GET":
-
             project_id = request.args.get("project_id")
-            print("project_id ", project_id)
-            user_project = Project.get(project_id).run()
+            user_project: Project = Project.get(project_id, fetch_links=True).run()
             if not user_project:
                 return json_response({"error": "Project not found."}, status=404)
             project_dict = user_project.model_dump(
@@ -86,10 +87,39 @@ async def project(request: Request):
             project_dict["slug"] = str(project_dict["slug"])
             project_dict["created_at"] = str(project_dict["created_at"])
             project_dict["updated_at"] = str(project_dict["updated_at"])
+            project_dict["papers"] = [str(pap.id) for pap in user_project.papers]
+
+            papers = [
+                {
+                    "task_id": pap.title,
+                    "status": "success",
+                    "file_name": pap.title,
+                    "experiments": pap.truth_ids[0].json_response["experiments"],
+                }
+                for pap in user_project.papers
+            ]
+
             if user_project:
-                return json_response({"project": project_dict})
+                return json_response({"project": project_dict, "results": papers})
             else:
                 return json_response({"error": "Project not found."}, status=404)
+        elif request.method == "PUT":
+            project_id = request.args.get("project_id")
+            project_name = request.json.get("project_name")
+            user_project = Project.get(project_id).run()
+            if not user_project:
+                return json_response({"error": "Project not found."}, status=404)
+            user_project.title = project_name
+            user_project.save()
+            project_dict = user_project.model_dump(
+                mode="json", exclude=["user"], serialize_as_any=True
+            )
+            project_dict["slug"] = str(project_dict["slug"])
+            project_dict["created_at"] = str(project_dict["created_at"])
+            project_dict["updated_at"] = str(project_dict["updated_at"])
+            return json_response(
+                {"message": "Project updated.", "project": project_dict}
+            )
 
     except jwt.ExpiredSignatureError:
         return json_response({"error": "Token has expired."}, status=401)
@@ -112,12 +142,45 @@ async def user_projects(request: Request):
         if not user:
             return json_response({"error": "User not found."}, status=404)
 
-        elif request.method == "GET":
-            project = Project.find(Project.user == user).to_list()
-            if project:
-                return json_response({"project": project})
+        if request.method == "GET":
+            projects = (
+                Project.find({"user.$id": user.id}).project(ProjectView).to_list()
+            )
+            pr_response = [p.model_dump(mode="json") for p in projects]
+
+            if projects:
+                return json_response({"project": pr_response})
             else:
                 return json_response({"error": "Project not found."}, status=404)
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
+
+
+@app.route("/api/user/papers", methods=["GET"])
+async def user_papers(request: Request):
+    """
+    A protected route.
+    """
+    try:
+
+        user_jwt = jwt.decode(
+            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        )
+        user = User.find_one(User.email == user_jwt.get("email")).run()
+        if not user:
+            return json_response({"error": "User not found."}, status=404)
+
+        if request.method == "GET":
+            papers = Paper.find({"user.$id": user.id}).project(PaperView).to_list()
+            pr_response = [p.model_dump(mode="json") for p in papers]
+            print("papers_response ", pr_response)
+            if papers:
+                return json_response({"papers": pr_response})
+            else:
+                return json_response({"error": "Papers not found."}, status=404)
 
     except jwt.ExpiredSignatureError:
         return json_response({"error": "Token has expired."}, status=401)
@@ -148,23 +211,46 @@ async def validate(request: Request):
         return await validate_user(email=email, token=token)
 
 
-@app.route("/api/task", methods=["GET", "POST"])
-async def task_handler(request: Request):
+@app.route("/api/add_paper", methods=["POST", "GET"])
+async def run_assistant_projects(request: Request):
     """
-    Handles the POST request for logging in the user.
+    Handles the POST request for running the assistant.
     """
     if request.method == "POST":
-        file = request.files.get("file")
-        file_path = f"paper/{file.name}"
-        with open(file_path, "wb") as f:
-            f.write(file.body)
+        # Get the file and the socket id
+        files = request.files.getlist("files[]")
+        socket_id = request.form.get("sid")
+        project_id = request.form.get("project_id")
 
-        task: EagerResult = get_paper_info.delay(file_path)
-        return json_response({"TASK": task.id})
+        user_jwt = jwt.decode(
+            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        )
+        user = User.find_one(User.email == user_jwt.get("email")).run()
+
+        if not user:
+            return json_response({"error": "User not found."}, status=404)
+
+        user_email = user.email
+        gpt_process = {}
+
+        for file in files:
+            file_path = f"paper/{socket_id}-{file.name}"
+            with open(file_path, "wb") as f:
+                f.write(file.body)
+
+        for file in files:
+            file_path = f"paper/{socket_id}-{file.name}"
+            task: EagerResult = add_paper.delay(
+                file_path, socket_id, user_email, project_id
+            )
+            gpt_process[file.name] = task.id
+
+        return json_response(gpt_process)
+
     elif request.method == "GET":
-        task_id = request.json.get("task_id")
-        task = get_paper_info.AsyncResult(task_id)
-        return json_response({"TASK": task.result})
+        task_id = request.args.get("task_id")
+        task = run_assistant.AsyncResult(task_id)
+        return json_response(task.result)
 
 
 @app.route("/api/run_assistant", methods=["POST", "GET"])
