@@ -123,7 +123,7 @@ export const flattenExperiment = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
-                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
+                id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}-${con_index}-${beh_index}`,
                 file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
                 status: data.status,
                 experiment_name: experiment.name,
@@ -159,7 +159,7 @@ export const flattenExperiment = (
           ) as KeyValuePairs[])
         : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
-              id: `${experiment_id}-${exp_index}-${con_index}`,
+              id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}-${con_index}`,
               file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
               status: data.status,
               experiment_name: experiment.name,
@@ -220,7 +220,7 @@ export const flattenExperiment = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
-                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
+                id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}-${con_index}-${beh_index}`,
                 file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
                 status: data.status,
                 experiment_name: experiment.name,
@@ -257,7 +257,7 @@ export const flattenExperiment = (
             ),
           ) as KeyValuePairs[])
         : data.experiments.flatMap((experiment, exp_index) => ({
-            id: `${experiment_id}-${exp_index}`,
+            id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}`,
             file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
             status: data.status,
             experiment_name: experiment.name,
@@ -313,7 +313,7 @@ export const flattenExperiment = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
-                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
+                id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}-${con_index}-${beh_index}`,
                 file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
                 status: data.status,
                 experiments: experiment.name,
@@ -330,7 +330,7 @@ export const flattenExperiment = (
           ) as KeyValuePairs[])
         : (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.map((condition, con_index) => ({
-              id: `${experiment_id}-${exp_index}-${con_index}`,
+              id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}-${con_index}`,
               file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
               status: data.status,
               experiments: experiment.name,
@@ -366,7 +366,7 @@ export const flattenExperiment = (
         ? (data.experiments.flatMap((experiment, exp_index) =>
             experiment.conditions.flatMap((condition, con_index) =>
               condition.behaviors.map((behavior, beh_index) => ({
-                id: `${experiment_id}-${exp_index}-${con_index}-${beh_index}`,
+                id: `${stringToHash(data.file_name)}-${stringToHash(experiment.name)}-${con_index}-${beh_index}`,
                 file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
                 status: data.status,
                 experiments: experiment.name,
@@ -380,7 +380,7 @@ export const flattenExperiment = (
           ) as KeyValuePairs[])
         : ([
             {
-              id: `${experiment_id}`,
+              id: `${stringToHash(data.file_name)}`,
               file_name: data.status === 'inprogress' ? data.task_id : data.file_name,
               status: data.status,
               experiments: `${data.experiments.length} experiment(s)`,
@@ -414,4 +414,12 @@ export const flattenExperiment = (
       return { headers, rows, headersGroup }
     }
   }
+}
+
+export const stringToHash = (input: string): number => {
+  let hash = 5381;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash * 33) ^ input.charCodeAt(i);
+  }
+  return hash >>> 0;
 }
