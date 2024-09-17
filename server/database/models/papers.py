@@ -25,12 +25,28 @@ class Paper(Document):
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()
 
+    # Define the property for experiments
+    @property
+    def experiments(self) -> List[dict]:
+        if self.truth_ids:
+            # Assuming that truth_ids is a list of Result documents
+            # Fetch the first Result document
+            result = self.truth_ids[0]
+            # Access the json_response field safely
+            return result.json_response.get("experiments", [])
+        else:
+            return []
+
     class Settings:
         """
         Settings for the Papers model.
         """
 
         name = "papers"
+
+    class Config:
+        orm_mode = True
+        underscore_attrs_are_private = True
 
 
 class PaperView(BaseModel):

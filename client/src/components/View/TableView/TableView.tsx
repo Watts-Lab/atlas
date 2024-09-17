@@ -38,7 +38,19 @@ const TableView = ({ project_id, project_results, token }: TableViewProps) => {
   const [isProcessing, setIsProcessing] = useState<PaperProcessingStatus[]>([])
 
   useEffect(() => {
-    setData(project_results)
+    const processedResults = project_results.map((obj) => {
+      if (obj.status === 'failed') {
+        return get_failed_data(`Failed - ${obj.task_id}`, false, obj.task_id)
+      }
+      try {
+        flattenData([obj], true, true, true)
+        return obj
+      } catch (error) {
+        return get_failed_data(`Failed - ${obj.task_id}`, false, obj.task_id)
+      }
+    })
+
+    setData(processedResults)
   }, [project_results])
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {

@@ -89,12 +89,15 @@ async def project(request: Request):
             project_dict["updated_at"] = str(project_dict["updated_at"])
             project_dict["papers"] = [str(pap.id) for pap in user_project.papers]
 
+            for proj in user_project.papers:
+                print("proj ", len(proj.truth_ids))
+
             papers = [
                 {
                     "task_id": pap.title,
-                    "status": "success",
+                    "status": "success" if pap.truth_ids else "failed",
                     "file_name": pap.title,
-                    "experiments": pap.truth_ids[0].json_response["experiments"],
+                    "experiments": pap.experiments,
                 }
                 for pap in user_project.papers
             ]
@@ -143,10 +146,20 @@ async def user_projects(request: Request):
             return json_response({"error": "User not found."}, status=404)
 
         if request.method == "GET":
-            projects = (
-                Project.find({"user.$id": user.id}).project(ProjectView).to_list()
-            )
-            pr_response = [p.model_dump(mode="json") for p in projects]
+            projects = Project.find(
+                Project.user.id == user.id, fetch_links=True
+            ).to_list()
+
+            pr_response = [
+                p.model_dump(
+                    mode="json",
+                    include=["id", "title", "description", "updated_at", "papers"],
+                )
+                for p in projects
+            ]
+
+            for proj in pr_response:
+                proj["papers"] = [str(pap["id"]) for pap in proj["papers"]]
 
             if projects:
                 return json_response({"project": pr_response})
@@ -174,11 +187,34 @@ async def user_papers(request: Request):
             return json_response({"error": "User not found."}, status=404)
 
         if request.method == "GET":
-            papers = Paper.find({"user.$id": user.id}).project(PaperView).to_list()
+            # Get the page and page size (pagination)
+            page = int(request.args.get("page", 1))
+            page_size = int(request.args.get("page_size", 10))
+
+            skip = (page - 1) * page_size
+            limit = page_size
+
+            total_papers = Paper.find({"user.$id": user.id}).count()
+
+            papers = (
+                Paper.find({"user.$id": user.id})
+                .project(PaperView)
+                .skip(skip)
+                .limit(limit)
+                .to_list()
+            )
+
             pr_response = [p.model_dump(mode="json") for p in papers]
             print("papers_response ", pr_response)
             if papers:
-                return json_response({"papers": pr_response})
+                return json_response(
+                    {
+                        "papers": pr_response,
+                        "total_papers": total_papers,
+                        "page": page,
+                        "page_size": page_size,
+                    }
+                )
             else:
                 return json_response({"error": "Papers not found."}, status=404)
 

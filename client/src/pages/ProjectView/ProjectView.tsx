@@ -103,7 +103,9 @@ const ProjectView = () => {
           updated_at: response_data.project.updated_at,
         })
 
-        setProjectResults(response_data.results)
+        if (response_data.results.length !== 0) {
+          setProjectResults(response_data.results)
+        }
       } catch (error: unknown) {
         console.error('Error:', error)
         return null

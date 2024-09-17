@@ -254,7 +254,7 @@ def run_assistant(self: Task, paper_path: str, socket_id: str):
         s3.upload_file(
             paper_path,
             AWS_S3_BUCKET,
-            f"amirhossein.nakhaei@rwth-aachen.de/{paper_path}",
+            f"free@atlas.com/{paper_path}",
             ExtraArgs=None,
             Callback=None,
             Config=None,
@@ -267,9 +267,7 @@ def run_assistant(self: Task, paper_path: str, socket_id: str):
         }
 
         # Save the paper info to the database
-        new_paper = save_paper_info(
-            paper_info=res, user_email="amirhossein.nakhaei@rwth-aachen.de"
-        )
+        new_paper = save_paper_info(paper_info=res, user_email="free@atlas.com")
 
         print(f"File uploaded to S3: {res}")
     except Exception as e:
@@ -280,7 +278,7 @@ def run_assistant(self: Task, paper_path: str, socket_id: str):
     )
 
     result_obj = Result(
-        user=User.find_one(User.email == "amirhossein.nakhaei@rwth-aachen.de").run(),
+        user=User.find_one(User.email == "free@atlas.com").run(),
         json_response=open_ai_res["output"]["result"],
         prompt_token=open_ai_res["output"]["prompt_token"],
         completion_token=open_ai_res["output"]["completion_token"],

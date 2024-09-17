@@ -7,9 +7,13 @@ export type Paper = {
 
 type PaperProps = {
   papers: Paper[] | []
+  currentPage: number
+  pageSize: number
+  totalPapers: number
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 
-const Papers = ({ papers }: PaperProps) => {
+const Papers = ({ papers, currentPage, pageSize, totalPapers, setCurrentPage }: PaperProps) => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
     if (isNaN(date.getTime())) {
@@ -84,11 +88,23 @@ const Papers = ({ papers }: PaperProps) => {
 
         {/* <!-- Pagination --> */}
         <div className='flex justify-between items-center mt-4'>
-          <button className='bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-700 px-4 py-2 rounded'>
+          <button
+            onClick={() => setCurrentPage((prev: number) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className='bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-700 px-4 py-2 rounded'
+          >
             Previous
           </button>
-          <span className='dark:text-gray-300'>Page 1 of 1</span>
-          <button className='bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-700 px-4 py-2 rounded'>
+          <span className='dark:text-gray-300'>
+            Page {currentPage} of {Math.ceil(totalPapers / pageSize)}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalPapers / pageSize)))
+            }
+            disabled={currentPage === Math.ceil(totalPapers / pageSize) || totalPapers === 0}
+            className='bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-700 px-4 py-2 rounded'
+          >
             Next
           </button>
         </div>

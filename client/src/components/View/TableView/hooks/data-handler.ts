@@ -48,12 +48,57 @@ export type TableData = {
   rows: KeyValuePairs[]
 }
 
+const defaultHeaders = ['id', 'file_name']
+const experimentHeaders = [
+  'experiment_name',
+  'experiment_description',
+  'participant_source',
+  'participant_source_category',
+  'units_randomized',
+  'units_analyzed',
+  'sample_size_randomized',
+  'sample_size_analyzed',
+  'sample_size_notes',
+  'adults',
+  'age_mean',
+  'age_sd',
+  'female_perc',
+  'male_perc',
+  'gender_other',
+  'language',
+  'language_secondary',
+  'compensation',
+  'demographics_conditions',
+  'population_other',
+]
+
+const conditionHeaders = [
+  'condition_name',
+  'condition_description',
+  'condition_type',
+  'condition_message',
+]
+const behaviorHeaders = [
+  'behavior_name',
+  'behavior_description',
+  'behavior_priority',
+  'behavior_focal',
+]
+
 export const flattenData = (
   data: Result[],
   expandedExperiment: boolean,
   expandedCondition: boolean,
   expandedBehavior: boolean,
 ): TableData => {
+  if (data.length === 0) {
+    return {
+      headers: [...defaultHeaders, ...experimentHeaders, ...conditionHeaders, ...behaviorHeaders],
+      rows: [],
+      headersGroup: [],
+    }
+  }
+
   const out = data.map((result, index) =>
     flattenExperiment(result, index, expandedExperiment, expandedCondition, expandedBehavior),
   )
@@ -72,45 +117,17 @@ export const flattenExperiment = (
   expandedCondition: boolean,
   expandedBehavior: boolean,
 ): TableData => {
-  const defaultHeaders = ['id', 'file_name']
-  const experimentHeaders = [
-    'experiment_name',
-    'experiment_description',
-    'participant_source',
-    'participant_source_category',
-    'units_randomized',
-    'units_analyzed',
-    'sample_size_randomized',
-    'sample_size_analyzed',
-    'sample_size_notes',
-    'adults',
-    'age_mean',
-    'age_sd',
-    'female_perc',
-    'male_perc',
-    'gender_other',
-    'language',
-    'language_secondary',
-    'compensation',
-    'demographics_conditions',
-    'population_other',
-  ]
-
-  const conditionHeaders = [
-    'condition_name',
-    'condition_description',
-    'condition_type',
-    'condition_message',
-  ]
-  const behaviorHeaders = [
-    'behavior_name',
-    'behavior_description',
-    'behavior_priority',
-    'behavior_focal',
-  ]
-
   if (!data.experiments) {
-    return { headers: defaultHeaders, rows: [], headersGroup: [] }
+    return {
+      headers: defaultHeaders,
+      rows: [],
+      headersGroup: [
+        { name: 'Paper', span: 2 },
+        { name: 'Experiments', span: experimentHeaders.length },
+        { name: 'Conditions', span: 4 },
+        { name: 'Behaviors', span: 4 },
+      ],
+    }
   }
 
   if (expandedExperiment) {
