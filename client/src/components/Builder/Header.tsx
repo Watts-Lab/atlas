@@ -3,6 +3,8 @@
 // import { useReactFlow } from 'reactflow'
 // import { WorkflowContext } from '../../context/Workflow/WorkflowProvider.types'
 
+import { useEffect } from 'react'
+
 interface HeaderProps {
   fileName: string
 }
@@ -28,17 +30,35 @@ const Header = ({ fileName }: HeaderProps) => {
 
   // const [isVisible, setIsVisible] = useState(false)
 
+  useEffect(() => {
+    const handleClickOutsideDropdown = (e: MouseEvent) => {
+      const dropdowns = document.querySelectorAll('.dropdown')
+      dropdowns.forEach((dropdown) => {
+        if (!dropdown.contains(e.target as Node)) {
+          // Click was outside the dropdown, close it
+          ;(dropdown as HTMLDetailsElement).open = false
+        }
+      })
+    }
+
+    window.addEventListener('click', handleClickOutsideDropdown)
+
+    return () => {
+      window.removeEventListener('click', handleClickOutsideDropdown)
+    }
+  }, [])
+
   return (
     <div className='navbar bg-base-100'>
       <div className='navbar-start z-10'>
         <div className='flex-none'>
-          {/* <ul className='menu menu-horizontal px-1'>
+          <ul className='menu menu-horizontal px-1'>
             <li>
               <details className='dropdown'>
                 <summary>File</summary>
-                <ul tabIndex={0} className='p-2 bg-base-100 z-[1]'>
+                <ul className='p-2 bg-base-100 w-40'>
                   <li>
-                    <a onClick={handleSave}>Save workflow</a>
+                    <a>Save workflow</a>
                   </li>
                   <li>
                     <a>Open PDF</a>
@@ -52,15 +72,12 @@ const Header = ({ fileName }: HeaderProps) => {
             <li>
               <details className='dropdown'>
                 <summary>Edit</summary>
-                <ul className='p-2 bg-base-100'>
+                <ul className='p-2 bg-base-100 w-40'>
                   <li>
-                    <a>Save prompt template</a>
+                    <a>Save project</a>
                   </li>
                   <li>
-                    <a href='/dashboard'>Load template</a>
-                  </li>
-                  <li>
-                    <a>Export template</a>
+                    <a>Export project</a>
                   </li>
                 </ul>
               </details>
@@ -68,9 +85,9 @@ const Header = ({ fileName }: HeaderProps) => {
             <li>
               <details className='dropdown'>
                 <summary>Run</summary>
-                <ul className='p-2 bg-base-100'>
+                <ul className='p-2 bg-base-100 w-40'>
                   <li>
-                    <a onClick={handleSendToBackend}>Run all</a>
+                    <a>Run all</a>
                   </li>
                   <li>
                     <a>Run modified only</a>
@@ -78,35 +95,14 @@ const Header = ({ fileName }: HeaderProps) => {
                 </ul>
               </details>
             </li>
-          </ul> */}
+          </ul>
         </div>
       </div>
       <div className='navbar-center text-center'>
-        <span className='normal-case text-xl'>
-          {fileName}
-
-          <br></br>
-          <span className='text-xs'>
-            drag and drop a pdf{' '}
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              stroke='currentColor'
-              className='size-6 h-4 w-4 inline-block ml-1'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15'
-              />
-            </svg>
-          </span>
-        </span>
+        <span className='normal-case text-xl'>{fileName}</span>
       </div>
       <div className='navbar-end z-10'>
-        {/* <button className='btn btn-ghost btn-circle'>
+        <button className='btn btn-ghost btn-circle'>
           <div className='indicator'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -124,7 +120,7 @@ const Header = ({ fileName }: HeaderProps) => {
             </svg>
             <span className='badge badge-xs badge-primary indicator-item'></span>
           </div>
-        </button> */}
+        </button>
       </div>
     </div>
   )
