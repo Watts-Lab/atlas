@@ -5,6 +5,7 @@ import { API_URL } from '../../service/api'
 import { useNavigate } from 'react-router-dom'
 
 const Dashboard = () => {
+  const email = localStorage.getItem('email') || ''
   const [projects, setProjects] = useState<Project[]>([])
   const [papers, setPapers] = useState<Paper[]>([])
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -97,7 +98,7 @@ const Dashboard = () => {
       <div className='bg-white dark:bg-gray-800 shadow-md rounded p-4 mb-6'>
         <div className='flex justify-between items-center'>
           <div>
-            <h2 className='text-xl font-bold dark:text-white'>User: user@example.com</h2>
+            <h2 className='text-xl font-bold dark:text-white'>User: {email}</h2>
             <p className='dark:text-gray-300'></p>
             <p className='dark:text-gray-300'>
               Projects: {projects.length} | Papers: {totalPapers}
