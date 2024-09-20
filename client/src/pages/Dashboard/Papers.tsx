@@ -96,7 +96,7 @@ const Papers = ({ papers, currentPage, pageSize, totalPapers, setCurrentPage }: 
             Previous
           </button>
           <span className='dark:text-gray-300'>
-            Page {currentPage} of {Math.ceil(totalPapers / pageSize)}
+            Page {currentPage} of {Math.max(Math.ceil(totalPapers / pageSize), 1)}
           </span>
           <button
             onClick={() =>

@@ -102,7 +102,7 @@ const Projects = ({ projects }: ProjectsProps) => {
                   </td>
                   <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300 text-right'>
                     <a
-                      href={`http://localhost:5173/projects/${project.id}`}
+                      href={`https://atlas.seas.upenn.edu/projects/${project.id}`}
                       target='_blank'
                       rel='noreferrer'
                       className='text-blue-500 dark:text-blue-400'
