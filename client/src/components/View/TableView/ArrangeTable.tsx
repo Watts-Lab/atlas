@@ -113,6 +113,42 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
     }
   }
 
+  const tooltipDictionary: { [key: string]: string } = {
+    id: "Unique ID for the row",
+    file_name: "The name of the file associated with the result",
+    experiments: "The number of experiments conducted in the paper",
+    conditions: "The number of conditions tested in the paper",
+    behaviors: "The number of behaviors observed in the paper",
+    experiment_name: "The name of the experiment conducted",
+    experiment_description: "A detailed description of the experiment",
+    participant_source: "The source from which participants were drawn for the experiment",
+    participant_source_category: "The category that best describes the participant source (e.g., online, in-person)",
+    units_randomized: "The units (e.g., individuals, groups) that were randomized in the experiment",
+    units_analyzed: "The units (e.g., individuals, groups) that were analyzed in the experiment",
+    sample_size_randomized: "The total number of participants or units that were randomized",
+    sample_size_analyzed: "The total number of participants or units that were analyzed",
+    sample_size_notes: "Additional notes or details about the sample size",
+    adults: "Indicates if the sample includes adult participants",
+    age_mean: "The mean (average) age of participants in the sample",
+    age_sd: "The standard deviation of the ages of participants in the sample, indicating the variability",
+    female_perc: "The percentage of participants who identified as female",
+    male_perc: "The percentage of participants who identified as male",
+    gender_other: "The percentage of participants who identified as a gender other than male or female",
+    language: "The primary language spoken by participants",
+    language_secondary: "Any secondary language(s) spoken by participants",
+    compensation: "Details about how participants were compensated for their participation",
+    demographics_conditions: "Conditions related to the demographics of participants, such as inclusion/exclusion criteria",
+    population_other: "Any other relevant information about the participant population",
+    condition_name: "The name of a specific condition or treatment within the experiment",
+    condition_description: "A detailed description of the condition or treatment",
+    condition_type: "The type or category of the condition (e.g., control, treatment)",
+    condition_message: "Any specific message or instruction given to participants in this condition",
+    behavior_name: "The name of the behavior being measured or observed",
+    behavior_description: "A detailed description of the behavior being measured or observed",
+    behavior_priority: "The priority or importance level of this behavior in the context of the experiment",
+    behavior_focal: "Indicates whether this behavior is the focal point of the experiment",
+  };
+
   return (
     <>
       <div className='navbar bg-base-100 flex flex-col sm:flex-row'>
@@ -222,6 +258,7 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
                   data-col={index}
                   onMouseEnter={() => handleMouseEnter(index)}
                   onMouseLeave={() => handleMouseLeave(index)}
+                  title={tooltipDictionary[header]}
                 >
                   {header}
                 </th>
