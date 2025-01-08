@@ -1,15 +1,61 @@
 import { useEffect, useRef, useState } from 'react'
 import { Result, TableData, flattenData } from './hooks/data-handler'
+import fuzzysort from 'fuzzysort'
+import { initialFeatures } from './hooks/features'
 
 type ArrageTableProps = {
   result: Result[]
   handleBackend: (file: FileList) => void
 }
 
+type Feature = {
+  name: string
+  trail: string
+  description: string
+  identifier: string
+}
+
 const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
   const [expandedExperiment, setExpandedExperiment] = useState<boolean>(false)
   const [expandedCondition, setExpandedCondition] = useState<boolean>(false)
   const [expandedBehavior, setExpandedBehavior] = useState<boolean>(false)
+
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [availableFeatures] = useState<Feature[]>(initialFeatures)
+  const [filteredFeatures, setFilteredFeatures] = useState<Feature[]>(availableFeatures)
+  const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    if (dialogRef.current?.open && !isFeatureModalOpen) {
+      dialogRef.current?.close()
+    } else if (!dialogRef.current?.open && isFeatureModalOpen) {
+      dialogRef.current?.showModal()
+    }
+  }, [isFeatureModalOpen])
+
+  useEffect(() => {
+    const results = fuzzysort.go(searchQuery, availableFeatures, { keys: ['name'] })
+
+    setFilteredFeatures(
+      searchQuery.length ? results.map((result) => result.obj) : availableFeatures,
+    )
+  }, [searchQuery])
+
+  // const fetchAvailableFeatures = async () => {
+  //   try {
+  //     const response = await fetch(`/available_features`, {
+  //       headers: { Authorization: `Bearer ` },
+  //     })
+  //     if (response.ok) {
+  //       const features = await response.json()
+  //       setAvailableFeatures(features)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching features:', error)
+  //   }
+  // }
 
   const [rows, setRows] = useState<TableData>(
     flattenData(result, expandedExperiment, expandedCondition, expandedBehavior),
@@ -20,7 +66,8 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
   }, [result])
 
   useEffect(() => {
-    setRows(flattenData(result, expandedExperiment, expandedCondition, expandedBehavior))
+    const flattened = flattenData(result, expandedExperiment, expandedCondition, expandedBehavior)
+    setRows(flattened)
   }, [expandedExperiment, expandedCondition, expandedBehavior])
 
   const changeExpanded = (type: string) => {
@@ -202,6 +249,78 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
         </div>
       </div>
       <div className='overflow-x-auto'>
+        {isFeatureModalOpen && (
+          <dialog ref={dialogRef} className='modal modal-bottom sm:modal-middle'>
+            <div className='modal-box'>
+              {/* <h3 className='font-bold text-md mb-2'>Select Features to Add</h3> */}
+              <div className='flex justify-between items-center mb-2'>
+                <h3 className='font-bold text-md'>Select Features to Add</h3>
+                <span className='text-xs text-gray-500'>hover feature for more details</span>
+              </div>
+
+              {/* Search Box */}
+              <input
+                type='text'
+                placeholder='Search features...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className='input input-md input-bordered w-full mb-2'
+              />
+
+              <div className='max-h-80 overflow-y-auto pr-2'>
+                {filteredFeatures.map((feature) => (
+                  <div
+                    key={feature.name}
+                    className='flex items-start hover:bg-slate-100 p-1 rounded'
+                    title={feature.description}
+                    onClick={() => {
+                      if (selectedFeatures.includes(feature.identifier)) {
+                        setSelectedFeatures(
+                          selectedFeatures.filter((f) => f !== feature.identifier),
+                        )
+                      } else {
+                        setSelectedFeatures([...selectedFeatures, feature.identifier])
+                      }
+                    }}
+                  >
+                    <div className='flex-grow'>
+                      <p className='font-semibold'>{feature.name}</p>
+                      <p className='text-sm text-gray-500'>{feature.trail}</p>
+                    </div>
+                    <div className='flex items-center'>
+                      <input
+                        type='checkbox'
+                        checked={selectedFeatures.includes(feature.identifier)}
+                        onChange={(e) => {
+                          e.stopPropagation() // Prevent div's onClick
+                          if (e.target.checked) {
+                            setSelectedFeatures([...selectedFeatures, feature.identifier])
+                          } else {
+                            setSelectedFeatures(
+                              selectedFeatures.filter((f) => f !== feature.identifier),
+                            )
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className='modal-action'>
+                <button
+                  className='btn btn-sm btn-primary'
+                  onClick={() => {
+                    setSearchQuery('')
+                    setIsFeatureModalOpen(false)
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
         <table className='table table-xs table-hover'>
           <thead>
             <tr>
@@ -214,6 +333,11 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
                   {header.name}
                 </th>
               ))}
+              <th className='bg-slate-300'>
+                <button className='btn btn-xs' onClick={() => setIsFeatureModalOpen(true)}>
+                  +
+                </button>
+              </th>
             </tr>
             <tr>
               {rows.headers.map((header, index) => (
@@ -253,6 +377,11 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
             )}
           </tbody>
         </table>
+        <div className='flex justify-start mt-2'>
+          <button className='btn btn-xs' onClick={handleButtonClick}>
+            + Add Papers
+          </button>
+        </div>
       </div>
     </>
   )

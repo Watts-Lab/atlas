@@ -7,6 +7,7 @@ from bunnet import init_bunnet
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+from database.models.features import Features
 from database.models.papers import Paper
 from database.models.projects import Project
 from database.models.users import User
@@ -27,5 +28,6 @@ def init_db():
 
     # Init beanie with the Product document class
     init_bunnet(
-        database=client.atlas_main, document_models=[User, Paper, Result, Project]
+        database=client.atlas_main,
+        document_models=[User, Paper, Result, Project, Features],
     )

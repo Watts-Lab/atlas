@@ -14,13 +14,16 @@ from config.app_config import AppConfig
 from controllers.login import login_user, validate_user
 from controllers.project import create_project
 from database.database import init_db
+from database.models.features import Features
 from database.models.papers import Paper, PaperView
-from database.models.projects import Project, ProjectView
+from database.models.projects import Project
 from database.models.results import Result
 from database.models.users import User
 import socketio
 
-from celery_worker import run_assistant, add_paper
+from bunnet.operators import Or, In
+
+from workers.celery_config import add_paper, another_task
 
 
 load_dotenv()
@@ -132,6 +135,119 @@ async def project(request: Request):
         return json_response({"error": str(e)}, status=500)
 
 
+@app.route("/api/projects/features", methods=["GET", "POST", "PUT"])
+async def project_features(request: Request):
+    """
+    A protected for adding or removing features to a project.
+    """
+    try:
+        # for testing
+        # user_jwt = jwt.decode(
+        #     request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        # )
+        # user = User.find_one(User.email == user_jwt.get("email")).run()
+        # if not user:
+        #     return json_response({"error": "User not found."}, status=404)
+
+        # Get the project features
+        if request.method == "GET":
+            project_id = request.args.get("project_id")
+            user_project: Project = Project.get(project_id, fetch_links=True).run()
+
+            # Check if the project exists
+            if not user_project:
+                return json_response({"error": "Project not found."}, status=404)
+
+            # Already added features
+            project_features = [
+                {
+                    "id": str(f.id),
+                    "feature_name": f.feature_name,
+                    "feature_description": f.feature_description,
+                    "feature_identifier": f.feature_identifier,
+                }
+                for f in user_project.features
+            ]
+
+            return json_response(
+                {"message": "Feature added.", "features": project_features}
+            )
+
+        # Add a new feature to the project
+        if request.method == "POST":
+            project_id = request.json.get("project_id")
+            feature_ids = request.json.get("feature_ids")
+
+            print("project_id ", request.json)
+
+            user_project: Project = Project.get(project_id, fetch_links=True).run()
+
+            # Check if the project exists
+            if not user_project:
+                return json_response({"error": "Project not found."}, status=404)
+
+            # Already added features
+            already_added_features = [str(f.id) for f in user_project.features]
+
+            # Check if the feature exists and is not already added
+            for f in feature_ids:
+                feature: Features = Features.get(f).run()
+                if not feature:
+                    return json_response({"error": "Feature not found."}, status=404)
+
+                if str(feature.id) not in already_added_features:
+                    user_project.features.append(feature)
+
+            user_project.save()
+
+            return json_response({"message": "Feature added."})
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
+    except Exception as e:
+        return json_response({"error": str(e)}, status=500)
+
+
+@app.route("/api/projects/results", methods=["GET", "POST", "PUT"])
+async def project_results(request: Request):
+    """
+    A protected for adding or removing features to a project.
+    """
+    try:
+        # Get the project features
+        if request.method == "GET":
+            project_id = request.args.get("project_id")
+
+            user_project: Project = Project.get(project_id).run()
+
+            print("user_project ", user_project)
+            # Check if the project exists
+            if not user_project:
+                return json_response({"error": "Project not found."}, status=404)
+
+            project_results_r = Result.find(
+                Result.project_id.id == user_project.id
+            ).to_list()
+
+            if not project_results_r:
+                return json_response({"error": "Results not found."}, status=404)
+
+            project_json_responses = [r.json_response for r in project_results_r]
+
+            return json_response(
+                {"message": "results found.", "results": project_json_responses}
+            )
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
+    except Exception as e:
+        return json_response({"error": str(e)}, status=500)
+
+
 @app.route("/api/user/projects", methods=["GET"])
 async def user_projects(request: Request):
     """
@@ -224,6 +340,96 @@ async def user_papers(request: Request):
         return json_response({"error": "Invalid token."}, status=401)
 
 
+@app.route("/api/features", methods=["GET", "POST"])
+async def features(request: Request):
+    """
+    A protected route.
+    """
+    try:
+        # Get all the features for the user and public features
+        if request.method == "GET":
+
+            user = User.find_one(
+                User.email == "amirhossein.nakhaei@rwth-aachen.de"
+            ).run()
+
+            print("user ", user.id)
+
+            experiment_feature = Features.find(
+                Or(Features.user.id == None, Features.user.id == user.id)
+            ).to_list()
+
+            res = []
+            for feature in experiment_feature:
+                o = feature.model_dump()
+                res.append(
+                    {
+                        "id": str(o["id"]),
+                        "feature_name": o["feature_name"],
+                        "feature_description": o["feature_description"],
+                        "feature_identifier": o["feature_identifier"],
+                    }
+                )
+
+            return json_response(
+                body={
+                    "response": "success",
+                    "features": res,
+                },
+                status=200,
+                content_type="application/json",
+            )
+
+        # Create a new feature
+        elif request.method == "POST":
+            data = request.json
+
+            feature_name = data.get("feature_name")
+            feature_description = data.get("feature_description", "")
+            feature_identifier = data.get("feature_identifier")
+            gpt_interface = data.get("gpt_interface")
+
+            if not feature_name or not feature_identifier:
+                return json_response({"error": "Missing required fields."}, status=400)
+
+            user = User.find_one(
+                User.email == "amirhossein.nakhaei@rwth-aachen.de"
+            ).run()
+
+            new_feature = Features(
+                feature_name=feature_name,
+                feature_parent="",
+                feature_identifier=feature_identifier,
+                feature_description=feature_description,
+                feature_gpt_interface=gpt_interface,
+                user=user.id,
+            )
+
+            new_feature.save()
+
+            o = new_feature.model_dump()
+
+            return json_response(
+                {
+                    "response": "success",
+                    "feature": {
+                        "id": str(o["id"]),
+                        "feature_name": o["feature_name"],
+                        "feature_description": o["feature_description"],
+                        "feature_identifier": o["feature_identifier"],
+                    },
+                },
+                status=201,
+            )
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
+    except Exception as e:
+        return json_response({"error": str(e)}, status=500)
+
+
 @app.route("/api/login", methods=["POST"])
 async def login(request: Request):
     """
@@ -254,7 +460,8 @@ async def run_assistant_projects(request: Request):
     """
     if request.method == "POST":
         # Get the file and the socket id
-        files = request.files.getlist("files[]")
+        files = [request.files.get("file")]
+        # files = request.files.getlist("files[]")
         socket_id = request.form.get("sid")
         project_id = request.form.get("project_id")
 
@@ -270,14 +477,17 @@ async def run_assistant_projects(request: Request):
         gpt_process = {}
 
         for file in files:
-            file_path = f"paper/{socket_id}-{file.name}"
+            file_path = f"papers/{socket_id}-{file.name}"
             with open(file_path, "wb") as f:
                 f.write(file.body)
 
         for file in files:
-            file_path = f"paper/{socket_id}-{file.name}"
+            file_path = f"papers/{socket_id}-{file.name}"
             task: EagerResult = add_paper.delay(
-                file_path, socket_id, user_email, project_id
+                file_path,
+                socket_id,
+                user_email,
+                project_id,
             )
             gpt_process[file.name] = task.id
 
@@ -285,38 +495,45 @@ async def run_assistant_projects(request: Request):
 
     elif request.method == "GET":
         task_id = request.args.get("task_id")
-        task = run_assistant.AsyncResult(task_id)
+        task = add_paper.AsyncResult(task_id)
         return json_response(task.result)
 
 
-@app.route("/api/run_assistant", methods=["POST", "GET"])
-async def run_assistant_endpoint(request: Request):
+@app.route("/api/run_paper", methods=["POST", "GET"])
+async def run_assistant_with_features(request: Request):
     """
     Handles the POST request for running the assistant.
     """
     if request.method == "POST":
-        # Get the file and the socket id
-        files = request.files.getlist("files[]")
-        sid = request.form.get("sid")
+        try:
+            user_jwt = jwt.decode(
+                request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+            )
+            user = User.find_one(User.email == user_jwt.get("email")).run()
+            if not user:
+                return json_response({"error": "User not found."}, status=404)
 
-        gpt_process = {}
+            # Get the file and the socket id
+            file = request.files.get("file")
+            requested_features = request.form.get("features")
+            socket_id = request.form.get("sid")
 
-        for file in files:
-            file_path = f"paper/{sid}-{file.name}"
+            file_path = f"papers/{socket_id}-{file.name}"
             with open(file_path, "wb") as f:
                 f.write(file.body)
 
-        for file in files:
-            file_path = f"paper/{sid}-{file.name}"
-            task: EagerResult = run_assistant.delay(file_path, sid)
-            gpt_process[file.name] = task.id
+            task: EagerResult = another_task.delay(
+                file_path,
+                socket_id,
+                str(user.id),
+            )
 
-        return json_response(gpt_process)
+            print(json.loads(requested_features))
 
-    elif request.method == "GET":
-        task_id = request.args.get("task_id")
-        task = run_assistant.AsyncResult(task_id)
-        return json_response(task.result)
+            return json_response({"status": task.id})
+        except Exception as e:
+            print("exception", e)
+            return json_response({"status": False})
 
 
 @sio.on("connect", namespace="/home")

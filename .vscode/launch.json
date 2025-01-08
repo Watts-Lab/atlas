@@ -5,12 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Debug Atlas server ",
-      "type": "debugpy",
+      "name": "Launch Firefox",
+      "type": "firefox",
       "request": "launch",
-      "program": "${workspaceFolder}/server/api.py",
-      "console": "integratedTerminal",
-      "args": ["--port", "8000", "--dev", "true"]
+      "reAttach": true,
+      "url": "http://localhost:5173",
+      "pathMappings": [
+        {
+          "url": "http://localhost:5173/src",
+          "path": "${workspaceFolder}/client/src"
+        }
+      ]
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { API_URL } from '../../service/api'
+import { API_URL, WEB_URL } from '../../service/api'
 
 export type Project = {
   id: number
@@ -102,12 +102,12 @@ const Projects = ({ projects }: ProjectsProps) => {
                   </td>
                   <td className='py-2 px-4 border-b dark:border-gray-700 dark:text-gray-300 text-right'>
                     <a
-                      href={`https://atlas.seas.upenn.edu/projects/${project.id}`}
+                      href={`${WEB_URL}/projects/${project.id}`}
                       target='_blank'
                       rel='noreferrer'
                       className='text-blue-500 dark:text-blue-400'
                     >
-                      {`https://atlas.seas.upenn.edu/projects/${project.id}`}
+                      {`${WEB_URL}/projects/${project.id}`}
                     </a>
                   </td>
                 </tr>
