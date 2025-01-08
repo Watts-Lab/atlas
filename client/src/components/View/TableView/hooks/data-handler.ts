@@ -194,11 +194,6 @@ export const flattenExperiment = (
               female_perc: experiment.female_perc,
               male_perc: experiment.male_perc,
               gender_other: experiment.gender_other,
-              //   white_perc: experiment.white_perc,
-              //   black_perc: experiment.black_perc,
-              //   hispanic_perc: experiment.hispanic_perc,
-              //   asian_perc: experiment.asian_perc,
-              //   other_ethnicity_perc: experiment.other_ethnicity_perc,
               language: experiment.language,
               language_secondary: experiment.language_secondary,
               compensation: experiment.compensation,
@@ -255,11 +250,6 @@ export const flattenExperiment = (
                 female_perc: experiment.female_perc,
                 male_perc: experiment.male_perc,
                 gender_other: experiment.gender_other,
-                // white_perc: experiment.white_perc,
-                // black_perc: experiment.black_perc,
-                // hispanic_perc: experiment.hispanic_perc,
-                // asian_perc: experiment.asian_perc,
-                // other_ethnicity_perc: experiment.other_ethnicity_perc,
                 language: experiment.language,
                 language_secondary: experiment.language_secondary,
                 compensation: experiment.compensation,
@@ -431,4 +421,42 @@ export const flattenExperiment = (
       return { headers, rows, headersGroup }
     }
   }
+}
+
+export function flattenObject(
+  obj: Record<string, unknown>[] | Record<string, unknown>,
+  parents_to_expand: string[] = [],
+): Record<string, unknown>[] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((item) => flattenObject(item))
+  }
+
+  const arrayKey = Object.keys(obj).find((key) => Array.isArray(obj[key]))
+
+  if (arrayKey) {
+    if (!parents_to_expand.includes(arrayKey)) {
+      const otherProperties = { ...obj }
+      delete otherProperties[arrayKey]
+
+      return (obj[arrayKey] as unknown[]).flatMap((arrayValue: unknown) => {
+        const newObject = { ...otherProperties }
+
+        if (typeof arrayValue === 'object' && arrayValue !== null) {
+          for (const [key, value] of Object.entries(arrayValue)) {
+            newObject[`${arrayKey} ${key}`] = value
+          }
+        } else {
+          newObject[arrayKey] = arrayValue
+        }
+
+        return flattenObject(newObject, parents_to_expand)
+      })
+    } else {
+      const newObject = { ...obj }
+      newObject[arrayKey] = `${(obj[arrayKey] as unknown[]).length} ${arrayKey}`
+      return flattenObject(newObject, parents_to_expand)
+    }
+  }
+
+  return [obj]
 }

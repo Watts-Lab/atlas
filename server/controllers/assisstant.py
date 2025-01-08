@@ -3,6 +3,7 @@ endpoint for running the assistant
 """
 
 import os
+from typing import List
 import socketio
 
 from gpt_assistant import AssistantException, call_asssistant_api
@@ -15,17 +16,25 @@ if not os.path.exists(UPLOAD_DIRECTORY):
 
 
 def run_assistant_api(
-    sid: str, file_path: str, sio: socketio.RedisManager, task_id: str
+    sid: str,
+    file_path: str,
+    sio: socketio.RedisManager,
+    task_id: str,
+    project_id: str,
 ):
     """
     Run the assistant with the uploaded file
     """
     try:
         result = call_asssistant_api(
-            file_path=file_path, sid=sid, sio=sio, task_id=task_id
+            file_path=file_path,
+            sid=sid,
+            sio=sio,
+            task_id=task_id,
+            project_id=project_id,
         )
 
-        file_name = file_path.replace("paper/", "").replace(f"{sid}-", "")
+        file_name = file_path.replace("papers/", "").replace(f"{sid}-", "")
 
         response_data = {
             "message": "Success",
@@ -38,7 +47,7 @@ def run_assistant_api(
             print("File removed from local storage successfully")
         else:
             # If it fails, inform the user.
-            print(f"Error: paper/{sid}-{file_name} file not found")
+            print(f"Error: papers/{sid}-{file_name} file not found")
 
         return response_data
     except AssistantException as e:

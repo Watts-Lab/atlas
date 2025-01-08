@@ -26,6 +26,7 @@ class GPTFeature:
             "feature_type": self.feature_type,
             "feature_prompt": self.feature_prompt,
             "feature_enum": self.feature_enum,
+            "feature_description": self.feature_description,
         }
 
     def get_functional_object_gpt(self, prefix=""):

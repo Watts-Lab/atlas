@@ -148,6 +148,17 @@ const TableView = ({ project_id, project_results, token }: TableViewProps) => {
     data.append('sid', socket?.id || '')
     data.append('model', 'gpt')
     data.append('project_id', project_id)
+    data.append(
+      'features',
+      JSON.stringify([
+        'experiments.name',
+        'experiments.description',
+        'experiments.participant_source',
+        'experiments.participant_source_category',
+        'experiments.units_randomized',
+        'experiments.units_analyzed',
+      ]),
+    )
 
     try {
       const response = await fetch(`${API_URL}/add_paper`, {

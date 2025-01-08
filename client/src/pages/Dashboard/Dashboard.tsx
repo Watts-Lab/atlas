@@ -17,10 +17,6 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('token') || ''
 
-    if (!token) {
-      navigate('/login')
-    }
-
     const fetchProjects = async () => {
       await fetch(`${API_URL}/user/projects`, {
         method: 'GET',
@@ -57,7 +53,7 @@ const Dashboard = () => {
   const fetchPapers = async (page: number) => {
     const token = localStorage.getItem('token') || ''
     if (!token) {
-      navigate('/login')
+      navigate('/')
     }
     await fetch(`${API_URL}/user/papers?page=${page}&page_size=${pageSize}`, {
       method: 'GET',

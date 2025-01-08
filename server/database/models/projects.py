@@ -9,13 +9,25 @@ from bunnet import Document, Link, PydanticObjectId
 
 from pydantic import BaseModel, Field
 
+from database.models.features import Features
 from database.models.papers import Paper
 from database.models.users import User
 
 
 class Project(Document):
     """
-    Papers model.
+    Project model.
+
+    This model is responsible for storing the project information.
+
+    fields:
+    - user: User
+    - title: str
+    - description: str
+    - slug: UUID
+    - papers: List[Link[Paper]]
+    - features: List[Link[Features]]
+
     """
 
     user: Link[User]
@@ -23,12 +35,7 @@ class Project(Document):
     description: str = "Created on " + str(datetime.now())
     slug: UUID = Field(default_factory=uuid4)
     papers: List[Link[Paper]] = []
-    features: List[str] = (
-        []
-    )  # selected features (give user a list of features to choose from in a checkbox format for now)
-    rules: List[str] = (
-        []
-    )  # on feature [experiments.conditions.number] (rule) [value] rule can be [greater than, less than, equal to, not equal to, contains, does not contain]
+    features: List[Link[Features]] = []
 
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()

@@ -1,7 +1,7 @@
 import { Result } from './data-handler'
 
 // Sample usage
-export const check_data: Result = {
+export const check_data: Record<string, unknown> = {
   task_id: 'task_id',
   status: 'success',
   file_name:

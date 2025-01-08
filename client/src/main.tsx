@@ -6,6 +6,7 @@ import React from 'react'
 import { ReactFlowProvider } from 'reactflow'
 import WorkflowProvider from './context/Workflow/WorkflowProvider.tsx'
 import { SocketProvider } from './context/Socket/SocketProvider.tsx'
+import { Toaster } from 'sonner'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -14,6 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <WorkflowProvider>
           <SocketProvider>
             <App />
+            <Toaster richColors />
           </SocketProvider>
         </WorkflowProvider>
       </ReactFlowProvider>

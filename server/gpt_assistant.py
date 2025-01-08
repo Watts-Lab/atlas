@@ -10,6 +10,9 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import socketio
 
+from database.models.features import Features
+from database.models.projects import Project
+
 load_dotenv()
 
 
@@ -26,7 +29,7 @@ class AssistantException(Exception):
         return f"AssistantException: {self.message}"
 
 
-def get_all_features() -> List[str]:
+def get_all_class_features(user_requested_features: List[str]) -> List[str]:
     """
     Gets all the available features.
 
@@ -65,36 +68,75 @@ def get_all_features() -> List[str]:
         "experiments.conditions.behaviors.focal",
     ]
 
-    sorted_features = sorted(experiments_features, key=lambda s: s.count("."))
+    # Check if all user requested features are within available experiments_features
+    for feature in user_requested_features:
+        if feature not in experiments_features:
+            raise AssistantException(
+                f"Feature '{feature}' is not a valid experiment feature."
+            )
+
+    sorted_features = sorted(user_requested_features, key=lambda s: s.count("."))
 
     return sorted_features
 
 
-def build_parent_objects(features: List[str]) -> dict:
+def get_all_features(project_id: str) -> List[str]:
+    """
+    Gets all the available features.
+
+    Returns:
+    - List of all available features.
+    """
+
+    current_project: Project = Project.get(project_id, fetch_links=True).run()
+
+    feature_list = []
+    user_features = {}
+
+    for feature in current_project.features:
+        user_features[feature.feature_identifier] = feature.feature_gpt_interface
+        feature_list.append(feature.feature_identifier)
+
+    sorted_features = sorted(feature_list, key=lambda s: s.count("."))
+
+    return sorted_features, user_features
+
+
+def build_parent_objects(feature_list: list[str], feature_object: dict) -> dict:
     """
     Builds the parent objects for the given features.
     """
     nested_dict = {}
 
-    for feature in features:
+    for feature in feature_list:
         keys = feature.split(".")
         current_dict = nested_dict
 
         for key in keys[:-1]:
             if key not in current_dict:
-                feature_module = importlib.import_module(
-                    f"features.{feature.rsplit('.', 1)[0]}.parent"
-                )
-                feature_class = feature_module.Feature()
-                current_dict[key] = feature_class.get_functional_object_parent_claude()
+                print(f"key: {key}")
+                feature_class = Features.find_one(
+                    Features.feature_identifier == f"{key}.parent"
+                ).run()
+
+                if feature_class:
+                    current_dict[key] = feature_class.feature_gpt_interface
+                else:
+                    current_dict[key] = {
+                        "type": "array",
+                        "description": f"Array of {key} objects with detailed properties.",
+                        "items": {
+                            "type": "object",
+                            "properties": {},
+                            "required": [],
+                        },
+                    }
             current_dict = current_dict[key]["items"]["properties"]
 
-        feature_module = importlib.import_module(f"features.{feature}")
-        feature_class = feature_module.Feature()
-        current_dict[keys[-1]] = feature_class.get_functional_object_claude()
+        current_dict[keys[-1]] = feature_object[feature]
 
     # add in the required keys
-    for feature in features:
+    for feature in feature_list:
         keys = feature.split(".")
         current_dict = nested_dict
         for key in keys[:-1]:
@@ -106,11 +148,14 @@ def build_parent_objects(features: List[str]) -> dict:
                 current_dict = current_dict["properties"][key]["items"]
 
         current_dict["required"].append(keys[-1])
+        current_dict["additionalProperties"] = False
 
     return nested_dict
 
 
-def build_openai_feature_functions(feature_list: List[str]) -> dict:
+def build_openai_feature_functions(
+    feature_list: list[str], feature_object: dict
+) -> dict:
     """
     Builds and returns a OPENAI function object.
 
@@ -130,10 +175,12 @@ def build_openai_feature_functions(feature_list: List[str]) -> dict:
             "Define the conditions and behaviors in each experiment. Each condition and behavior "
             "should be a separate object with specified properties and values under the experiments object."
         ),
+        "strict": True,
         "parameters": {
             "type": "object",
-            "properties": build_parent_objects(feature_list),
-            "required": ["experiments"],
+            "properties": build_parent_objects(feature_list, feature_object),
+            "additionalProperties": False,
+            "required": ["paper"],
         },
     }
 
@@ -177,15 +224,18 @@ def update_assistant(
     - assistant_id: ID of the assistant to update.
     - function: List of dictionaries containing the feature function.
     """
-
-    my_updated_assistant = client.beta.assistants.update(
-        assistant_id=assistant_id,
-        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-        tools=[
-            {"type": "file_search"},
-            {"type": "function", "function": function},
-        ],
-    )
+    try:
+        my_updated_assistant = client.beta.assistants.update(
+            assistant_id=assistant_id,
+            tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+            tools=[
+                {"type": "file_search"},
+                {"type": "function", "function": function},
+            ],
+        )
+    except Exception as e:
+        print(e)
+        raise AssistantException("Assistant update failed") from e
 
     return my_updated_assistant
 
@@ -199,7 +249,7 @@ def check_output_format(output):
     - True if the format is correct, raises an exception if not.
     """
     # Implement your format checking logic here
-    if isinstance(output, dict) and "experiments" in output:
+    if isinstance(output, dict) and "paper" in output:
         return True
     else:
         raise AssistantException("Output format is incorrect")
@@ -223,8 +273,8 @@ def create_temporary_assistant(client: OpenAI):
             "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format."
         ),
         name="Atlas explorer",
-        model="gpt-4o-2024-08-06",
-        temperature=1,
+        model="gpt-4o",
+        temperature=0.7,
     )
 
     return my_temporary_assistant
@@ -257,7 +307,11 @@ def emit_status(
 
 
 def call_asssistant_api(
-    file_path: str, sid: str, sio: socketio.RedisManager, task_id: str
+    file_path: str,
+    sid: str,
+    sio: socketio.RedisManager,
+    task_id: str,
+    project_id: str,
 ):
     """
     Calls the Assistant API to perform a task using OpenAI's GPT-3 model.
@@ -283,7 +337,7 @@ def call_asssistant_api(
             sid=sid,
         )
 
-        feature_list = get_all_features()
+        feature_list, feature_obj = get_all_features(project_id)
 
         emit_status(
             sio=sio,
@@ -293,7 +347,7 @@ def call_asssistant_api(
             sid=sid,
         )
 
-        functions = build_openai_feature_functions(feature_list)
+        functions = build_openai_feature_functions(feature_list, feature_obj)
 
         emit_status(
             sio=sio,
@@ -342,7 +396,7 @@ def call_asssistant_api(
             messages=[
                 {
                     "role": "user",
-                    "content": "run function define_experiments_conditions_and_behaviors",
+                    "content": "Please define the experiments, conditions and behaviors in the paper.",
                 }
             ],
         )
@@ -359,6 +413,9 @@ def call_asssistant_api(
             task_id=task_id,
             sid=sid,
         )
+
+        with open("logfile.log", "w", encoding="utf-8") as log_file:
+            log_file.write(f"RUN RESULTS: {run.to_json()}\n")
 
         tool_outputs = json.loads(
             run.required_action.submit_tool_outputs.tool_calls[0].function.arguments

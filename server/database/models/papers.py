@@ -7,7 +7,6 @@ from typing import List
 from bunnet import Document, Link, PydanticObjectId
 from pydantic import BaseModel
 
-from database.models.results import Result
 from database.models.users import User
 
 
@@ -18,8 +17,6 @@ class Paper(Document):
 
     user: Link[User]
     title: str
-    run_ids: List[str]
-    truth_ids: List[Link[Result]]
     s3_url: str
     file_hash: str
     created_at: datetime = datetime.now()
