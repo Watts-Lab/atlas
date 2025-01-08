@@ -27,6 +27,9 @@ const vitestConfig = defineVitestConfig({
     exclude: [...configDefaults.exclude, 'shared/*'],
     environment: 'jsdom',
     setupFiles: './tests/setup.js',
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
   },
 })
 
