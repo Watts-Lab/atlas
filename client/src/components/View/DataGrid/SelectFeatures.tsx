@@ -120,7 +120,7 @@ const SelectFeatures = ({
                         <p>
                           {feature.trail
                             .split(' ← ')
-                            .map((part, index, arr) =>
+                            .map((part, index) =>
                               index === 0 ? <b key={index}>{part}</b> : ` ← ${part}`,
                             )}
                         </p>

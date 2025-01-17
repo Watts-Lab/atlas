@@ -48,15 +48,17 @@ const Flow = ({ initialNodes, initialEdges }: { initialNodes: Node[]; initialEdg
   const onSelectionChange = useCallback((elements: any) => {
     setSelectedNode(
       // eslint-disable-next-line no-constant-binary-expression
-      {
-        id: elements.nodes[0]?.id,
-        type: elements.nodes[0]?.type,
-        data: elements.nodes[0]?.data,
-      } || {
-        id: null,
-        type: null,
-        data: null,
-      },
+      elements.nodes[0]
+        ? {
+            id: elements.nodes[0].id,
+            type: elements.nodes[0].type,
+            data: elements.nodes[0].data,
+          }
+        : {
+            id: null,
+            type: null,
+            data: null,
+          },
     )
   }, [])
 

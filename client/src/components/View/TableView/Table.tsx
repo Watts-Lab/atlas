@@ -22,7 +22,7 @@ const Table = () => {
   // State
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-  const [data, setData] = useState<Result[]>([check_data])
+  const [data, setData] = useState<Result[]>([check_data as unknown as Result])
   const [status, setStatus] = useState<RunStatus>({
     status: '',
     progress: 0,

@@ -23,7 +23,7 @@ const ProjectView = () => {
 
   const [loading, setLoading] = useState<boolean>(false)
 
-  const [projectResults, setProjectResults] = useState<Result[]>([check_data])
+  const [projectResults, setProjectResults] = useState<Result[]>([check_data as unknown as Result])
   const [project, setProject] = useState<ProjectDetails>({
     name: '',
     id: '',
