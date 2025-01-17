@@ -6,6 +6,10 @@ env:
   ECR_REPOSITORY_BACKEND: atlas-backend
   ECR_REPOSITORY_FRONTEND: atlas-frontend
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   frontend-container:
     runs-on: ubuntu-latest
