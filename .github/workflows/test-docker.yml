@@ -1,0 +1,42 @@
+name: Test Docker Containerization
+
+on: [push]
+
+env:
+  ECR_REPOSITORY_BACKEND: atlas-backend
+  ECR_REPOSITORY_FRONTEND: atlas-frontend
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  frontend-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build docker image for frontend
+        id: build-front-image
+        env:
+          ECR_REGISTRY: atlas-ecr-registry
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG -f Dockerfile.client .
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  backend-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build docker image for backend
+        id: build-backend-image
+        env:
+          ECR_REGISTRY: atlas-ecr-registry
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG -f Dockerfile.server .
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
