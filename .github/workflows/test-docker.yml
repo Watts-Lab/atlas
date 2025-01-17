@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build, tag, and push frontend image to Amazon ECR
+      - name: Build docker image for frontend
         id: build-front-image
         env:
           ECR_REGISTRY: atlas-ecr-registry
@@ -32,7 +32,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build, tag, and push backend image to Amazon ECR
+      - name: Build docker image for backend
         id: build-backend-image
         env:
           ECR_REGISTRY: atlas-ecr-registry
