@@ -72,7 +72,8 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   // If user *already* has a token in localStorage, validate it and possibly redirect
   useEffect(() => {
     const token = localStorage.getItem('token') || ''
-    if (!loggingIn && token) {
+    const email = localStorage.getItem('email') || ''
+    if (!loggingIn && token && email) {
       setIsLoggingIn(true)
       setLoggingInMessage('Authenticating your token... Please wait.')
 
@@ -81,7 +82,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
+        body: JSON.stringify({ email: email, magic_link: token }),
       }).then((res) => {
         if (res.ok) {
           localStorage.setItem('token', res.headers.get('Authorization')!)
