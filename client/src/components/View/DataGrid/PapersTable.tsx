@@ -34,15 +34,6 @@ import { useState } from 'react'
 import { WEB_URL } from '@/service/api'
 import { useNavigate } from 'react-router-dom'
 
-const data: Papers[] = [
-  {
-    id: '1',
-    title: 'Minimizing the impact of COVID-19 pandemic on the mental health of university students',
-    file_hash: 'd41d8cd98f00b204e9800998ecf8427e',
-    uploaded_at: '2021-09-07T14:00:00Z',
-  },
-]
-
 export type Papers = {
   id: string
   title: string
@@ -148,7 +139,11 @@ export const columns: ColumnDef<Papers>[] = [
   },
 ]
 
-export default function PapersTable() {
+export type PapersTableProps = {
+  papers: Papers[]
+}
+
+export default function PapersTable({ papers }: PapersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -156,8 +151,8 @@ export default function PapersTable() {
 
   const navigate = useNavigate()
 
-  const table = useReactTable({
-    data,
+  const table = useReactTable<Papers>({
+    data: papers,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
