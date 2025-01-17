@@ -14,6 +14,9 @@ jobs:
       - name: Install packages
         run: npm ci
 
+      - name: Print file tree (excluding node_modules)
+        run: tree -I 'node_modules'
+
       - name: Run lint
         run: npm run lint
 
