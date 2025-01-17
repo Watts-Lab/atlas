@@ -5,13 +5,20 @@ on: [push]
 jobs:
   vite-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
-        working-directory: client
-      - run: npm run lint
-        working-directory: client
-      - run: npm run build
-        working-directory: client
-      - run: npm test
-        working-directory: client
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build front-end files
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
