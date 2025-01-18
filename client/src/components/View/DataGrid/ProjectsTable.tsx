@@ -37,15 +37,6 @@ import { WEB_URL } from '@/service/api'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
-const data: Projects[] = [
-  {
-    id: '675327731b4c5203b51444f4',
-    name: 'Nice Project',
-    description: 'Test project for testing purposes',
-    paper_count: 4,
-  },
-]
-
 export type Projects = {
   id: string
   name: string
@@ -135,7 +126,11 @@ export const columns: ColumnDef<Projects>[] = [
   },
 ]
 
-export default function ProjectsTable() {
+export type ProjectTableProps = {
+  projects: Projects[]
+}
+
+export default function ProjectsTable({ projects }: ProjectTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -144,7 +139,7 @@ export default function ProjectsTable() {
   const navigate = useNavigate()
 
   const table = useReactTable({
-    data,
+    data: projects,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

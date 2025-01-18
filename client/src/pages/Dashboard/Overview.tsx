@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
-import Papers, { Paper } from './Papers'
-import Projects, { Project } from './Projects'
 import { API_URL } from '../../service/api'
 import { useNavigate } from 'react-router-dom'
+import MainPage from '@/components/View/DataGrid/MainPage'
+import ProjectsTable, { Projects } from '@/components/View/DataGrid/ProjectsTable'
+import PapersTable, { Papers } from '@/components/View/DataGrid/PapersTable'
 
-const Dashboard = () => {
-  const email = localStorage.getItem('email') || ''
-  const [projects, setProjects] = useState<Project[]>([])
-  const [papers, setPapers] = useState<Paper[]>([])
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [pageSize] = useState<number>(10) // Set your desired page size here
-  const [totalPapers, setTotalPapers] = useState<number>(0)
+const Overview = () => {
+  const [projects, setProjects] = useState<Projects[]>([])
+  const [papers, setPapers] = useState<Papers[]>([])
+
+  // papers table page size default is 50
+  const [pageSize] = useState<number>(50)
 
   const navigate = useNavigate()
 
@@ -36,8 +36,8 @@ const Dashboard = () => {
                   id: project.id,
                   name: project.title,
                   description: project.description,
-                  papers: project.papers.length,
-                }
+                  paper_count: project.papers.length,
+                } as Projects
               },
             ),
           )
@@ -72,12 +72,11 @@ const Dashboard = () => {
                 id: paper.id,
                 title: paper.title,
                 file_hash: paper.file_hash,
-                updated_at: paper.updated_at,
-              }
+                uploaded_at: paper.updated_at,
+              } as Papers
             },
           ),
         )
-        setTotalPapers(data.total_papers)
       } else {
         throw new Error('Network response was not ok')
       }
@@ -85,34 +84,39 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    fetchPapers(currentPage)
-  }, [currentPage])
+    fetchPapers(1)
+  }, [])
 
   return (
-    <div className='bg-gray-100 dark:bg-gray-900 p-4 min-h-screen'>
-      {/* <!-- User Info Section --> */}
-      <div className='bg-white dark:bg-gray-800 shadow-md rounded p-4 mb-6'>
-        <div className='flex justify-between items-center'>
-          <div>
-            <h2 className='text-xl font-bold dark:text-white'>User: {email}</h2>
-            <p className='dark:text-gray-300'></p>
-            <p className='dark:text-gray-300'>
-              Projects: {projects.length} | Papers: {totalPapers}
-            </p>
+    <MainPage
+      breadcrumbs={[
+        {
+          title: 'Dashboard',
+          url: '/dashboard',
+        },
+      ]}
+      sidebarOpen={true}
+    >
+      <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
+        <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
+          <div className='bg-white rounded-lg shadow-md p-4'>
+            <h2 className='text-lg font-semibold'>Running jobs</h2>
+            <p className='text-sm text-gray-500'>0 In progress</p>
+          </div>
+          <div className='bg-white rounded-lg shadow-md p-4'>
+            <h2 className='text-lg font-semibold'>Available features</h2>
+            <p className='text-sm text-gray-500'>57 Total - 0 User</p>
+          </div>
+          <div className='bg-white rounded-lg shadow-md p-4'>
+            <h2 className='text-lg font-semibold'>Available credit</h2>
+            <p className='text-sm text-gray-500'>0 tokens</p>
           </div>
         </div>
+        <ProjectsTable projects={projects} />
+        <PapersTable papers={papers} />
       </div>
-
-      <Projects projects={projects} />
-      <Papers
-        papers={papers}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        totalPapers={totalPapers}
-        setCurrentPage={setCurrentPage}
-      />
-    </div>
+    </MainPage>
   )
 }
 
-export default Dashboard
+export default Overview

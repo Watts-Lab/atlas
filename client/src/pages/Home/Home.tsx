@@ -1,96 +1,163 @@
-import Login from '../../components/View/Login/Login'
-
-import icon from '../../icons/icon.svg'
-
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { createUniverse } from './stars-render'
 import { API_URL } from '../../service/api'
-
-type HomeProps = {
-  loggingIn?: boolean
-}
+import { useNavigate, useParams } from 'react-router-dom'
 
 type Params = {
   email?: string
   magicLink?: string
 }
 
-type FetchDataResponse = {
-  token: string
-}
-
-const Home = ({ loggingIn }: HomeProps) => {
+const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const emailRef = useRef<HTMLInputElement | null>(null)
   const params: Params = useParams()
   const navigate = useNavigate()
 
-  const [loading, setLoading] = useState<boolean>(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(loggingIn)
+  const [loggingInMessage, setLoggingInMessage] = useState('Authenticating... Please wait.')
 
   useEffect(() => {
-    const fetchData = async (): Promise<FetchDataResponse | null> => {
-      setLoading(true)
+    const starDensity = 0.216
+    const speedCoeff = 0.03
+    const giantColor = '180,184,240'
+    const starColor = '226,225,142'
+    const cometColor = '226,225,224'
+    const cometDisabled = false
 
-      try {
-        const response = await fetch(`${API_URL}/api/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        return data
-      } catch (error: unknown) {
-        console.error('Error logging in:', error)
-        return null
-      } finally {
-        setLoading(false)
-      }
+    const canva = canvasRef.current!
+    const cleanup = createUniverse(
+      canva,
+      starDensity,
+      speedCoeff,
+      giantColor,
+      starColor,
+      cometColor,
+      cometDisabled,
+    )
+    return () => {
+      cleanup()
     }
+  }, [])
 
-    const executeLogin = async () => {
-      if (loggingIn && params.magicLink) {
-        const data = await fetchData()
+  // Handle immediate magic-link login when "loggingIn" is true
+  useEffect(() => {
+    if (loggingIn) {
+      setIsLoggingIn(true)
+      setLoggingInMessage('Authenticating... Please wait.')
 
-        if (data) {
-          localStorage.setItem('token', data.token)
+      fetch(`${API_URL}/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
+      }).then((res) => {
+        if (res.ok) {
+          localStorage.setItem('token', res.headers.get('Authorization')!)
+          localStorage.setItem('email', params.email!)
           navigate('/dashboard')
+        } else {
+          // ADDED: If invalid magic link
+          setLoggingInMessage('Invalid or expired magic link. Please try logging in again.')
+          setTimeout(() => {
+            setIsLoggingIn(false)
+          }, 3000)
         }
-      } else {
-        const token = localStorage.getItem('token')
-        if (token) {
-          navigate('/dashboard')
-        }
-      }
+      })
     }
+  }, [loggingIn])
 
-    executeLogin()
-  }, [loggingIn, params.magicLink, navigate, params.email])
+  // If user *already* has a token in localStorage, validate it and possibly redirect
+  useEffect(() => {
+    const token = localStorage.getItem('token') || ''
+    const email = localStorage.getItem('email') || ''
+    if (!loggingIn && token && email) {
+      setIsLoggingIn(true)
+      setLoggingInMessage('Authenticating your token... Please wait.')
+
+      fetch(`${API_URL}/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email, magic_link: token }),
+      }).then((res) => {
+        if (res.ok) {
+          localStorage.setItem('token', res.headers.get('Authorization')!)
+          localStorage.setItem('email', params.email!)
+          navigate('/dashboard')
+        } else {
+          setLoggingInMessage('Token authentication failed. Please login again.')
+          localStorage.removeItem('token')
+          setTimeout(() => {
+            setIsLoggingIn(false)
+          }, 3000)
+        }
+      })
+    }
+  }, [])
+
+  // Handle normal login flow via email input
+  const submitEmail = async (e: React.FormEvent) => {
+    setSubmitting(true)
+    e.preventDefault()
+
+    const email = emailRef.current!.value
+    await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Something went wrong!')
+        }
+      })
+      .then(await new Promise((resolve) => setTimeout(resolve, 3000)))
+      .finally(() => {
+        setSubmitting(false)
+        navigate('/table')
+      })
+  }
 
   return (
-    <div className='flex flex-col items-center justify-center h-screen'>
-      <h1 data-testid='home-h1' className='text-4xl text-center'>
-        Atlas
-      </h1>
-      <img className='w-20 h-20 py-4' src={icon} alt='icon' />
+    <div className='p-0 m-0 w-full h-full fixed flex justify-center items-center contrast-120'>
+      <div className='w-full h-full container-gradient'>
+        <div className='w-inherit h-inherit'>
+          <canvas ref={canvasRef} id='universe' className='w-full h-full'></canvas>
+          <div className='absolute top-1/3 w-full text-center'>
+            <h1 className='text-5xl text-gray-50 pb-4'>Atlas</h1>
+            <p className='text-base text-gray-50'>
+              A simple and fun way to explore the universe of science. <br />
+              Sign up now to get started.
+            </p>
 
-      {loading ? (
-        <>
-          <p className='text-center py-3'>Authenticating... Please wait.</p>
-          <span className='loading loading-lg'></span>
-        </>
-      ) : (
-        <>
-          <p className='text-center py-3'>
-            Enter your email to get started. We&apos;ll send you a link to sign in.
-          </p>
-          <Login />
-        </>
-      )}
+            {isLoggingIn ? <p className='text-slate-200 pt-4 fade-in'>{loggingInMessage}</p> : null}
+
+            <form onSubmit={submitEmail} className='flex flex-col justify-center items-center'>
+              {submitting ? (
+                <p className='text-slate-200 pt-4 fade-in'>Check your email for the magic link!</p>
+              ) : (
+                <input
+                  data-testid='email-input'
+                  type='email'
+                  placeholder='Email'
+                  className='input input-sm w-72 mt-4'
+                  ref={emailRef}
+                />
+              )}
+
+              <button className='mt-3 border rounded border-gray-300 px-2 opacity-40 text-[#edf3fe] transition-opacity duration-400 ease hover:opacity-100 hover:border-white'>
+                Sign up / Login
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
