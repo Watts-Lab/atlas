@@ -5,6 +5,7 @@ import ProjectView from './pages/ProjectView/ProjectView'
 import Project from './components/View/DataGrid/Project'
 import MainPage from './components/View/DataGrid/MainPage'
 import Overview from './pages/Dashboard/Overview'
+import IC2S2 from './pages/IC2S2/IC2S2'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             </MainPage>
           }
         />
+        <Route path='/ic2s2' element={<IC2S2 />} />
       </Routes>
     </>
   )
