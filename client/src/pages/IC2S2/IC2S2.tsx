@@ -147,8 +147,7 @@ const IC2S2 = () => {
           </ul>
           <p className='text-lg'>
             Please bring your own list of papers (e.g., experiments with at least 10 subjects and
-            multiple conditions) and a laptop with internet access. Equipment such as a video
-            projector and reliable WiFi will be provided for the workshop.
+            multiple conditions) and a laptop.
           </p>
         </section>
 
