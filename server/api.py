@@ -1,4 +1,4 @@
-""" This module contains the Sanic RESTful API endpoint for the workflow editor. """
+""" This module contains the RESTful API endpoint for atlas. """
 
 import argparse
 import json
@@ -23,6 +23,7 @@ import socketio
 
 from bunnet.operators import Or, In
 
+from routes.auth import require_jwt
 from workers.celery_config import add_paper, another_task
 
 

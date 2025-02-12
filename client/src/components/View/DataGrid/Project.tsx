@@ -7,6 +7,32 @@ import Contenteditable from '../../../pages/ProjectView/Contenteditable'
 import { debounce } from 'lodash'
 import api from '../../../service/api'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { FolderDown } from 'lucide-react'
+import { MultiSelect } from '@/components/ui/multi-select'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { useForm } from 'react-hook-form'
+import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
+import { usePapaParse } from 'react-papaparse'
+import { flattenObject, nestFlatKeys } from '../TableView/hooks/data-handler'
 
 type ProjectDetails = {
   name: string
@@ -90,7 +116,6 @@ const Project: React.FC = () => {
           },
         })
         const response_data = response.data
-        console.log('projectResults:', response_data.results)
         setProjectResults(response_data.results)
       } catch (error) {
         console.error('Error:', error)
@@ -187,6 +212,85 @@ const Project: React.FC = () => {
     }
   }
 
+  const form = useForm()
+  const [selectableHeaders, setSelectableHeaders] = useState<string[]>([])
+
+  useEffect(() => {
+    const allKeys = new Set<string>()
+    flattenObject(projectResults).forEach((obj) => {
+      Object.keys(obj).forEach((key) => allKeys.add(key))
+    })
+    setSelectableHeaders(Array.from(allKeys))
+  }, [projectResults])
+
+  const { jsonToCSV, readString } = usePapaParse()
+
+  const handleJsonToCSV = () => {
+    const selectedColumns = form.watch('frameworks') || []
+    const data = flattenObject(projectResults)
+    if (!data.length) return
+
+    const finalCols = selectableHeaders.reduce((acc, col) => {
+      acc.push(col)
+      if (selectedColumns.includes(col)) acc.push(`${col}_truth`)
+      return acc
+    }, [] as string[])
+
+    const finalData = data.map((row) =>
+      finalCols.reduce(
+        (acc, col) => {
+          acc[col] = row[col] ?? (col.endsWith('_truth') ? 'Fill in ground truth' : 'NaN')
+          return acc
+        },
+        {} as Record<string, unknown>,
+      ),
+    )
+
+    const csvString = jsonToCSV(finalData)
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'truth_template.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // State and handlers for reading user’s CSV
+  const [truthFile, setTruthFile] = useState<File | null>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) {
+      setTruthFile(null)
+      return
+    }
+    setTruthFile(e.target.files[0])
+  }
+
+  const handleLoadCSV = () => {
+    if (!truthFile) return
+
+    // Read file contents
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (!e.target?.result) return
+
+      const csvString = e.target.result as string
+      readString(csvString, {
+        header: true,
+        complete: (results) => {
+          results.data.forEach((value: unknown) => {
+            const row = value as Record<string, unknown>
+            const nestedRow = nestFlatKeys(row)
+            console.log(nestedRow)
+          })
+        },
+      })
+    }
+    reader.readAsText(truthFile)
+  }
+
   return (
     <main className={`${loading ? 'blur-sm' : ''}`}>
       <div className='navbar bg-base-100 flex flex-col sm:flex-row'>
@@ -205,7 +309,77 @@ const Project: React.FC = () => {
         <div className='navbar-center text-center'>
           <div className='flex flex-row justify-center '>{project.id}</div>
         </div>
-        <div className='md:navbar-end z-10 max-sm:pt-4'></div>
+        <div className='md:navbar-end z-10 max-md:pt-4'>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <FolderDown />
+                &nbsp;Load truth
+              </Button>
+            </DialogTrigger>
+            <DialogContent className='sm:max-w-[600px]'>
+              <DialogHeader>
+                <DialogTitle>Create truth input</DialogTitle>
+                <DialogDescription>
+                  Select the columns you want to input a ground truth for and then export the CSV
+                  file. After editing, upload your modified ground truth to obtain an accuracy score
+                  on your features.
+                </DialogDescription>
+              </DialogHeader>
+
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(() => {})} className='space-y-8'>
+                  <FormField
+                    control={form.control}
+                    name='frameworks'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Columns</FormLabel>
+                        <FormControl>
+                          <MultiSelect
+                            options={selectableHeaders.map((feature) => ({
+                              label: feature.replace(/\s/g, ' → ').toLowerCase(),
+                              value: feature,
+                            }))}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            placeholder='Select columns'
+                            variant='inverted'
+                            maxCount={3}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Choose the columns/features you are interested in.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button type='submit' onClick={handleJsonToCSV}>
+                      Export CSV Base Template
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+
+              <Separator />
+
+              <div className='space-y-2'>
+                <div className='font-semibold'>Import Ground Truth</div>
+                <p className='text-sm text-muted-foreground'>
+                  Upload your modified ground truth CSV to score your features.
+                </p>
+                <Input type='file' accept='.csv' onChange={handleFileChange} />
+                <DialogFooter>
+                  <Button type='submit' onClick={handleLoadCSV}>
+                    Load CSV Ground Truth
+                  </Button>
+                </DialogFooter>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       <hr></hr>
 

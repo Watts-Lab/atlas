@@ -3,7 +3,6 @@ import Table from './components/View/TableView/Table'
 import Home from './pages/Home/Home'
 import ProjectView from './pages/ProjectView/ProjectView'
 import Project from './components/View/DataGrid/Project'
-import MainPage from './components/View/DataGrid/MainPage'
 import Overview from './pages/Dashboard/Overview'
 
 function App() {
@@ -15,14 +14,7 @@ function App() {
         <Route path='/table' element={<Table />} />
         <Route path='/projects/:project_id' element={<ProjectView />} />
         <Route path='/dashboard' element={<Overview />} />
-        <Route
-          path='/grid/:project_id'
-          element={
-            <MainPage breadcrumbs={[]} sidebarOpen={false}>
-              <Project />
-            </MainPage>
-          }
-        />
+        <Route path='/grid/:project_id' element={<Project />} />
       </Routes>
     </>
   )

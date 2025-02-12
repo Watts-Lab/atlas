@@ -52,9 +52,9 @@ const Overview = () => {
 
   const fetchPapers = async (page: number) => {
     const token = localStorage.getItem('token') || ''
-    if (!token) {
-      navigate('/')
-    }
+    // if (!token) {
+    //   navigate('/')
+    // }
     await fetch(`${API_URL}/user/papers?page=${page}&page_size=${pageSize}`, {
       method: 'GET',
       headers: {
