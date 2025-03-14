@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { FolderDown } from 'lucide-react'
+import { FolderDown, Loader2 } from 'lucide-react'
 import { MultiSelect } from '@/components/ui/multi-select'
 import {
   Form,
@@ -32,7 +32,7 @@ import { useForm } from 'react-hook-form'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { usePapaParse } from 'react-papaparse'
-import { flattenObject, nestFlatKeys } from '../TableView/hooks/data-handler'
+import { flattenObject } from '../TableView/hooks/data-handler'
 
 type ProjectDetails = {
   name: string
@@ -58,6 +58,8 @@ const Project: React.FC = () => {
     updated_at: '',
   })
 
+  const token = localStorage.getItem('token') || ''
+
   const [availableFeatures, setAvailableFeatures] = useState<Feature[]>([])
 
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -69,16 +71,14 @@ const Project: React.FC = () => {
       }
       const controller = new AbortController()
       abortControllerRef.current = controller
-      const token = localStorage.getItem('token') || ''
       if (!token) {
         return
       }
       try {
         const response = await api.put(
-          `/projects`,
+          `/v1/projects/${params.project_id}`,
           { project_name: updatedName },
           {
-            params: { project_id: params.project_id },
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
@@ -103,7 +103,6 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchResults = async () => {
       setLoading(true)
-      const token = localStorage.getItem('token') || ''
       if (!token) {
         return
       }
@@ -130,13 +129,11 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      const token = localStorage.getItem('token') || ''
       if (!token) {
         return
       }
       try {
-        const response = await api.get('/projects', {
-          params: { project_id: params.project_id },
+        const response = await api.get(`/v1/projects/${params.project_id}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -165,9 +162,14 @@ const Project: React.FC = () => {
     const loadFeatures = async () => {
       try {
         const allFeatures = await fetchFeatures()
-
-        const response = await api.get(`/projects/features`, {
-          params: { project_id: params.project_id },
+        if (!token) {
+          return
+        }
+        const response = await api.get(`/projects/${params.project_id}/features`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
         })
         const projectFeatures: Feature[] = response.data.features
 
@@ -223,7 +225,7 @@ const Project: React.FC = () => {
     setSelectableHeaders(Array.from(allKeys))
   }, [projectResults])
 
-  const { jsonToCSV, readString } = usePapaParse()
+  const { jsonToCSV } = usePapaParse()
 
   const handleJsonToCSV = () => {
     const selectedColumns = form.watch('frameworks') || []
@@ -239,7 +241,7 @@ const Project: React.FC = () => {
     const finalData = data.map((row) =>
       finalCols.reduce(
         (acc, col) => {
-          acc[col] = row[col] ?? (col.endsWith('_truth') ? 'Fill in ground truth' : 'NaN')
+          acc[col] = row[col] ?? (col.endsWith('_truth') ? 'FILL_IN' : 'NaN')
           return acc
         },
         {} as Record<string, unknown>,
@@ -268,27 +270,42 @@ const Project: React.FC = () => {
     setTruthFile(e.target.files[0])
   }
 
-  const handleLoadCSV = () => {
+  const [open, setOpen] = useState(false)
+  const [loadingAccuracy, setLoadingAccuracy] = useState<boolean>(false)
+  const [accuracyScores, setAccuracyScores] = useState<Record<string, number> | null>(null)
+
+  const handleLoadCSV = async () => {
     if (!truthFile) return
+    setLoadingAccuracy(true)
+    const formData = new FormData()
+    formData.append('file', truthFile)
 
-    // Read file contents
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      if (!e.target?.result) return
-
-      const csvString = e.target.result as string
-      readString(csvString, {
-        header: true,
-        complete: (results) => {
-          results.data.forEach((value: unknown) => {
-            const row = value as Record<string, unknown>
-            const nestedRow = nestFlatKeys(row)
-            console.log(nestedRow)
-          })
+    try {
+      const response = await api.post(`/v1/projects/${params.project_id}/score_csv`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
       })
+      if (response.status === 200) {
+        const scores = response.data.aggregate_scores
+        const formattedScores: Record<string, number> = {}
+        Object.entries(scores).forEach(([key, value]) => {
+          formattedScores[key.split('.').join(' ')] = value as number
+        })
+        setAccuracyScores(formattedScores)
+        toast.success('CSV loaded successfully')
+        setOpen(false)
+      } else {
+        toast.error('Error loading CSV')
+      }
+      toast.success('Scoring complete!')
+    } catch (error) {
+      console.error(error)
+      toast.error('Error scoring the CSV.')
+    } finally {
+      setLoadingAccuracy(false)
     }
-    reader.readAsText(truthFile)
   }
 
   return (
@@ -310,7 +327,7 @@ const Project: React.FC = () => {
           <div className='flex flex-row justify-center '>{project.id}</div>
         </div>
         <div className='md:navbar-end z-10 max-md:pt-4'>
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>
                 <FolderDown />
@@ -372,7 +389,8 @@ const Project: React.FC = () => {
                 </p>
                 <Input type='file' accept='.csv' onChange={handleFileChange} />
                 <DialogFooter>
-                  <Button type='submit' onClick={handleLoadCSV}>
+                  <Button type='submit' onClick={handleLoadCSV} disabled={loadingAccuracy}>
+                    {loadingAccuracy && <Loader2 className='animate-spin' />}
                     Load CSV Ground Truth
                   </Button>
                 </DialogFooter>
@@ -386,6 +404,7 @@ const Project: React.FC = () => {
       <GridTable
         data={projectResults}
         availableFeatures={availableFeatures}
+        accuracyScores={accuracyScores}
         setAvailableFeatures={setAvailableFeatures}
         addNewFeature={addNewFeatureHandler}
         updateProjectFeatures={updateProjectFeatures}

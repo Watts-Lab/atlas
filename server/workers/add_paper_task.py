@@ -2,11 +2,11 @@
 Run the feature collection task for a paper.
 """
 
-import os
-from celery import Task
-import socketio
 import logging
+import os
 
+import socketio
+from celery import Task
 from controllers.assisstant import run_assistant_api
 from database.models.projects import Project
 from database.models.results import Result

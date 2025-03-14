@@ -22,6 +22,7 @@ export function NavMain({
     url: string
     icon?: LucideIcon
     isActive?: boolean
+    isDefaultOpen?: boolean
     items?: {
       title: string
       url: string
@@ -39,7 +40,7 @@ export function NavMain({
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={item.isActive}
+              defaultOpen={item.isDefaultOpen}
               className='group/collapsible'
               disabled={!item.isActive}
               onClick={(evnt) => {
@@ -62,9 +63,9 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
+                          <Link to={subItem.url}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

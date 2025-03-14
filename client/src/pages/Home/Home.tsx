@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createUniverse } from './stars-render'
 import { API_URL } from '../../service/api'
 import { useNavigate, useParams } from 'react-router-dom'
+import { LoginForm } from './LoginForm'
 
 type Params = {
   email?: string
@@ -14,7 +15,8 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   const params: Params = useParams()
   const navigate = useNavigate()
 
-  const [submitting, setSubmitting] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_submitting, setSubmitting] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(loggingIn)
   const [loggingInMessage, setLoggingInMessage] = useState('Authenticating... Please wait.')
 
@@ -129,16 +131,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
       <div className='w-full h-full container-gradient'>
         <div className='w-inherit h-inherit'>
           <canvas ref={canvasRef} id='universe' className='w-full h-full'></canvas>
-          <div className='absolute top-1/3 w-full text-center'>
-            <h1 className='text-5xl text-gray-50 pb-4'>Atlas</h1>
-            <p className='text-base text-gray-50'>
-              A simple and fun way to explore the universe of science. <br />
-              Sign up now to get started.
-            </p>
-
+          <div className='absolute top-1/4 w-full text-center'>
             {isLoggingIn ? <p className='text-slate-200 pt-4 fade-in'>{loggingInMessage}</p> : null}
 
-            <form onSubmit={submitEmail} className='flex flex-col justify-center items-center'>
+            {/* <form onSubmit={submitEmail} className='flex flex-col justify-center items-center'>
               {submitting ? (
                 <p className='text-slate-200 pt-4 fade-in'>Check your email for the magic link!</p>
               ) : (
@@ -154,7 +150,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
               <button className='mt-3 border rounded border-gray-300 px-2 opacity-40 text-[#edf3fe] transition-opacity duration-400 ease hover:opacity-100 hover:border-white'>
                 Sign up / Login
               </button>
-            </form>
+            </form> */}
+            <div className='w-full max-w-sm mx-auto'>
+              <LoginForm emailRef={emailRef} submitEmail={submitEmail} />
+            </div>
           </div>
         </div>
       </div>

@@ -22,7 +22,7 @@ class AppConfig(Config):
     """
 
     BASE_URL = os.getenv(
-        "PYTHON_ENV" == "development" and "BASE_URL_DEV" or "BASE_URL_PROD"
+        "BASE_URL_DEV" if os.getenv("PYTHON_ENV") == "development" else "BASE_URL_PROD"
     )
     SECRET = os.getenv("SOCKET_SECRET")
     JWT_SECRET = os.getenv("JWT_SECRET")

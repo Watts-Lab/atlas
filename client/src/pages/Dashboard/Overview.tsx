@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { API_URL } from '../../service/api'
-import { useNavigate } from 'react-router-dom'
 import MainPage from '@/components/View/DataGrid/MainPage'
 import ProjectsTable, { Projects } from '@/components/View/DataGrid/ProjectsTable'
 import PapersTable, { Papers } from '@/components/View/DataGrid/PapersTable'
@@ -11,8 +10,6 @@ const Overview = () => {
 
   // papers table page size default is 50
   const [pageSize] = useState<number>(50)
-
-  const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem('token') || ''

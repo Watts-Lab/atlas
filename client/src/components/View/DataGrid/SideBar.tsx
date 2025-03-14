@@ -18,6 +18,7 @@ const data = {
       url: '/dashboard',
       icon: House,
       isActive: true,
+      isDefaultOpen: true,
       items: [],
     },
     {
@@ -25,6 +26,7 @@ const data = {
       url: '#',
       icon: SquareTerminal,
       isActive: true,
+      isDefaultOpen: true,
       items: [
         {
           title: 'All Projects',
@@ -42,24 +44,30 @@ const data = {
     },
     {
       title: 'Documentation',
-      url: '#',
+      url: '/docs',
       icon: BookOpen,
+      isActive: true,
+      isDefaultOpen: false,
       items: [
         {
           title: 'Introduction',
-          url: '#',
+          url: '/docs/introduction',
         },
         {
           title: 'Get Started',
-          url: '#',
+          url: '/docs/get-started',
         },
         {
           title: 'Tutorials',
-          url: '#',
+          url: '/docs/tutorials',
         },
         {
           title: 'Changelog',
-          url: '#',
+          url: '/docs/changelog',
+        },
+        {
+          title: 'API Reference',
+          url: '/docs/api-reference',
         },
       ],
     },

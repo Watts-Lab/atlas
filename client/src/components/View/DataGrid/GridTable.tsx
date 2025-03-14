@@ -13,6 +13,7 @@ import { Feature, NewFeature } from './feature.types'
 export type GridTableProps = {
   data: Record<string, unknown>[]
   availableFeatures: Feature[]
+  accuracyScores: Record<string, number> | null
   setAvailableFeatures: React.Dispatch<React.SetStateAction<Feature[]>>
   addNewFeature: (newFeatureData: NewFeature) => void
   updateProjectFeatures: () => void
@@ -21,6 +22,7 @@ export type GridTableProps = {
 const GridTable = ({
   data,
   availableFeatures,
+  accuracyScores,
   setAvailableFeatures,
   updateProjectFeatures,
 }: GridTableProps) => {
@@ -36,11 +38,17 @@ const GridTable = ({
     }
   }, [isFeatureModalOpen])
 
+  function getHeaderColorClass(score: number): string {
+    if (score < 0.2) return 'bg-red-400/75'
+    if (score < 0.4) return 'bg-orange-400/75'
+    if (score < 0.6) return 'bg-yellow-400/75'
+    if (score < 0.8) return 'bg-green-300/75'
+    return 'bg-green-600/75'
+  }
+
   useEffect(() => {
     const row = flattenObject(data)
-
     setRowData(row)
-
     if (!row.length) {
       return
     }
@@ -49,18 +57,32 @@ const GridTable = ({
     row.forEach((obj) => {
       Object.keys(obj).forEach((key) => allKeys.add(key))
     })
-
     const allKeysArray = Array.from(allKeys)
 
     const newColDefs: ColDef[] = allKeysArray.map((key) => {
       if (key !== 'task_id' && key !== 'status') {
-        return { field: key, hide: false }
+        // colorize the column based on score
+        const value = accuracyScores ? accuracyScores[key] : undefined
+        if (!value) {
+          return {
+            field: key,
+            hide: false,
+          }
+        }
+
+        const score = Math.max(0, Math.min(1, value))
+
+        return {
+          field: key,
+          cellClass: getHeaderColorClass(score),
+          headerClass: getHeaderColorClass(score),
+          hide: false,
+        }
       } else {
         return { field: key, hide: true }
       }
     })
 
-    // Add the '+' column
     newColDefs.push({
       headerName: '',
       field: 'add',
@@ -76,7 +98,7 @@ const GridTable = ({
     })
 
     setColDefs(newColDefs)
-  }, [data])
+  }, [data, accuracyScores])
 
   const [colDefs, setColDefs] = useState<ColDef[]>()
 

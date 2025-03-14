@@ -5,6 +5,8 @@ import ProjectView from './pages/ProjectView/ProjectView'
 import Project from './components/View/DataGrid/Project'
 import Overview from './pages/Dashboard/Overview'
 import IC2S2 from './pages/IC2S2/IC2S2'
+import DocumentationLayout from './pages/Documentation/DocumentationLayout'
+import DocPage from './pages/Documentation/DocPage'
 
 function App() {
   return (
@@ -17,6 +19,15 @@ function App() {
         <Route path='/dashboard' element={<Overview />} />
         <Route path='/grid/:project_id' element={<Project />} />
         <Route path='/ic2s2' element={<IC2S2 />} />
+
+        <Route path='/docs' element={<DocumentationLayout />}>
+          <Route index element={<DocPage fileName='overview.md' />} />
+          <Route path='introduction' element={<DocPage fileName='introduction.md' />} />
+          <Route path='get-started' element={<DocPage fileName='get-started.md' />} />
+          <Route path='tutorials' element={<DocPage fileName='tutorials.md' />} />
+          <Route path='changelog' element={<DocPage fileName='changelog.md' />} />
+          <Route path='api-reference' element={<DocPage fileName='api_refrence.md' />} />
+        </Route>
       </Routes>
     </>
   )
