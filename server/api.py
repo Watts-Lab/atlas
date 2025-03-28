@@ -11,7 +11,7 @@ from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_cors import CORS
 from config.app_config import AppConfig
-from controllers.login import login_user, validate_user
+from controllers.login import login_user, validate_token, validate_user
 from routes.auth import require_jwt
 from routes.v1 import v1_blueprint
 from database.database import init_db
@@ -403,6 +403,17 @@ async def validate(request: Request):
         email = data.get("email")
         token = data.get("magic_link")
         return await validate_user(email=email, token=token)
+
+
+@app.route("/api/check", methods=["POST"])
+async def check_token(request: Request):
+    """
+    Handles the POST request for validating the magic link.
+    """
+    if request.method == "POST":
+        data = request.json
+        email = data.get("email")
+        return await validate_token(email=email, request=request)
 
 
 @app.route("/api/add_paper", methods=["POST", "GET"])

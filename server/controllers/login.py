@@ -5,7 +5,7 @@ from json import JSONDecodeError
 import secrets
 import jwt
 
-from sanic import Sanic, json as json_response
+from sanic import Request, Sanic, json as json_response
 
 from controllers.utils.email_client import send_magic_link
 from database.models.users import User
@@ -114,6 +114,48 @@ async def validate_user(email: str, token: str):
             response_data = {"error": "User not found."}
             return json_response(body=response_data, status=404)
 
+    except JSONDecodeError:
+        response_data = {"error": "Invalid JSON data."}
+        return json_response(body=response_data, status=400)
+    except Exception as e:
+        response_data = {"error": "An error occurred.", "message": str(e)}
+        return json_response(body=response_data, status=500)
+
+
+async def validate_token(email: str, request: Request):
+    """
+    Handles the POST request for validating the magic link.
+    """
+    app = Sanic.get_app("Atlas")
+    try:
+        if not email:
+            response_data = {"error": "Email and auth headers are required."}
+            return json_response(body=response_data, status=400)
+
+        # Fetch user asynchronously
+        user_jwt = jwt.decode(
+            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        )
+        user = User.find_one(User.email == user_jwt.get("email")).run()
+
+        if user:
+            if user.email == email:
+                # Users local storage token is valid
+                response_data = {"message": "Token is valid."}
+                return json_response(body=response_data, status=200)
+
+                # Magic link has expired
+            response_data = {"error": "Token is invalid or expired."}
+            return json_response(body=response_data, status=401)
+        # Check if the token is valid
+        else:
+            response_data = {"error": "User not found."}
+            return json_response(body=response_data, status=404)
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
     except JSONDecodeError:
         response_data = {"error": "Invalid JSON data."}
         return json_response(body=response_data, status=400)

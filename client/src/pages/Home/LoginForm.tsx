@@ -1,5 +1,4 @@
-import { Globe } from 'lucide-react'
-
+import { Globe, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,12 +7,14 @@ import { Label } from '@/components/ui/label'
 type LoginFormProps = {
   emailRef: React.RefObject<HTMLInputElement>
   submitEmail: (e: React.FormEvent<HTMLFormElement>) => void
+  submitting: boolean
 }
 
 export function LoginForm({
   className,
   emailRef,
   submitEmail,
+  submitting,
   ...props
 }: LoginFormProps & React.HTMLProps<HTMLDivElement>) {
   return (
@@ -29,32 +30,33 @@ export function LoginForm({
             </a>
             <h1 className='text-2xl font-bold text-gray-50'>Welcome to Atlas</h1>
             <p className='text-base text-gray-50'>
-              Explore the universe of science. <br />
+              Atlas is a platform for research cartography and data visualization. <br />
             </p>
-            <div className='text-center text-sm text-gray-50'>
-              Don&apos;t have an account?{' '}
-              <a href='#' className='underline underline-offset-4'>
-                Sign up
-              </a>
-            </div>
           </div>
           <div className='flex flex-col gap-6'>
             <div className='grid gap-2 text-gray-50'>
               <Label htmlFor='email'>Email</Label>
-              <Input
-                data-testid='email-input'
-                ref={emailRef}
-                id='email'
-                type='email'
-                placeholder='example@scaledhumanity.org'
-                required
-              />
+              {!submitting ? (
+                <Input
+                  data-testid='email-input'
+                  ref={emailRef}
+                  id='email'
+                  type='email'
+                  placeholder='example@scaledhumanity.org'
+                  required
+                />
+              ) : (
+                <p className='text-slate-200 pt-4 fade-in'>
+                  Please check your email for a login link
+                </p>
+              )}
             </div>
-            <Button type='submit' className='w-full bg-gray-700'>
+            <Button disabled={submitting} type='submit' className='w-full bg-gray-700'>
+              {submitting && <Loader2 className='animate-spin' />}
               Login
             </Button>
           </div>
-          <div className='relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border'>
+          {/* <div className='relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border'>
             <span className='relative z-10 bg-[#1a1f41] px-2 text-gray-100'>Or</span>
           </div>
           <div className='grid gap-4 sm:grid-cols-2'>
@@ -81,12 +83,13 @@ export function LoginForm({
               </svg>
               Continue with Google
             </Button>
-          </div>
+          </div> */}
         </div>
       </form>
       <div className='text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary text-gray-100'>
-        By clicking continue, you agree to our <a href='#'>Terms of Service</a> and{' '}
-        <a href='#'>Privacy Policy</a>.
+        By clicking continue, you agree to our{' '}
+        <a href='https://github.com/Watts-Lab/atlas'>Terms of Service</a> and{' '}
+        <a href='https://github.com/Watts-Lab/atlas'>Privacy Policy</a>.
       </div>
     </div>
   )
