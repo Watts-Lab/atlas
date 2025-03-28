@@ -39,7 +39,10 @@ async def project(request: Request):
             project_description = "New Project"
             new_project = create_project(project_name, project_description, user)
             return json_response(
-                {"message": "Project created.", "project_id": new_project}
+                {
+                    "message": "Project created.",
+                    "project_id": str(new_project.id),
+                },
             )
 
         elif request.method == "GET":

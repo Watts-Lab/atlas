@@ -3,6 +3,7 @@ import { API_URL } from '../../service/api'
 import MainPage from '@/components/View/DataGrid/MainPage'
 import ProjectsTable, { Projects } from '@/components/View/DataGrid/ProjectsTable'
 import PapersTable, { Papers } from '@/components/View/DataGrid/PapersTable'
+import { useNavigate } from 'react-router-dom'
 
 const Overview = () => {
   const [projects, setProjects] = useState<Projects[]>([])
@@ -10,6 +11,8 @@ const Overview = () => {
 
   // papers table page size default is 50
   const [pageSize] = useState<number>(50)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem('token') || ''
@@ -48,10 +51,10 @@ const Overview = () => {
   }, [])
 
   const fetchPapers = async (page: number) => {
-    const token = localStorage.getItem('token') || ''
-    // if (!token) {
-    //   navigate('/')
-    // }
+    const token = localStorage.getItem('token')
+    if (!token) {
+      navigate('/')
+    }
     await fetch(`${API_URL}/user/papers?page=${page}&page_size=${pageSize}`, {
       method: 'GET',
       headers: {

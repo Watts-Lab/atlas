@@ -299,7 +299,6 @@ const Project: React.FC = () => {
       } else {
         toast.error('Error loading CSV')
       }
-      toast.success('Scoring complete!')
     } catch (error) {
       console.error(error)
       toast.error('Error scoring the CSV.')

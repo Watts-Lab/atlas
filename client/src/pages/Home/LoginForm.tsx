@@ -88,8 +88,8 @@ export function LoginForm({
       </form>
       <div className='text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary text-gray-100'>
         By clicking continue, you agree to our{' '}
-        <a href='https://github.com/Watts-Lab/atlas'>Terms of Service</a> and{' '}
-        <a href='https://github.com/Watts-Lab/atlas'>Privacy Policy</a>.
+        <a href='https://github.com/Watts-Lab/atlas?tab=coc-ov-file'>Code of Conduct</a> and{' '}
+        <a href='https://github.com/Watts-Lab/atlas?tab=AGPL-3.0-1-ov-file'>License</a>.
       </div>
     </div>
   )
