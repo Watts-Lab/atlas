@@ -7,7 +7,7 @@ import { Node } from '@xyflow/react'
 
 type DetailRendererProps = {
   nodeType: string
-  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  setNodes: React.Dispatch<React.SetStateAction<Node<Record<string, unknown>>[]>>
   selectedNode: selectedNode
 }
 

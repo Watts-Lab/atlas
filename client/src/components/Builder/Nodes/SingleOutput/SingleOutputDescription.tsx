@@ -5,7 +5,7 @@ import { selectedNode } from '../../Flow.types'
 type MeasurementOption = 'Choose an option' | 'GPT-4' | 'GPT-3.5' | 'Human'
 
 type SingleOutputDescriptionProps = {
-  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  setNodes: React.Dispatch<React.SetStateAction<Node<Record<string, unknown>>[]>>
   selectedNode: selectedNode
 }
 
@@ -15,11 +15,12 @@ const SingleOutputDescription = ({ setNodes, selectedNode }: SingleOutputDescrip
   const [measurement, setMeasurement] = useState<MeasurementOption>('Choose an option')
   const [prompt, setPrompt] = useState('')
 
-  const thisNode: Node = nodes.find((node) => node.id === selectedNode.id)!
+  const thisNode: Node<{ name?: string; measurement?: MeasurementOption; prompt?: string }> =
+    nodes.find((node) => node.id === selectedNode.id)!
 
   useEffect(() => {
     if (thisNode) {
-      setNodeName(thisNode?.data.name || '')
+      setNodeName(thisNode.data?.name || '')
       setMeasurement(thisNode?.data.measurement || 'Choose an option')
       setPrompt(thisNode?.data.prompt || '')
     }
