@@ -13,7 +13,6 @@ class Features(Document):
     """This class represents a feature stored in MongoDB."""
 
     # TODO: Add a versioning
-
     feature_name: str
     feature_parent: str
     feature_identifier: str

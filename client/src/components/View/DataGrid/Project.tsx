@@ -5,7 +5,7 @@ import GridTable from './GridTable'
 import { useParams } from 'react-router-dom'
 import Contenteditable from '../../../pages/ProjectView/Contenteditable'
 import { debounce } from 'lodash'
-import api from '../../../service/api'
+import api, { API_URL } from '../../../service/api'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,6 +33,7 @@ import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { usePapaParse } from 'react-papaparse'
 import { flattenObject } from '../TableView/hooks/data-handler'
+import { useSocket } from '@/context/Socket/UseSocket'
 
 type ProjectDetails = {
   name: string
@@ -47,18 +48,21 @@ type Params = {
 
 const Project: React.FC = () => {
   const params: Params = useParams()
+  const { socket } = useSocket()
 
   const [loading, setLoading] = useState<boolean>(false)
 
-  const [projectResults, setProjectResults] = useState<Record<string, unknown>[]>([])
+  const [projectResults, setProjectResults] = useState<Record<string, unknown>[]>([
+    {
+      paper: '...',
+    },
+  ])
   const [project, setProject] = useState<ProjectDetails>({
     name: '',
     id: '',
     created_at: '',
     updated_at: '',
   })
-
-  const token = localStorage.getItem('token') || ''
 
   const [availableFeatures, setAvailableFeatures] = useState<Feature[]>([])
 
@@ -71,18 +75,11 @@ const Project: React.FC = () => {
       }
       const controller = new AbortController()
       abortControllerRef.current = controller
-      if (!token) {
-        return
-      }
       try {
         const response = await api.put(
           `/v1/projects/${params.project_id}`,
           { project_name: updatedName },
           {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
             signal: controller.signal,
           },
         )
@@ -103,17 +100,8 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchResults = async () => {
       setLoading(true)
-      if (!token) {
-        return
-      }
       try {
-        const response = await api.get('/projects/results', {
-          params: { project_id: params.project_id },
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await api.get(`/v1/projects/${params.project_id}/results`)
         const response_data = response.data
         setProjectResults(response_data.results)
       } catch (error) {
@@ -129,24 +117,13 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      if (!token) {
-        return
-      }
       try {
-        const response = await api.get(`/v1/projects/${params.project_id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        const response_data = response.data
-
+        const response = await api.get(`/v1/projects/${params.project_id}`)
         setProject({
-          name: response_data.project.title,
-          id: response_data.project.id,
-          created_at: response_data.project.created_at,
-          updated_at: response_data.project.updated_at,
+          name: response.data.project.title,
+          id: response.data.project.id,
+          created_at: response.data.project.created_at,
+          updated_at: response.data.project.updated_at,
         })
       } catch (error) {
         console.error('Error:', error)
@@ -162,15 +139,7 @@ const Project: React.FC = () => {
     const loadFeatures = async () => {
       try {
         const allFeatures = await fetchFeatures()
-        if (!token) {
-          return
-        }
-        const response = await api.get(`/projects/${params.project_id}/features`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await api.get(`/projects/${params.project_id}/features`)
         const projectFeatures: Feature[] = response.data.features
 
         const featuresWithSelection = allFeatures.map((feature) => {
@@ -200,18 +169,20 @@ const Project: React.FC = () => {
     const projectId = params.project_id
     const selectedFeatures = availableFeatures.filter((feature) => feature.selected)
 
-    const response = await api.post('/projects/features', {
-      project_id: projectId,
-      feature_ids: selectedFeatures.map((feature) => feature.id),
-    })
-
-    if (response.status === 200) {
-      toast.success('Project features updated successfully')
-      console.log('Features updated successfully')
-    } else {
-      toast.error('Error updating features')
-      console.error('Error updating features')
-    }
+    await api
+      .post(`/projects/${params.project_id}/features`, {
+        project_id: projectId,
+        feature_ids: selectedFeatures.map((feature) => feature.id),
+      })
+      .then((response) => {
+        if (response.status === 201) {
+          toast.success('Project features updated successfully')
+          console.log('Features updated successfully')
+        } else {
+          toast.error('Error updating features')
+          console.error('Error updating features')
+        }
+      })
   }
 
   const form = useForm()
@@ -279,14 +250,8 @@ const Project: React.FC = () => {
     setLoadingAccuracy(true)
     const formData = new FormData()
     formData.append('file', truthFile)
-
     try {
-      const response = await api.post(`/v1/projects/${params.project_id}/score_csv`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      const response = await api.post(`/v1/projects/${params.project_id}/score_csv`)
       if (response.status === 200) {
         const scores = response.data.aggregate_scores
         const formattedScores: Record<string, number> = {}
@@ -304,6 +269,54 @@ const Project: React.FC = () => {
       toast.error('Error scoring the CSV.')
     } finally {
       setLoadingAccuracy(false)
+    }
+  }
+
+  const handleBackend = async (files: FileList) => {
+    if (params.project_id === undefined) return
+
+    const data = new FormData()
+    for (const file of files) {
+      data.append('files[]', file, file.name)
+    }
+    data.append('sid', socket?.id || '')
+    data.append('model', 'gpt')
+    data.append('project_id', params.project_id)
+    data.append(
+      'features',
+      JSON.stringify([
+        'experiments.name',
+        'experiments.description',
+        'experiments.participant_source',
+        'experiments.participant_source_category',
+        'experiments.units_randomized',
+        'experiments.units_analyzed',
+      ]),
+    )
+
+    try {
+      const response = await api.post(`${API_URL}/add_paper`, data)
+      if (response.status === 200) {
+        toast.success('File uploaded successfully')
+      } else {
+        toast.error('Error uploading file')
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+    }
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+  const handleUploadFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (files) {
+      handleBackend(files)
     }
   }
 
@@ -326,6 +339,17 @@ const Project: React.FC = () => {
           <div className='flex flex-row justify-center '>{project.id}</div>
         </div>
         <div className='md:navbar-end z-10 max-md:pt-4'>
+          <Button onClick={handleButtonClick} className='mr-2'>
+            Upload file
+          </Button>
+          <input
+            type='file'
+            ref={fileInputRef}
+            onChange={handleUploadFileChange}
+            style={{ display: 'none' }}
+            accept='application/pdf'
+            multiple
+          />
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>

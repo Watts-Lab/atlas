@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Node, useNodes } from 'reactflow'
+import { Node, useNodes } from '@xyflow/react'
 import { selectedNode } from '../../Flow.types'
 
 type MeasurementOption = 'Choose an option' | 'GPT-4' | 'GPT-3.5' | 'Human'

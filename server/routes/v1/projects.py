@@ -11,6 +11,7 @@ from sklearn.metrics import f1_score, r2_score
 from controllers.project import create_project
 from database.models.features import Features
 from database.models.projects import Project
+from database.models.results import Result
 from routes.auth import require_jwt
 from sanic import Blueprint
 from sanic import json as json_response
@@ -35,9 +36,20 @@ async def project(request: Request):
             return json_response({"error": "User not found."}, status=404)
 
         if request.method == "POST":
-            project_name = "New Project"
-            project_description = "New Project"
-            new_project = create_project(project_name, project_description, user)
+            project_name = request.json.get("project_name")
+            project_description = request.json.get("project_description")
+            project_features = request.json.get("project_features")
+
+            if not project_name:
+                return json_response({"error": "Project name is required."}, status=400)
+
+            new_project = create_project(
+                project_name=project_name,
+                project_description=project_description,
+                project_features=project_features,
+                user=user,
+            )
+
             return json_response(
                 {
                     "message": "Project created.",
@@ -46,9 +58,7 @@ async def project(request: Request):
             )
 
         elif request.method == "GET":
-            projects = Project.find(
-                Project.user.id == user.id, fetch_links=True
-            ).to_list()
+            projects = Project.find(Project.user.id == user.id).to_list()
 
             pr_response = [
                 p.model_dump(
@@ -61,10 +71,7 @@ async def project(request: Request):
             for proj in pr_response:
                 proj["papers"] = [str(pap["id"]) for pap in proj["papers"]]
 
-            if projects:
-                return json_response({"project": pr_response})
-            else:
-                return json_response({"error": "No projects found."}, status=404)
+            return json_response({"project": pr_response})
 
     except jwt.ExpiredSignatureError:
         return json_response({"error": "Token has expired."}, status=401)
@@ -74,7 +81,9 @@ async def project(request: Request):
         return json_response({"error": str(e)}, status=500)
 
 
-@projects_bp.route("/<project_id>", methods=["GET", "PUT"], name="project_detail")
+@projects_bp.route(
+    "/<project_id>", methods=["GET", "PUT", "DELETE"], name="project_detail"
+)
 @require_jwt
 async def project_detail(request: Request, project_id: str):
     """
@@ -134,6 +143,56 @@ async def project_detail(request: Request, project_id: str):
             return json_response(
                 {"message": "Project updated.", "project": project_dict}
             )
+
+        elif request.method == "DELETE":
+            # Delete project
+            user_project: Project = Project.get(project_id, fetch_links=True).run()
+            if not user_project:
+                return json_response({"error": "Project not found."}, status=404)
+
+            if user_project.user.id != user.id:
+                return json_response(
+                    {"error": "You are not authorized to delete this project."},
+                    status=403,
+                )
+
+            # Delete the project
+            user_project.delete()
+            return json_response({"message": "Project deleted."})
+
+    except jwt.ExpiredSignatureError:
+        return json_response({"error": "Token has expired."}, status=401)
+    except jwt.InvalidTokenError:
+        return json_response({"error": "Invalid token."}, status=401)
+    except Exception as e:
+        return json_response({"error": str(e)}, status=500)
+
+
+@projects_bp.route("/<project_id>/results", methods=["GET"], name="project_results")
+@require_jwt
+async def project_results(request: Request, project_id: str):
+    """
+    A protected route for getting results of a project.
+    """
+    try:
+        # Validate user from JWT
+        user = request.ctx.user
+        if not user:
+            return json_response({"error": "User not found."}, status=404)
+
+        user_project: Project = Project.get(project_id).run()
+
+        # TODO: Should check if the user is the owner of the project
+        if not user_project:
+            return json_response({"error": "Project not found."}, status=404)
+
+        project_result = Result.find(Result.project_id.id == user_project.id).to_list()
+
+        project_json_responses = [r.json_response for r in project_result]
+
+        return json_response(
+            {"message": "results found.", "results": project_json_responses}
+        )
 
     except jwt.ExpiredSignatureError:
         return json_response({"error": "Token has expired."}, status=401)
@@ -379,13 +438,23 @@ async def score_csv_endpoint(request: Request, project_id: str):
         return json_response({"error": str(e)}, status=500)
 
 
+# • /api/projects/:
+#   – GET    -> list projects
+#   – POST   -> create new project
+#   - DELETE -> delete multiple projects
+
+# • /api/projects/<project_id>:
+#   – GET    -> retrieve project
+#   – PUT    -> update project
+#   – DELETE -> delete project
+
 # • /api/projects/<project_id>/features:
 #   – GET    -> list features for a project
 #   – POST   -> add new feature to a project
 
 # • /api/projects/<project_id>/results:
 #   – GET    -> list or retrieve results
-#   – POST   -> create new result (if that’s a valid use case)
+#   – POST   -> create new result
 
 # • /api/projects/<project_id>/results/<result_id>:
 #   – GET    -> retrieve single result

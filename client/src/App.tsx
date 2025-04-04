@@ -7,6 +7,8 @@ import Overview from './pages/Dashboard/Overview'
 import IC2S2 from './pages/IC2S2/IC2S2'
 import DocumentationLayout from './pages/Documentation/DocumentationLayout'
 import DocPage from './pages/Documentation/DocPage'
+import ProjectCreate from './pages/ProjectCreate/ProjectCreate'
+import ProjectSettings from './pages/ProjectSettings/ProjectSettings'
 
 function App() {
   return (
@@ -15,9 +17,13 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/login/:email/:magicLink' element={<Home loggingIn={true} />} />
         <Route path='/table' element={<Table />} />
-        <Route path='/projects/:project_id' element={<ProjectView />} />
         <Route path='/dashboard' element={<Overview />} />
-        <Route path='/grid/:project_id' element={<Project />} />
+        <Route path='/projects' element={<Overview />} />
+        <Route path='/projects/create' element={<ProjectCreate />} />
+        <Route path='/projects/settings' element={<ProjectSettings />} />
+        <Route path='/project/:project_id' element={<Project />} />
+
+        <Route path='/project-old/:project_id' element={<ProjectView />} />
         <Route path='/ic2s2' element={<IC2S2 />} />
 
         <Route path='/docs' element={<DocumentationLayout />}>

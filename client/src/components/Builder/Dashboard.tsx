@@ -1,20 +1,18 @@
-import { useContext } from 'react'
+import { useEffect } from 'react'
 import Flow from './Flow'
-import Header from './Header'
-import { WorkflowContext } from '../../context/Workflow/WorkflowProvider.types'
+import { useWorkflow } from '@/context/Workflow/useWorkflow'
 
 const Dashboard = () => {
-  const { loadWorkflow } = useContext(WorkflowContext)
+  const { loadWorkflow } = useWorkflow()
 
-  const initialNodes = loadWorkflow().nodes
-  const initialEdges = loadWorkflow().edges
+  useEffect(() => {
+    loadWorkflow()
+  }, [loadWorkflow])
 
   return (
-    <>
-      <Header fileName='Workflow-1' />
-
-      <Flow initialNodes={initialNodes} initialEdges={initialEdges} />
-    </>
+    <div style={{ display: 'flex', width: '100%', height: '100vh' }}>
+      <Flow />
+    </div>
   )
 }
 

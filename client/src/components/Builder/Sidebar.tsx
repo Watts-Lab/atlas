@@ -2,7 +2,7 @@ import { DragEvent, useEffect, useState } from 'react'
 import DetailRenderer from './DetailRenderer'
 import { loadNodeTypes } from './Nodes'
 import { selectedNode } from './Flow.types'
-import { Node } from 'reactflow'
+import { Node } from '@xyflow/react'
 
 type SidebarProps = {
   setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>

@@ -15,8 +15,10 @@ import {
 import { Link } from 'react-router-dom'
 
 export function NavMain({
+  label,
   items,
 }: {
+  label: string
   items: {
     title: string
     url: string
@@ -33,7 +35,7 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Atlas v0.1.4 [Alpha Release]</SidebarGroupLabel>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           return item.items?.length !== 0 ? (

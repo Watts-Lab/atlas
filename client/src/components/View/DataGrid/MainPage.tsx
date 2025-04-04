@@ -17,9 +17,15 @@ type PageProps = {
     url: string
   }[]
   sidebarOpen?: boolean
+  rightSidebar?: React.ReactNode
 }
 
-export default function MainPage({ children, breadcrumbs, sidebarOpen = true }: PageProps) {
+export default function MainPage({
+  children,
+  breadcrumbs,
+  sidebarOpen = true,
+  rightSidebar,
+}: PageProps) {
   return (
     <SidebarProvider>
       <AppSidebar sidebarOpen={sidebarOpen} />
@@ -37,7 +43,7 @@ export default function MainPage({ children, breadcrumbs, sidebarOpen = true }: 
                         <BreadcrumbItem>
                           <BreadcrumbLink href={breadcrumb.url}>{breadcrumb.title}</BreadcrumbLink>
                         </BreadcrumbItem>
-                        <BreadcrumbSeparator />
+                        {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
                       </Fragment>
                     ))}
                   </BreadcrumbList>
@@ -48,6 +54,7 @@ export default function MainPage({ children, breadcrumbs, sidebarOpen = true }: 
         </header>
         <div>{children}</div>
       </SidebarInset>
+      {rightSidebar}
     </SidebarProvider>
   )
 }

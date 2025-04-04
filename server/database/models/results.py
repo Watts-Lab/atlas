@@ -3,7 +3,8 @@ Results model.
 """
 
 from datetime import datetime
-from bunnet import Document, Link
+from bunnet import Document, Link, PydanticObjectId
+from pydantic import BaseModel
 
 from database.models.projects import Project
 from database.models.users import User
@@ -30,3 +31,18 @@ class Result(Document):
         """
 
         name = "results"
+
+
+class ResultViewId(BaseModel):
+    """
+    Result view model.
+    """
+
+    id: PydanticObjectId
+    project_id: Link[Project]
+
+    class Settings:
+        projection = {
+            "id": "$_id",
+            "project_id": "$project_id",
+        }

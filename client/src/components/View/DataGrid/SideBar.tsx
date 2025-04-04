@@ -30,15 +30,15 @@ const data = {
       items: [
         {
           title: 'All Projects',
-          url: '#',
+          url: '/projects',
         },
         {
           title: 'Create Project',
-          url: '#',
+          url: '/projects/create',
         },
         {
           title: 'Project Settings',
-          url: '#',
+          url: '/projects/settings',
         },
       ],
     },
@@ -115,7 +115,7 @@ export function AppSidebar({
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain label='Atlas v0.1.4 [Alpha Release]' items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
