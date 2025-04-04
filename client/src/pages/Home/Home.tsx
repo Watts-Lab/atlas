@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { createUniverse } from './stars-render'
-import { API_URL } from '../../service/api'
 import { useNavigate, useParams } from 'react-router-dom'
 import { LoginForm } from './LoginForm'
+import api from '@/service/api'
 
 type Params = {
   email?: string
@@ -49,25 +49,21 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
       setIsLoggingIn(true)
       setLoggingInMessage('Authenticating... Please wait.')
 
-      fetch(`${API_URL}/validate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: params.email, magic_link: params.magicLink }),
-      }).then((res) => {
-        if (res.ok) {
-          localStorage.setItem('token', res.headers.get('Authorization')!)
-          localStorage.setItem('email', params.email!)
-          navigate('/dashboard')
-        } else {
-          // ADDED: If invalid magic link
-          setLoggingInMessage('Invalid or expired magic link. Please try logging in again.')
-          setTimeout(() => {
-            setIsLoggingIn(false)
-          }, 3000)
-        }
-      })
+      api
+        .post(`/validate`, { email: params.email, magic_link: params.magicLink })
+        .then((response) => {
+          if (response.status === 200) {
+            localStorage.setItem('token', response.headers['authorization'])
+            localStorage.setItem('email', params.email!)
+            navigate('/dashboard')
+          } else {
+            // ADDED: If invalid magic link
+            setLoggingInMessage('Invalid or expired magic link. Please try logging in again.')
+            setTimeout(() => {
+              setIsLoggingIn(false)
+            }, 3000)
+          }
+        })
     }
   }, [loggingIn])
 
@@ -79,15 +75,8 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
       setIsLoggingIn(true)
       setLoggingInMessage('Authenticating token... Please wait.')
 
-      fetch(`${API_URL}/check`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ email: email }),
-      }).then((res) => {
-        if (res.ok) {
+      api.post(`/check`, { email: email }).then((res) => {
+        if (res.status === 200) {
           navigate('/dashboard')
         } else {
           setLoggingInMessage('Token authentication failed. Please login again.')
@@ -107,15 +96,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
     e.preventDefault()
 
     const email = emailRef.current!.value
-    await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    })
+    await api
+      .post(`/login`, { email: email })
       .then((res) => {
-        if (!res.ok) {
+        if (res.status !== 200) {
           throw new Error('Something went wrong!')
         }
       })

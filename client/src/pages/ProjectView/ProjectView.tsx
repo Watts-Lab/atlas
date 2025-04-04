@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { API_URL } from '../../service/api'
 import Contenteditable from './Contenteditable'
 import { debounce } from 'lodash'
 import TableView from '../../components/View/TableView/TableView'
 import { check_data } from '../../components/View/TableView/hooks/mock-data'
 import { Result } from '../../components/View/TableView/hooks/data-handler'
+import api from '@/service/api'
 
 type ProjectDetails = {
   name: string
@@ -49,22 +49,19 @@ const ProjectView = () => {
         return
       }
       try {
-        const response = await fetch(`${API_URL}/projects?project_id=${params.project_id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+        const response = await api.put(
+          `/projects?project_id=${params.project_id}`,
+          { project_name: updatedName },
+          {
+            signal: controller.signal,
           },
-          body: JSON.stringify({ project_name: updatedName }),
-          signal: controller.signal,
-        })
-        if (!response.ok) {
+        )
+        if (response.status !== 200) {
           throw new Error('Network response was not ok')
         }
-        const response_data = await response.json()
         setProject((prevProject) => ({
           ...prevProject,
-          name: response_data.project.title,
+          name: response.data.project.title,
         }))
       } catch (error: unknown) {
         console.error('Error:', error)
@@ -83,28 +80,21 @@ const ProjectView = () => {
       }
 
       try {
-        const response = await fetch(`${API_URL}/projects?project_id=${params.project_id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await api.get(`/projects?project_id=${params.project_id}`)
 
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error('Network response was not ok')
         }
 
-        const response_data = await response.json()
         setProject({
-          name: response_data.project.title,
-          id: response_data.project.id,
-          created_at: response_data.project.created_at,
-          updated_at: response_data.project.updated_at,
+          name: response.data.project.title,
+          id: response.data.project.id,
+          created_at: response.data.project.created_at,
+          updated_at: response.data.project.updated_at,
         })
 
-        if (response_data.results.length !== 0) {
-          setProjectResults(response_data.results)
+        if (response.data.results.length !== 0) {
+          setProjectResults(response.data.results)
         }
       } catch (error: unknown) {
         console.error('Error:', error)

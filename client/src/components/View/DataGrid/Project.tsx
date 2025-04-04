@@ -5,7 +5,6 @@ import GridTable from './GridTable'
 import { useParams } from 'react-router-dom'
 import Contenteditable from '../../../pages/ProjectView/Contenteditable'
 import { debounce } from 'lodash'
-import api, { API_URL } from '../../../service/api'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,6 +33,7 @@ import { Input } from '@/components/ui/input'
 import { usePapaParse } from 'react-papaparse'
 import { flattenObject } from '../TableView/hooks/data-handler'
 import { useSocket } from '@/context/Socket/UseSocket'
+import api from '@/service/api'
 
 type ProjectDetails = {
   name: string
@@ -177,10 +177,8 @@ const Project: React.FC = () => {
       .then((response) => {
         if (response.status === 201) {
           toast.success('Project features updated successfully')
-          console.log('Features updated successfully')
         } else {
           toast.error('Error updating features')
-          console.error('Error updating features')
         }
       })
   }
@@ -295,7 +293,7 @@ const Project: React.FC = () => {
     )
 
     try {
-      const response = await api.post(`${API_URL}/add_paper`, data)
+      const response = await api.post(`/add_paper`, data)
       if (response.status === 200) {
         toast.success('File uploaded successfully')
       } else {

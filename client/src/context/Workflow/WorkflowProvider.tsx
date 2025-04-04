@@ -85,7 +85,6 @@ function getParentChain(identifier: string): string[] {
     chain.push(parent)
     current = parent
   }
-  console.log(chain)
   return chain
 }
 

@@ -33,7 +33,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useState } from 'react'
-import api, { API_URL, WEB_URL } from '@/service/api'
+import api, { WEB_URL } from '@/service/api'
 import { toast } from 'sonner'
 
 export type Projects = {
@@ -106,7 +106,7 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
           e.stopPropagation()
           if (!confirm(`Are you sure you want to delete "${project.name}"?`)) return
           try {
-            await api.delete(`${API_URL}/v1/projects/${project.id}`)
+            await api.delete(`/v1/projects/${project.id}`)
             toast.success('Project deleted successfully')
             // Optionally, refresh your projects list or remove it from state.
             refetchProjects()

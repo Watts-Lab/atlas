@@ -1,6 +1,6 @@
 import { Papers } from '@/components/View/DataGrid/PapersTable'
 import { Projects } from '@/components/View/DataGrid/ProjectsTable'
-import api, { API_URL } from '@/service/api'
+import api from '@/service/api'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -21,7 +21,7 @@ export default function useOverviewData(pageSize: number = 50) {
     const fetchProjects = async () => {
       setIsLoadingProjects(true)
       try {
-        const response = await api.get(`${API_URL}/v1/projects`)
+        const response = await api.get(`/v1/projects`)
         if (response.status !== 200) {
           throw new Error('Network response was not ok')
         }
@@ -51,7 +51,7 @@ export default function useOverviewData(pageSize: number = 50) {
   const refetchProjects = useCallback(async () => {
     setIsLoadingProjects(true)
     try {
-      const response = await api.get(`${API_URL}/user/projects`)
+      const response = await api.get(`/user/projects`)
       if (response.status !== 200) {
         throw new Error('Network response was not ok')
       }
@@ -79,7 +79,7 @@ export default function useOverviewData(pageSize: number = 50) {
     const fetchPapers = async (page: number = 1) => {
       setIsLoadingPapers(true)
       try {
-        const response = await api.get(`${API_URL}/user/papers?page=${page}&page_size=${pageSize}`)
+        const response = await api.get(`/user/papers?page=${page}&page_size=${pageSize}`)
         if (response.status !== 200) {
           throw new Error('Network response was not ok')
         }

@@ -1,9 +1,9 @@
 import { useState, DragEvent, useEffect, useCallback } from 'react'
 import { useSocket } from '../../../context/Socket/UseSocket'
-import { API_URL } from '../../../service/api'
 import ArrageTable from './ArrangeTable'
 import { flattenData, Result } from './hooks/data-handler'
 import { check_data, get_failed_data } from './hooks/mock-data'
+import api from '@/service/api'
 
 type RunStatus = {
   status: string
@@ -75,22 +75,11 @@ const Table = () => {
   }, [socket])
 
   const getResults = async (task_id: string) => {
-    const response = await fetch(
-      `${API_URL}/run_assistant?task_id=${task_id}
-      `,
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      },
-    )
-    if (response.ok) {
-      const new_data = await response.json()
+    const response = await api.get(`/run_assistant?task_id=${task_id}`)
+    if (response.status === 200) {
       try {
-        flattenData([new_data], true, true, true)
-        setData((prev) => prev.map((obj) => (obj.task_id === task_id ? new_data : obj)))
+        flattenData([response.data], true, true, true)
+        setData((prev) => prev.map((obj) => (obj.task_id === task_id ? response.data : obj)))
       } catch (error) {
         setData((prev) =>
           prev.map((obj) =>
@@ -125,13 +114,9 @@ const Table = () => {
     data.append('model', 'gpt')
 
     try {
-      const response = await fetch(`${API_URL}/run_assistant`, {
-        method: 'POST',
-        body: data,
-        headers: {},
-      })
-      if (response.ok) {
-        const new_data: { [key: string]: string } = await response.json()
+      const response = await api.post(`/run_assistant`, data)
+      if (response.status === 200) {
+        const new_data: { [key: string]: string } = response.data
         Object.entries(new_data).forEach(([key, value]) => {
           setIsProcessing((prev) => [
             ...prev,
