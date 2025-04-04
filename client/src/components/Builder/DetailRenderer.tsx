@@ -3,11 +3,11 @@ import PaperInputDescription from './Nodes/PaperInput/PaperInputDescription'
 import MultipleOutputDescription from './Nodes/MultipleOutput/MultipleOutputDescription'
 import SingleOutputDescription from './Nodes/SingleOutput/SingleOutputDescription'
 import { selectedNode } from './Flow.types'
-import { Node } from 'reactflow'
+import { Node } from '@xyflow/react'
 
 type DetailRendererProps = {
   nodeType: string
-  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  setNodes: React.Dispatch<React.SetStateAction<Node<Record<string, unknown>>[]>>
   selectedNode: selectedNode
 }
 

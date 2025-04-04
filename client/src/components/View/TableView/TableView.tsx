@@ -64,7 +64,7 @@ const TableView = ({ project_id, project_results, token }: TableViewProps) => {
     setIsDragging(false)
   }
 
-  const socket = useSocket()
+  const { socket } = useSocket()
 
   const onMessage = useCallback(
     (data: { status: string; progress: number; task_id: string; done: boolean }) => {

@@ -42,7 +42,7 @@ const Table = () => {
     setIsDragging(false)
   }
 
-  const socket = useSocket()
+  const { socket } = useSocket()
 
   const onMessage = useCallback(
     (data: { status: string; progress: number; task_id: string; done: boolean }) => {
@@ -65,16 +65,14 @@ const Table = () => {
   )
 
   useEffect(() => {
-    if (!socket) {
-      return
-    }
+    if (!socket) return
 
-    socket.on('status', onMessage)
+    socket.on('message', onMessage)
 
     return () => {
-      socket.off('status', onMessage)
+      socket.off('message', onMessage)
     }
-  }, [socket, onMessage])
+  }, [socket])
 
   const getResults = async (task_id: string) => {
     const response = await fetch(

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Node, useNodes } from 'reactflow'
+import { Node, useNodes } from '@xyflow/react'
 import { selectedNode } from '../../Flow.types'
 
 type MeasurementOption = 'Choose an option' | 'GPT-4' | 'GPT-3.5' | 'Human'
 
 type MultipleOutputDescriptionProps = {
-  setNodes: React.Dispatch<React.SetStateAction<Node<string | undefined>[]>>
+  setNodes: React.Dispatch<React.SetStateAction<Node<Record<string, unknown>>[]>>
   selectedNode: selectedNode
 }
 
@@ -15,7 +15,8 @@ const MultipleOutputDescription = ({ setNodes, selectedNode }: MultipleOutputDes
   const [measurement, setMeasurement] = useState<MeasurementOption>('Choose an option')
   const [prompt, setPrompt] = useState('')
 
-  const thisNode: Node = nodes.find((node) => node.id === selectedNode.id)!
+  const thisNode: Node<{ name?: string; measurement?: MeasurementOption; prompt?: string }> =
+    nodes.find((node) => node.id === selectedNode.id)!
 
   useEffect(() => {
     if (thisNode) {

@@ -460,3 +460,29 @@ export function flattenObject(
 
   return [obj]
 }
+
+export function nestFlatKeys(flatObj: Record<string, unknown>) {
+  const nested: Record<string, unknown> = {}
+
+  for (const [key, val] of Object.entries(flatObj)) {
+    const segments = key.split(' ')
+    let curr = nested
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i].endsWith('_truth')
+        ? segments[i].slice(0, -6) // remove "_truth"
+        : segments[i]
+
+      if (i === segments.length - 1) {
+        curr[segment] = val
+      } else {
+        if (curr[segment] == null) {
+          curr[segment] = {}
+        }
+        curr = curr[segment] as Record<string, unknown>
+      }
+    }
+  }
+
+  return nested
+}

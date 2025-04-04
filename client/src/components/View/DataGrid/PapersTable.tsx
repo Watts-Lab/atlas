@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Copy, Link, MoreHorizontal, Trash2 } from 'lucide-react'
+import { Copy, Link, Loader2, MoreHorizontal, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -32,7 +32,6 @@ import {
 } from '@/components/ui/table'
 import { useState } from 'react'
 import { WEB_URL } from '@/service/api'
-import { useNavigate } from 'react-router-dom'
 
 export type Papers = {
   id: string
@@ -141,15 +140,14 @@ export const columns: ColumnDef<Papers>[] = [
 
 export type PapersTableProps = {
   papers: Papers[]
+  isLoading: boolean
 }
 
-export default function PapersTable({ papers }: PapersTableProps) {
+export default function PapersTable({ papers, isLoading }: PapersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-
-  const navigate = useNavigate()
 
   const table = useReactTable<Papers>({
     data: papers,
@@ -193,13 +191,22 @@ export default function PapersTable({ papers }: PapersTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className='text-center py-10'>
+                  <div className='flex flex-col items-center justify-center'>
+                    <Loader2 className='h-6 w-6 animate-spin text-gray-500' />
+                    <p className='mt-2 text-gray-500'>Loading Projects...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   className='cursor-pointer'
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  onClick={() => navigate(`/grid/${row.original.id}`)}
+                  onClick={() => {}}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

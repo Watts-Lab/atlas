@@ -42,8 +42,7 @@ class Paper(Document):
         name = "papers"
 
     class Config:
-        orm_mode = True
-        underscore_attrs_are_private = True
+        from_attributes = True
 
 
 class PaperView(BaseModel):

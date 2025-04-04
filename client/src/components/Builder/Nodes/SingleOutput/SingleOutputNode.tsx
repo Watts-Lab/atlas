@@ -1,4 +1,7 @@
-import { Handle, Position } from 'reactflow'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
+import { Handle, Position } from '@xyflow/react'
 
 type SingleOutputNodeProps = {
   isConnectable: boolean | undefined
@@ -13,33 +16,53 @@ type SingleOutputNodeProps = {
 }
 
 function SingleOutputNode({ isConnectable, selected, data }: SingleOutputNodeProps) {
-  const { name, measurement, prompt, maxLength = 60 } = data
-
-  const trimmedText = prompt.length > maxLength ? prompt.slice(0, maxLength) + '...' : prompt
+  const { name, measurement, prompt } = data
 
   return (
-    <div className={`paper-input-node`}>
+    <div className='relative'>
       <Handle type='target' position={Position.Top} isConnectable={isConnectable} />
-
-      <div
-        className={`border-2 w-52 h-24 p-2 bg-slate-300 rounded ${
-          selected ? 'border-slate-600' : 'border-slate-300'
-        }`}
+      <Card
+        className={`
+          w-52 h-24 
+          overflow-hidden 
+          rounded-md 
+          shadow-sm 
+          bg-card
+          ${selected ? 'border-2 border-border' : 'border border-border'}
+          bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-800
+        `}
       >
-        <div className='flex justify-between items-start'>
-          <p className=' text-sm font-bold'>{name}</p>
-          <span className='badge badge-md badge-neutral text-xs'>
-            {measurement === 'Choose an option' ? '' : measurement}
-          </span>
-        </div>
-        <p className='mt-2 text-xs text-justify'>{trimmedText}</p>
-      </div>
+        <CardHeader className='p-2 pb-1'>
+          <div className='flex justify-between items-center'>
+            <CardTitle className='text-sm font-bold truncate'>{name}</CardTitle>
+            {measurement !== 'Choose an option' && (
+              <Badge variant='secondary' className='truncate'>
+                {measurement}
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
 
+        <CardContent className='px-2 py-0'>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className='text-xs text-justify whitespace-normal line-clamp-3 overflow-hidden text-ellipsis cursor-help'>
+                  {prompt}
+                </p>
+              </TooltipTrigger>
+              <TooltipContent className='max-w-sm'>
+                <p className='text-xs'>{prompt}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </CardContent>
+      </Card>
       <Handle type='source' position={Position.Bottom} isConnectable={isConnectable} />
     </div>
   )
 }
+
 export const displayGroup = 'LLMs'
 export const displayName = 'Single output feature'
-
 export default SingleOutputNode

@@ -2,11 +2,11 @@
 Run the feature collection task for a paper.
 """
 
-import os
-from celery import Task
-import socketio
 import logging
+import os
 
+import socketio
+from celery import Task
 from controllers.assisstant import run_assistant_api
 from database.models.projects import Project
 from database.models.results import Result
@@ -46,17 +46,9 @@ def add_paper(
         namespace="/home",
     )
 
-    print(f"User email: {user_email}")
-    print(f"Project id: {project_id}")
-
     current_project = Project.get(project_id, fetch_links=True).run()
 
-    user_features = []
-
-    for feature in current_project.features:
-        user_features.append(feature.feature_identifier)
-
-    print(f"User features: {user_features}")
+    user_features = [feature.feature_identifier for feature in current_project.features]
 
     logger.info("Running assistant for user %s", user_email)
 

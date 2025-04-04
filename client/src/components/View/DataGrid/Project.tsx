@@ -5,8 +5,35 @@ import GridTable from './GridTable'
 import { useParams } from 'react-router-dom'
 import Contenteditable from '../../../pages/ProjectView/Contenteditable'
 import { debounce } from 'lodash'
-import api from '../../../service/api'
+import api, { API_URL } from '../../../service/api'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { FolderDown, Loader2 } from 'lucide-react'
+import { MultiSelect } from '@/components/ui/multi-select'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { useForm } from 'react-hook-form'
+import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
+import { usePapaParse } from 'react-papaparse'
+import { flattenObject } from '../TableView/hooks/data-handler'
+import { useSocket } from '@/context/Socket/UseSocket'
 
 type ProjectDetails = {
   name: string
@@ -21,10 +48,15 @@ type Params = {
 
 const Project: React.FC = () => {
   const params: Params = useParams()
+  const { socket } = useSocket()
 
   const [loading, setLoading] = useState<boolean>(false)
 
-  const [projectResults, setProjectResults] = useState<Record<string, unknown>[]>([])
+  const [projectResults, setProjectResults] = useState<Record<string, unknown>[]>([
+    {
+      paper: '...',
+    },
+  ])
   const [project, setProject] = useState<ProjectDetails>({
     name: '',
     id: '',
@@ -43,20 +75,11 @@ const Project: React.FC = () => {
       }
       const controller = new AbortController()
       abortControllerRef.current = controller
-      const token = localStorage.getItem('token') || ''
-      if (!token) {
-        return
-      }
       try {
         const response = await api.put(
-          `/projects`,
+          `/v1/projects/${params.project_id}`,
           { project_name: updatedName },
           {
-            params: { project_id: params.project_id },
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
             signal: controller.signal,
           },
         )
@@ -77,20 +100,9 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchResults = async () => {
       setLoading(true)
-      const token = localStorage.getItem('token') || ''
-      if (!token) {
-        return
-      }
       try {
-        const response = await api.get('/projects/results', {
-          params: { project_id: params.project_id },
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await api.get(`/v1/projects/${params.project_id}/results`)
         const response_data = response.data
-        console.log('projectResults:', response_data.results)
         setProjectResults(response_data.results)
       } catch (error) {
         console.error('Error:', error)
@@ -105,26 +117,13 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      const token = localStorage.getItem('token') || ''
-      if (!token) {
-        return
-      }
       try {
-        const response = await api.get('/projects', {
-          params: { project_id: params.project_id },
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        const response_data = response.data
-
+        const response = await api.get(`/v1/projects/${params.project_id}`)
         setProject({
-          name: response_data.project.title,
-          id: response_data.project.id,
-          created_at: response_data.project.created_at,
-          updated_at: response_data.project.updated_at,
+          name: response.data.project.title,
+          id: response.data.project.id,
+          created_at: response.data.project.created_at,
+          updated_at: response.data.project.updated_at,
         })
       } catch (error) {
         console.error('Error:', error)
@@ -140,10 +139,7 @@ const Project: React.FC = () => {
     const loadFeatures = async () => {
       try {
         const allFeatures = await fetchFeatures()
-
-        const response = await api.get(`/projects/features`, {
-          params: { project_id: params.project_id },
-        })
+        const response = await api.get(`/projects/${params.project_id}/features`)
         const projectFeatures: Feature[] = response.data.features
 
         const featuresWithSelection = allFeatures.map((feature) => {
@@ -173,17 +169,154 @@ const Project: React.FC = () => {
     const projectId = params.project_id
     const selectedFeatures = availableFeatures.filter((feature) => feature.selected)
 
-    const response = await api.post('/projects/features', {
-      project_id: projectId,
-      feature_ids: selectedFeatures.map((feature) => feature.id),
-    })
+    await api
+      .post(`/projects/${params.project_id}/features`, {
+        project_id: projectId,
+        feature_ids: selectedFeatures.map((feature) => feature.id),
+      })
+      .then((response) => {
+        if (response.status === 201) {
+          toast.success('Project features updated successfully')
+          console.log('Features updated successfully')
+        } else {
+          toast.error('Error updating features')
+          console.error('Error updating features')
+        }
+      })
+  }
 
-    if (response.status === 200) {
-      toast.success('Project features updated successfully')
-      console.log('Features updated successfully')
-    } else {
-      toast.error('Error updating features')
-      console.error('Error updating features')
+  const form = useForm()
+  const [selectableHeaders, setSelectableHeaders] = useState<string[]>([])
+
+  useEffect(() => {
+    const allKeys = new Set<string>()
+    flattenObject(projectResults).forEach((obj) => {
+      Object.keys(obj).forEach((key) => allKeys.add(key))
+    })
+    setSelectableHeaders(Array.from(allKeys))
+  }, [projectResults])
+
+  const { jsonToCSV } = usePapaParse()
+
+  const handleJsonToCSV = () => {
+    const selectedColumns = form.watch('frameworks') || []
+    const data = flattenObject(projectResults)
+    if (!data.length) return
+
+    const finalCols = selectableHeaders.reduce((acc, col) => {
+      acc.push(col)
+      if (selectedColumns.includes(col)) acc.push(`${col}_truth`)
+      return acc
+    }, [] as string[])
+
+    const finalData = data.map((row) =>
+      finalCols.reduce(
+        (acc, col) => {
+          acc[col] = row[col] ?? (col.endsWith('_truth') ? 'FILL_IN' : 'NaN')
+          return acc
+        },
+        {} as Record<string, unknown>,
+      ),
+    )
+
+    const csvString = jsonToCSV(finalData)
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'truth_template.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // State and handlers for reading user’s CSV
+  const [truthFile, setTruthFile] = useState<File | null>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) {
+      setTruthFile(null)
+      return
+    }
+    setTruthFile(e.target.files[0])
+  }
+
+  const [open, setOpen] = useState(false)
+  const [loadingAccuracy, setLoadingAccuracy] = useState<boolean>(false)
+  const [accuracyScores, setAccuracyScores] = useState<Record<string, number> | null>(null)
+
+  const handleLoadCSV = async () => {
+    if (!truthFile) return
+    setLoadingAccuracy(true)
+    const formData = new FormData()
+    formData.append('file', truthFile)
+    try {
+      const response = await api.post(`/v1/projects/${params.project_id}/score_csv`)
+      if (response.status === 200) {
+        const scores = response.data.aggregate_scores
+        const formattedScores: Record<string, number> = {}
+        Object.entries(scores).forEach(([key, value]) => {
+          formattedScores[key.split('.').join(' ')] = value as number
+        })
+        setAccuracyScores(formattedScores)
+        toast.success('CSV loaded successfully')
+        setOpen(false)
+      } else {
+        toast.error('Error loading CSV')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('Error scoring the CSV.')
+    } finally {
+      setLoadingAccuracy(false)
+    }
+  }
+
+  const handleBackend = async (files: FileList) => {
+    if (params.project_id === undefined) return
+
+    const data = new FormData()
+    for (const file of files) {
+      data.append('files[]', file, file.name)
+    }
+    data.append('sid', socket?.id || '')
+    data.append('model', 'gpt')
+    data.append('project_id', params.project_id)
+    data.append(
+      'features',
+      JSON.stringify([
+        'experiments.name',
+        'experiments.description',
+        'experiments.participant_source',
+        'experiments.participant_source_category',
+        'experiments.units_randomized',
+        'experiments.units_analyzed',
+      ]),
+    )
+
+    try {
+      const response = await api.post(`${API_URL}/add_paper`, data)
+      if (response.status === 200) {
+        toast.success('File uploaded successfully')
+      } else {
+        toast.error('Error uploading file')
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+    }
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+  const handleUploadFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (files) {
+      handleBackend(files)
     }
   }
 
@@ -205,13 +338,96 @@ const Project: React.FC = () => {
         <div className='navbar-center text-center'>
           <div className='flex flex-row justify-center '>{project.id}</div>
         </div>
-        <div className='md:navbar-end z-10 max-sm:pt-4'></div>
+        <div className='md:navbar-end z-10 max-md:pt-4'>
+          <Button onClick={handleButtonClick} className='mr-2'>
+            Upload file
+          </Button>
+          <input
+            type='file'
+            ref={fileInputRef}
+            onChange={handleUploadFileChange}
+            style={{ display: 'none' }}
+            accept='application/pdf'
+            multiple
+          />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <FolderDown />
+                &nbsp;Load truth
+              </Button>
+            </DialogTrigger>
+            <DialogContent className='sm:max-w-[600px]'>
+              <DialogHeader>
+                <DialogTitle>Create truth input</DialogTitle>
+                <DialogDescription>
+                  Select the columns you want to input a ground truth for and then export the CSV
+                  file. After editing, upload your modified ground truth to obtain an accuracy score
+                  on your features.
+                </DialogDescription>
+              </DialogHeader>
+
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(() => {})} className='space-y-8'>
+                  <FormField
+                    control={form.control}
+                    name='frameworks'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Columns</FormLabel>
+                        <FormControl>
+                          <MultiSelect
+                            options={selectableHeaders.map((feature) => ({
+                              label: feature.replace(/\s/g, ' → ').toLowerCase(),
+                              value: feature,
+                            }))}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            placeholder='Select columns'
+                            variant='inverted'
+                            maxCount={3}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Choose the columns/features you are interested in.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button type='submit' onClick={handleJsonToCSV}>
+                      Export CSV Base Template
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+
+              <Separator />
+
+              <div className='space-y-2'>
+                <div className='font-semibold'>Import Ground Truth</div>
+                <p className='text-sm text-muted-foreground'>
+                  Upload your modified ground truth CSV to score your features.
+                </p>
+                <Input type='file' accept='.csv' onChange={handleFileChange} />
+                <DialogFooter>
+                  <Button type='submit' onClick={handleLoadCSV} disabled={loadingAccuracy}>
+                    {loadingAccuracy && <Loader2 className='animate-spin' />}
+                    Load CSV Ground Truth
+                  </Button>
+                </DialogFooter>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       <hr></hr>
 
       <GridTable
         data={projectResults}
         availableFeatures={availableFeatures}
+        accuracyScores={accuracyScores}
         setAvailableFeatures={setAvailableFeatures}
         addNewFeature={addNewFeatureHandler}
         updateProjectFeatures={updateProjectFeatures}

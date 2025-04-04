@@ -18,6 +18,7 @@ const data = {
       url: '/dashboard',
       icon: House,
       isActive: true,
+      isDefaultOpen: true,
       items: [],
     },
     {
@@ -25,41 +26,48 @@ const data = {
       url: '#',
       icon: SquareTerminal,
       isActive: true,
+      isDefaultOpen: true,
       items: [
         {
           title: 'All Projects',
-          url: '#',
+          url: '/projects',
         },
         {
           title: 'Create Project',
-          url: '#',
+          url: '/projects/create',
         },
         {
           title: 'Project Settings',
-          url: '#',
+          url: '/projects/settings',
         },
       ],
     },
     {
       title: 'Documentation',
-      url: '#',
+      url: '/docs',
       icon: BookOpen,
+      isActive: true,
+      isDefaultOpen: false,
       items: [
         {
           title: 'Introduction',
-          url: '#',
+          url: '/docs/introduction',
         },
         {
           title: 'Get Started',
-          url: '#',
+          url: '/docs/get-started',
         },
         {
           title: 'Tutorials',
-          url: '#',
+          url: '/docs/tutorials',
         },
         {
           title: 'Changelog',
-          url: '#',
+          url: '/docs/changelog',
+        },
+        {
+          title: 'API Reference',
+          url: '/docs/api-reference',
         },
       ],
     },
@@ -107,7 +115,7 @@ export function AppSidebar({
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain label='Atlas v0.1.4 [Alpha Release]' items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

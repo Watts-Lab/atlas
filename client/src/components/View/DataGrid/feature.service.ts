@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import api from '../../../service/api'
 import { Feature, NewFeature } from './feature.types'
 
@@ -15,8 +16,8 @@ export const fetchFeatures = async (): Promise<Feature[]> => {
         trail = trail.replace('.parent', '')
       }
       // reverse trail : trail.split('.').reverse().join(' ← ')
-      // trail = trail.replace(/\./g, ' → ')
-      trail = trail.split('.').reverse().join(' ← ')
+      trail = trail.replace(/\./g, ' → ')
+      // trail = trail.split('.').reverse().join(' ← ')
       return {
         id: feature.id,
         feature_name: feature.feature_name,
@@ -27,6 +28,23 @@ export const fetchFeatures = async (): Promise<Feature[]> => {
       }
     },
   )
+}
+
+export function useFeatures() {
+  const [features, setFeatures] = useState<Feature[]>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const loadFeatures = async () => {
+      setLoading(true)
+      const loadedFeatures = await fetchFeatures()
+      setFeatures(loadedFeatures)
+      setLoading(false)
+    }
+    loadFeatures()
+  }, [])
+
+  return { features, loading }
 }
 
 export const addFeature = async (feature: NewFeature): Promise<Feature> => {

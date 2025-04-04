@@ -170,7 +170,7 @@ def send_magic_link(email: str, token: str):
                 <div class=link>{{token}}</div>
                 <p>If you did not request this email, you can safely ignore it.</div>
 <hr>
-<div class=footer>© 2024 Atlas. All rights reserved.</div>
+<div class=footer>© 2025 Atlas. All rights reserved.</div>
 </div>
 """
 
