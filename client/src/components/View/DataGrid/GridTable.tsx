@@ -59,6 +59,16 @@ const GridTable = ({
     })
     const allKeysArray = Array.from(allKeys)
 
+    const descriptionDict = availableFeatures
+      .filter((f) => f.selected)
+      .reduce(
+        (acc: Record<string, string>, f) => {
+          acc[f.feature_identifier_spaced] = f.feature_description
+          return acc
+        },
+        {} as Record<string, string>,
+      )
+
     const newColDefs: ColDef[] = allKeysArray.map((key) => {
       if (key !== 'task_id' && key !== 'status') {
         // colorize the column based on score
@@ -67,6 +77,7 @@ const GridTable = ({
           return {
             field: key,
             hide: false,
+            headerTooltip: descriptionDict[key] ?? key,
           }
         }
 
@@ -77,7 +88,7 @@ const GridTable = ({
           cellClass: getHeaderColorClass(score),
           headerClass: getHeaderColorClass(score),
           hide: false,
-        }
+        } as ColDef
       } else {
         return { field: key, hide: true }
       }
@@ -98,7 +109,7 @@ const GridTable = ({
     })
 
     setColDefs(newColDefs)
-  }, [data, accuracyScores])
+  }, [data, accuracyScores, availableFeatures])
 
   const [colDefs, setColDefs] = useState<ColDef[]>()
 
@@ -121,6 +132,7 @@ const GridTable = ({
             suppressDragLeaveHidesColumns={true}
             suppressMakeColumnVisibleAfterUnGroup={true}
             suppressRowGroupHidesColumns={true}
+            tooltipShowDelay={100}
           />
         </div>
       </main>

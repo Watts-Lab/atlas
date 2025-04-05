@@ -3,6 +3,7 @@ export type Feature = {
   feature_name: string
   feature_description: string
   feature_identifier: string
+  feature_identifier_spaced: string
   trail: string
   selected?: boolean
 }

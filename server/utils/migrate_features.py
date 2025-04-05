@@ -2,21 +2,18 @@
 This file is responsible for initializing the database connection and the beanie model.
 """
 
-import importlib
+import json
 import os
-from typing import List
-from bunnet import init_bunnet
-from dotenv import load_dotenv
-from pymongo import MongoClient
+import pathlib
 
+from bunnet import init_bunnet
 from database.models.features import Features
 from database.models.papers import Paper
 from database.models.projects import Project
-from database.models.users import User
 from database.models.results import Result
-from features.gpt_feature import GPTFeature
-import json
-import pathlib
+from database.models.users import User
+from dotenv import load_dotenv
+from pymongo import MongoClient
 
 
 def init_db():
@@ -37,68 +34,9 @@ def init_db():
     )
 
 
-def get_all_features() -> List[str]:
-    """
-    Gets all the available features.
-
-    Returns:
-    - List of all available features.
-    """
-
-    experiments_features = [
-        "experiments.name",
-        "experiments.description",
-        "experiments.participant_source",
-        "experiments.participant_source_category",
-        "experiments.units_randomized",
-        "experiments.units_analyzed",
-        "experiments.sample_size_randomized",
-        "experiments.sample_size_analyzed",
-        "experiments.sample_size_notes",
-        "experiments.adults",
-        "experiments.age_mean",
-        "experiments.age_sd",
-        "experiments.female_perc",
-        "experiments.male_perc",
-        "experiments.gender_other",
-        "experiments.language",
-        "experiments.language_secondary",
-        "experiments.compensation",
-        "experiments.demographics_conditions",
-        "experiments.population_other",
-        "experiments.conditions.name",
-        "experiments.conditions.description",
-        "experiments.conditions.type",
-        "experiments.conditions.message",
-        "experiments.conditions.behaviors.name",
-        "experiments.conditions.behaviors.description",
-        "experiments.conditions.behaviors.priority",
-        "experiments.conditions.behaviors.focal",
-    ]
-
-    sorted_features = sorted(experiments_features, key=lambda s: s.count("."))
-
-    return sorted_features
-
-
-def build_parent_objects(_features: List[str]) -> dict:
-    """
-    Builds the parent objects for the given _features.
-    """
-    nested_dict = {}
-    for _feature in _features:
-        feature_module: GPTFeature = importlib.import_module(
-            f"features.{_feature}"
-        ).Feature()
-        nested_dict[_feature]["class"] = feature_module.get_json_object()
-        nested_dict[_feature]["identifier"] = f"paper.{_feature}"
-    return nested_dict
-
-
 if __name__ == "__main__":
     init_db()
 
-    features = get_all_features()
     # parent_objects = build_parent_objects(features)
 
     # Load the JSON file

@@ -3,29 +3,27 @@
 import argparse
 import json
 import os
+
+import socketio
 from bunnet import PydanticObjectId
+from bunnet.operators import In, Or
 from celery.result import EagerResult
-from dotenv import load_dotenv
-import jwt
-from sanic import Sanic, json as json_response
-from sanic.request import Request
-from sanic.worker.manager import WorkerManager
-from sanic_cors import CORS
 from config.app_config import AppConfig
 from controllers.login import login_user, validate_token, validate_user
-from routes.auth import require_jwt
-from routes.v1 import v1_blueprint
 from database.database import init_db
 from database.models.features import Features
 from database.models.papers import Paper, PaperView
 from database.models.projects import Project
-from database.models.users import User
-import socketio
-
-from bunnet.operators import Or, In
-
+from dotenv import load_dotenv
+from routes.auth import require_jwt
+from routes.error_handler import error_handler
+from routes.v1 import v1_blueprint
+from sanic import Sanic
+from sanic import json as json_response
+from sanic.request import Request
+from sanic.worker.manager import WorkerManager
+from sanic_cors import CORS
 from workers.celery_config import add_paper, another_task
-
 
 load_dotenv()
 
@@ -69,265 +67,202 @@ app.blueprint(v1_blueprint, url_prefix="/api")
     name="project_features",
 )
 @require_jwt
+@error_handler
 async def project_features(request: Request, project_id: str):
     """
     A protected for adding or removing features to a project.
     """
-    try:
-        # Validate user from JWT
-        user = request.ctx.user
-        if not user:
-            return json_response({"error": "User not found."}, status=404)
+    # Get the project features
+    if request.method == "GET":
+        user_project: Project = Project.get(project_id, fetch_links=True).run()
 
-        # Get the project features
-        if request.method == "GET":
-            user_project: Project = Project.get(project_id, fetch_links=True).run()
+        # Check if the project exists
+        if not user_project:
+            return json_response({"error": "Project not found."}, status=404)
 
-            # Check if the project exists
-            if not user_project:
-                return json_response({"error": "Project not found."}, status=404)
+        # Already added features
+        project_feature_list = [
+            {
+                "id": str(f.id),
+                "feature_name": f.feature_name,
+                "feature_description": f.feature_description,
+                "feature_identifier": f.feature_identifier,
+            }
+            for f in user_project.features
+        ]
 
-            # Already added features
-            project_features = [
-                {
-                    "id": str(f.id),
-                    "feature_name": f.feature_name,
-                    "feature_description": f.feature_description,
-                    "feature_identifier": f.feature_identifier,
-                }
-                for f in user_project.features
-            ]
-
-            return json_response(
-                {"message": "Feature added.", "features": project_features}, status=200
-            )
-
-        # Add a new feature to the project
-        if request.method == "POST":
-            project_id = request.json.get("project_id")
-            feature_ids = request.json.get("feature_ids", [])
-
-            user_project: Project = Project.get(project_id, fetch_links=True).run()
-
-            # Check if the project exists
-            if not user_project:
-                return json_response({"error": "Project not found."}, status=404)
-
-            feature_docs = Features.find(
-                In(Features.id, [PydanticObjectId(p) for p in feature_ids])
-            ).run()
-
-            if len(feature_docs) != len(feature_ids):
-                return json_response({"error": "Some features not found."}, status=404)
-
-            user_project.features = feature_docs
-
-            user_project.save()
-
-            return json_response({"message": "Feature updated."}, status=201)
-
-        # Remove a feature from the project
-        if request.method == "DELETE":
-
-            feature_ids_to_remove = request.json.get("feature_ids", [])
-
-            # Retrieve the project (no need to fetch_links if you only want to manipulate IDs)
-            user_project = Project.get(project_id, fetch_links=False).run()
-
-            if not user_project:
-                return json_response({"error": "Project not found."}, status=404)
-
-            # Filter out any features from user_project.features whose IDs match feature_ids_to_remove
-            user_project.features = [
-                f
-                for f in user_project.features
-                if str(f.id) not in feature_ids_to_remove
-            ]
-
-            # Save once
-            user_project.save()
-
-            return json_response({"message": "Feature removed."}, status=200)
-
-    except jwt.ExpiredSignatureError:
-        return json_response({"error": "Token has expired."}, status=401)
-    except jwt.InvalidTokenError:
-        return json_response({"error": "Invalid token."}, status=401)
-    except Exception as e:
-        return json_response({"error": str(e)}, status=500)
-
-
-@app.route("/api/user/projects", methods=["GET"])
-async def user_projects(request: Request):
-    """
-    A protected route.
-    """
-    try:
-        user_jwt = jwt.decode(
-            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
+        return json_response(
+            {"message": "Feature added.", "features": project_feature_list},
+            status=200,
         )
-        user = User.find_one(User.email == user_jwt.get("email")).run()
-        if not user:
-            return json_response({"error": "User not found."}, status=404)
 
-        if request.method == "GET":
-            projects = Project.find(
-                Project.user.id == user.id, fetch_links=True
-            ).to_list()
+    # Modify features of a project
+    if request.method == "POST":
+        project_id = request.json.get("project_id")
+        feature_ids = request.json.get("feature_ids", [])
 
-            pr_response = [
-                p.model_dump(
-                    mode="json",
-                    include=["id", "title", "description", "updated_at", "papers"],
-                )
-                for p in projects
-            ]
+        user_project: Project = Project.get(project_id, fetch_links=True).run()
 
-            for proj in pr_response:
-                proj["papers"] = [str(pap["id"]) for pap in proj["papers"]]
+        # Check if the project exists
+        if not user_project:
+            return json_response({"error": "Project not found."}, status=404)
 
-            if projects:
-                return json_response({"project": pr_response})
-            else:
-                return json_response({"error": "Project not found."}, status=404)
+        feature_docs = Features.find(
+            In(Features.id, [PydanticObjectId(p) for p in feature_ids])
+        ).run()
 
-    except jwt.ExpiredSignatureError:
-        return json_response({"error": "Token has expired."}, status=401)
-    except jwt.InvalidTokenError:
-        return json_response({"error": "Invalid token."}, status=401)
+        if len(feature_docs) != len(feature_ids):
+            return json_response({"error": "Some features not found."}, status=404)
+
+        user_project.features = feature_docs
+
+        user_project.save()
+
+        return json_response({"message": "Feature updated."}, status=201)
+
+    # Remove a feature from the project
+    if request.method == "DELETE":
+
+        feature_ids_to_remove = request.json.get("feature_ids", [])
+
+        # Retrieve the project (no need to fetch_links if you only want to manipulate IDs)
+        user_project = Project.get(project_id, fetch_links=False).run()
+
+        if not user_project:
+            return json_response({"error": "Project not found."}, status=404)
+
+        # Filter out any features from user_project.features whose IDs match feature_ids_to_remove
+        user_project.features = [
+            f for f in user_project.features if str(f.id) not in feature_ids_to_remove
+        ]
+
+        # Save once
+        user_project.save()
+
+        return json_response({"message": "Feature removed."}, status=200)
 
 
 @app.route("/api/user/papers", methods=["GET"])
 @require_jwt
+@error_handler
 async def user_papers(request: Request):
     """
     A protected route that fetches the user's papers, supporting pagination.
     Returns JSON with "papers", "total_papers", "page", and "page_size".
     """
-    try:
 
-        if request.method == "GET":
-            # Validate user token
-            user = request.ctx.user
-            if not user:
-                return json_response({"error": "User not found."}, status=404)
-
-            page = int(request.args.get("page", 1))
-            page_size = int(request.args.get("page_size", 10))
-            skip = (page - 1) * page_size
-            limit = page_size
-
-            total_papers = Paper.find({"user.$id": user.id}).count()
-            papers = (
-                Paper.find({"user.$id": user.id})
-                .project(PaperView)
-                .skip(skip)
-                .limit(limit)
-                .to_list()
-            )
-
-            pr_response = [p.model_dump(mode="json") for p in papers]
-
-            return json_response(
-                {
-                    "papers": pr_response,
-                    "total_papers": total_papers,
-                    "page": page,
-                    "page_size": page_size,
-                },
-                status=200,
-            )
-
-    except jwt.ExpiredSignatureError:
-        return json_response({"error": "Token has expired."}, status=401)
-    except jwt.InvalidTokenError:
-        return json_response({"error": "Invalid token."}, status=401)
-
-
-@app.route("/api/features", methods=["GET", "POST"], name="all_features")
-@require_jwt
-async def features(request: Request):
-    """
-    A protected route.
-    """
-    try:
-        # Validate user from JWT
+    if request.method == "GET":
+        # Validate user token
         user = request.ctx.user
         if not user:
             return json_response({"error": "User not found."}, status=404)
 
-        # Get all the features for the user and public features
-        if request.method == "GET":
-            # Get the user features
-            experiment_feature = Features.find(
-                Or(Features.user.id == None, Features.user.id == user.id)
-            ).to_list()
+        page = int(request.args.get("page", 1))
+        page_size = int(request.args.get("page_size", 10))
+        skip = (page - 1) * page_size
+        limit = page_size
 
-            res = []
-            for feature in experiment_feature:
-                o = feature.model_dump()
-                res.append(
-                    {
-                        "id": str(o["id"]),
-                        "feature_name": o["feature_name"],
-                        "feature_description": o["feature_description"],
-                        "feature_identifier": o["feature_identifier"],
-                    }
-                )
+        total_papers = Paper.find({"user.$id": user.id}).count()
+        papers = (
+            Paper.find({"user.$id": user.id})
+            .project(PaperView)
+            .skip(skip)
+            .limit(limit)
+            .to_list()
+        )
 
-            return json_response(
-                body={
-                    "response": "success",
-                    "features": res,
-                },
-                status=200,
-                content_type="application/json",
+        pr_response = [p.model_dump(mode="json") for p in papers]
+
+        return json_response(
+            {
+                "papers": pr_response,
+                "total_papers": total_papers,
+                "page": page,
+                "page_size": page_size,
+            },
+            status=200,
+        )
+
+
+@app.route("/api/features", methods=["GET", "POST"], name="all_features")
+@require_jwt
+@error_handler
+async def features(request: Request):
+    """
+    A protected route.
+    """
+
+    # Validate user from JWT
+    user = request.ctx.user
+
+    # Get all the features for the user and public features
+    if request.method == "GET":
+        # Get the user features
+        experiment_feature = Features.find(
+            Or(
+                Features.user.id == None,  # pylint: disable=C0121
+                Features.user.id == user.id,
             )
+        ).to_list()
 
-        # Create a new feature
-        elif request.method == "POST":
-            data = request.json
-
-            feature_name = data.get("feature_name")
-            feature_description = data.get("feature_description", "")
-            feature_identifier = data.get("feature_identifier")
-            gpt_interface = data.get("gpt_interface")
-
-            if not feature_name or not feature_identifier:
-                return json_response({"error": "Missing required fields."}, status=400)
-
-            new_feature = Features(
-                feature_name=feature_name,
-                feature_parent="",
-                feature_identifier=feature_identifier,
-                feature_description=feature_description,
-                feature_gpt_interface=gpt_interface,
-                user=user.id,
-            )
-
-            new_feature.save()
-
-            o = new_feature.model_dump()
-
-            return json_response(
+        res = []
+        for feature in experiment_feature:
+            o = feature.model_dump()
+            res.append(
                 {
-                    "response": "success",
-                    "feature": {
-                        "id": str(o["id"]),
-                        "feature_name": o["feature_name"],
-                        "feature_description": o["feature_description"],
-                        "feature_identifier": o["feature_identifier"],
-                    },
-                },
-                status=201,
+                    "id": str(o["id"]),
+                    "feature_name": o["feature_name"],
+                    "feature_description": o["feature_description"],
+                    "feature_identifier": o["feature_identifier"],
+                }
             )
 
-    except jwt.ExpiredSignatureError:
-        return json_response({"error": "Token has expired."}, status=401)
-    except jwt.InvalidTokenError:
-        return json_response({"error": "Invalid token."}, status=401)
-    except Exception as e:
-        return json_response({"error": str(e)}, status=500)
+        return json_response(
+            body={
+                "response": "success",
+                "features": res,
+            },
+            status=200,
+            content_type="application/json",
+        )
+
+    # Create a new feature
+    if request.method == "POST":
+        data = request.json
+
+        feature_name = data.get("feature_name")
+        feature_description = data.get("feature_description", "")
+        feature_identifier = data.get("feature_identifier")
+        gpt_interface = data.get("gpt_interface")
+
+        if not feature_name or not feature_identifier:
+            return json_response({"error": "Missing required fields."}, status=400)
+
+        new_feature = Features(
+            feature_name=feature_name,
+            feature_parent="",
+            feature_identifier=feature_identifier,
+            feature_description=feature_description,
+            feature_gpt_interface=gpt_interface,
+            user=user.id,
+        )
+
+        new_feature.save()
+
+        o = new_feature.model_dump()
+
+        return json_response(
+            {
+                "response": "success",
+                "feature": {
+                    "id": str(o["id"]),
+                    "feature_name": o["feature_name"],
+                    "feature_description": o["feature_description"],
+                    "feature_identifier": o["feature_identifier"],
+                },
+            },
+            status=201,
+        )
 
 
 @app.route("/api/login", methods=["POST"])
@@ -366,13 +301,12 @@ async def check_token(request: Request):
 
 @app.route("/api/add_paper", methods=["POST", "GET"], name="add_paper_to_project")
 @require_jwt
+@error_handler
 async def run_assistant_projects(request: Request):
     """
     Handles the POST request for running the assistant.
     """
     user = request.ctx.user
-    if not user:
-        return json_response({"error": "User not found."}, status=404)
 
     if request.method == "POST":
         # Get the file and the socket id
@@ -404,7 +338,7 @@ async def run_assistant_projects(request: Request):
 
         return json_response(gpt_process)
 
-    elif request.method == "GET":
+    if request.method == "GET":
         task_id = request.args.get("task_id")
         task = add_paper.AsyncResult(task_id)
         return json_response(task.result)
@@ -412,37 +346,31 @@ async def run_assistant_projects(request: Request):
 
 @app.route("/api/run_paper", methods=["POST", "GET"], name="run_paper_assistant")
 @require_jwt
+@error_handler
 async def run_assistant_with_features(request: Request):
     """
     Handles the POST request for running the assistant.
     """
-    try:
-        user = request.ctx.user
-        if not user:
-            return json_response({"error": "User not found."}, status=404)
+    user = request.ctx.user
+    if request.method == "POST":
+        # Get the file and the socket id
+        file = request.files.get("file")
+        requested_features = request.form.get("features")
+        socket_id = request.form.get("sid")
 
-        if request.method == "POST":
-            # Get the file and the socket id
-            file = request.files.get("file")
-            requested_features = request.form.get("features")
-            socket_id = request.form.get("sid")
+        file_path = f"papers/{socket_id}-{file.name}"
+        with open(file_path, "wb") as f:
+            f.write(file.body)
 
-            file_path = f"papers/{socket_id}-{file.name}"
-            with open(file_path, "wb") as f:
-                f.write(file.body)
+        task: EagerResult = another_task.delay(
+            file_path,
+            socket_id,
+            str(user.id),
+        )
 
-            task: EagerResult = another_task.delay(
-                file_path,
-                socket_id,
-                str(user.id),
-            )
+        print(json.loads(requested_features))
 
-            print(json.loads(requested_features))
-
-            return json_response({"status": task.id})
-    except Exception as e:
-        print("exception", e)
-        return json_response({"status": False})
+        return json_response({"status": task.id})
 
 
 @sio.on("connect", namespace="/home")

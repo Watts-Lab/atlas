@@ -3,13 +3,12 @@ endpoint for running the assistant
 """
 
 import os
-from typing import List
 import socketio
 
 from gpt_assistant import AssistantException, call_asssistant_api
 
 
-UPLOAD_DIRECTORY = "paper/"
+UPLOAD_DIRECTORY = "papers/"
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
@@ -42,18 +41,21 @@ def run_assistant_api(
             "output": result,
         }
 
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-            print("File removed from local storage successfully")
-        else:
-            # If it fails, inform the user.
-            print(f"Error: papers/{sid}-{file_name} file not found")
-
         return response_data
+
     except AssistantException as e:
+        # Handle the AssistantException
         response_data = {
             "message": "Failed",
             "file_name": "failed",
             "output": str(e),
         }
         return response_data
+    finally:
+        # Clean up the file after processing
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print("File removed from local storage successfully")
+        else:
+            # If it fails, inform the user.
+            print(f"Error: papers/{sid}-{file_name} file not found")

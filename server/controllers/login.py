@@ -107,12 +107,12 @@ async def validate_user(email: str, token: str):
                 # Magic link has expired
                 response_data = {"error": "Magic link has expired."}
                 return json_response(body=response_data, status=400)
-            else:
-                response_data = {"error": "Invalid magic link."}
-                return json_response(body=response_data, status=400)
-        else:
-            response_data = {"error": "User not found."}
-            return json_response(body=response_data, status=404)
+
+            response_data = {"error": "Invalid magic link."}
+            return json_response(body=response_data, status=400)
+
+        response_data = {"error": "User not found."}
+        return json_response(body=response_data, status=404)
 
     except JSONDecodeError:
         response_data = {"error": "Invalid JSON data."}
@@ -147,10 +147,10 @@ async def validate_token(email: str, request: Request):
                 # Magic link has expired
             response_data = {"error": "Token is invalid or expired."}
             return json_response(body=response_data, status=401)
+
         # Check if the token is valid
-        else:
-            response_data = {"error": "User not found."}
-            return json_response(body=response_data, status=404)
+        response_data = {"error": "User not found."}
+        return json_response(body=response_data, status=404)
 
     except jwt.ExpiredSignatureError:
         return json_response({"error": "Token has expired."}, status=401)

@@ -23,6 +23,7 @@ export const fetchFeatures = async (): Promise<Feature[]> => {
         feature_name: feature.feature_name,
         feature_description: feature.feature_description,
         feature_identifier: feature.feature_identifier,
+        feature_identifier_spaced: feature.feature_identifier.replace(/\./g, ' '),
         trail,
         selected: false,
       }

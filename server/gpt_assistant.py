@@ -3,8 +3,8 @@ Functions to interact with the OpenAI API.
 """
 
 import json
-import importlib
 from datetime import datetime
+import logging
 from typing import Dict, List
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -14,6 +14,8 @@ from database.models.features import Features
 from database.models.projects import Project
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class AssistantException(Exception):
@@ -102,25 +104,39 @@ def get_all_features(project_id: str) -> List[str]:
     return sorted_features, user_features
 
 
+def enforce_additional_properties(schema):
+    """
+    Recursively enforce that every object in the schema has "additionalProperties": False.
+    """
+    if isinstance(schema, dict):
+        if schema.get("type") == "object" and "additionalProperties" not in schema:
+            schema["additionalProperties"] = False
+        for key, value in schema.items():
+            schema[key] = enforce_additional_properties(value)
+    elif isinstance(schema, list):
+        schema = [enforce_additional_properties(item) for item in schema]
+    return schema
+
+
 def build_parent_objects(feature_list: list[str], feature_object: dict) -> dict:
     """
     Builds the parent objects for the given features.
     """
     nested_dict = {}
-
     for feature in feature_list:
         keys = feature.split(".")
         current_dict = nested_dict
-
+        # Create nested schema definitions as arrays with object items
         for key in keys[:-1]:
             if key not in current_dict:
-                print(f"key: {key}")
+                logger.info("Adding key %s to the dictionary", key)
                 feature_class = Features.find_one(
                     Features.feature_identifier == f"{key}.parent"
                 ).run()
-
                 if feature_class:
-                    current_dict[key] = feature_class.feature_gpt_interface
+                    schema = feature_class.feature_gpt_interface
+                    schema = enforce_additional_properties(schema)
+                    current_dict[key] = schema
                 else:
                     current_dict[key] = {
                         "type": "array",
@@ -129,27 +145,35 @@ def build_parent_objects(feature_list: list[str], feature_object: dict) -> dict:
                             "type": "object",
                             "properties": {},
                             "required": [],
+                            "additionalProperties": False,
                         },
                     }
+            # Move to the nested object properties for further definitions.
             current_dict = current_dict[key]["items"]["properties"]
 
+        # Set the final property from feature_object, it should be a schema dict.
         current_dict[keys[-1]] = feature_object[feature]
 
-    # add in the required keys
+    # Add required keys if necessary by traversing again
     for feature in feature_list:
         keys = feature.split(".")
-        current_dict = nested_dict
+        current_section = nested_dict
         for key in keys[:-1]:
-            if key in current_dict:
-                current_dict = current_dict[key]["items"]
+            if key in current_section:
+                current_section = current_section[key]["items"]
             else:
-                if key not in current_dict["required"]:
-                    current_dict["required"].append(key)
-                current_dict = current_dict["properties"][key]["items"]
+                if "required" not in current_section:
+                    current_section["required"] = []
+                if key not in current_section["required"]:
+                    current_section["required"].append(key)
+                current_section = current_section["properties"][key]["items"]
+        if "required" not in current_section:
+            current_section["required"] = []
+        current_section["required"].append(keys[-1])
+        current_section["additionalProperties"] = False
 
-        current_dict["required"].append(keys[-1])
-        current_dict["additionalProperties"] = False
-
+    # Finally, run the entire built schema through the enforcement function
+    nested_dict = enforce_additional_properties(nested_dict)
     return nested_dict
 
 
@@ -234,7 +258,7 @@ def update_assistant(
             ],
         )
     except Exception as e:
-        print(e)
+        logger.error("Failed to update assistant: %s", e)
         raise AssistantException("Assistant update failed") from e
 
     return my_updated_assistant
@@ -251,8 +275,8 @@ def check_output_format(output):
     # Implement your format checking logic here
     if isinstance(output, dict) and "paper" in output:
         return True
-    else:
-        raise AssistantException("Output format is incorrect")
+
+    raise AssistantException("Output format is incorrect")
 
 
 def create_temporary_assistant(client: OpenAI):
@@ -424,13 +448,13 @@ def call_asssistant_api(
         check_output_format(tool_outputs)
 
     except json.JSONDecodeError as je:
-        print(je)
+        logger.error("JSON Decode Error: %s", je)
         raise AssistantException("Assistant run failed - JSON Decode Error") from je
     except TypeError as te:
-        print(te)
+        logger.error("Type Error: %s", te)
         raise AssistantException("Assistant run failed - Type Error") from te
     except Exception as e:
-        print(e)
+        logger.error("General Error: %s", e)
         raise AssistantException(run.to_json()) from e
     finally:
         emit_status(
@@ -450,17 +474,17 @@ def call_asssistant_api(
             vector_store_id=vector_store.id
         )
         if deleted_vector_store.deleted:
-            print("Vector store deleted successfully")
+            logger.info("Vector store deleted successfully")
         else:
-            print("Vector store deletion failed")
+            logger.error("Vector store deletion failed")
 
         # deleting the file
         for file_id in file_ids:
             deleted_file = client.files.delete(file_id)
             if deleted_file.deleted is True:
-                print("File deleted successfully")
+                logger.info("File deleted successfully")
             else:
-                print("File deletion failed")
+                logger.error("File deletion failed")
 
         client.beta.threads.delete(thread_id=thread_message.id)
 

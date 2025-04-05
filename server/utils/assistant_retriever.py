@@ -6,7 +6,6 @@ from datetime import datetime
 import json
 from typing import Dict
 from openai import OpenAI
-from sanic.request.form import File
 
 
 class AssistantException(Exception):
@@ -126,8 +125,8 @@ class Assistant:
         """Checks if the tool output is correctly formatted."""
         if isinstance(output, dict) and "title" in output:
             return True
-        else:
-            raise AssistantException("Output format is incorrect")
+
+        raise AssistantException("Output format is incorrect")
 
     def cleanup_resources(self, vector_store_id: str, assistant: dict, thread_id: str):
         """Cleans up resources after running the assistant."""
