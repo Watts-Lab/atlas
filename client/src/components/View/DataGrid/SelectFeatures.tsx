@@ -1,6 +1,10 @@
 import fuzzysort from 'fuzzysort'
 import { useEffect, useState } from 'react'
 import { Feature } from './feature.types'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs' // adjust this import path according to your project
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export type SelectFeaturesProps = {
   dialogRef: React.RefObject<HTMLDialogElement>
@@ -19,8 +23,6 @@ const SelectFeatures = ({
 }: SelectFeaturesProps) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredFeatures, setFilteredFeatures] = useState<Feature[]>([])
-  const [activeTab, setActiveTab] = useState<'select' | 'define'>('select')
-
   // New state for defining a feature
   const [newFeatureType, setNewFeatureType] = useState('')
   const [newFeatureParent, setNewFeatureParent] = useState('')
@@ -49,42 +51,30 @@ const SelectFeatures = ({
       trail: `${newFeatureParent} → ${newFeatureName}`,
       // Add other necessary fields based on your Feature type
     }
-
     // Update the available features
     setAvailableFeatures([...availableFeatures, newFeature])
-
     // Reset form fields
     setNewFeatureType('')
     setNewFeatureParent('')
     setNewFeatureName('')
     setNewFeatureDescription('')
     setNewFeaturePrompt('')
-
-    // Switch back to the Select tab
-    setActiveTab('select')
   }
 
   return (
     <dialog ref={dialogRef} className='modal modal-bottom sm:modal-middle'>
       <div className='modal-box'>
-        {/* Tabs */}
-        <div role='tablist' className='tabs tabs-boxed'>
-          <button
-            className={`tab tab-bordered ${activeTab === 'select' ? 'tab-active' : ''}`}
-            onClick={() => setActiveTab('select')}
-          >
-            Select Features
-          </button>
-          <button
-            className={`tab tab-bordered ${activeTab === 'define' ? 'tab-active' : ''}`}
-            onClick={() => setActiveTab('define')}
-          >
-            Define New Feature
-          </button>
-        </div>
+        <Tabs defaultValue='select'>
+          <TabsList className='mb-4 w-full'>
+            <TabsTrigger className='w-full' value='select'>
+              Select Features
+            </TabsTrigger>
+            <TabsTrigger className='w-full' value='define'>
+              Define New Feature
+            </TabsTrigger>
+          </TabsList>
 
-        {activeTab === 'select' && (
-          <>
+          <TabsContent value='select'>
             <div className='mt-4'>
               {/* Select Features Content */}
               <div className='flex justify-between items-center mb-2'>
@@ -92,7 +82,7 @@ const SelectFeatures = ({
                 <span className='text-xs text-gray-500'>hover feature for more details</span>
               </div>
               {/* Search Box */}
-              <input
+              <Input
                 type='text'
                 placeholder='Search features...'
                 value={searchQuery}
@@ -105,7 +95,7 @@ const SelectFeatures = ({
                   .map((feature, index) => (
                     <div
                       key={`${feature.feature_name}-${index}`}
-                      className='flex items-start hover:bg-slate-100 p-1 rounded'
+                      className='flex items-start hover:bg-slate-100 p-1 rounded cursor-pointer'
                       title={feature.feature_name}
                       onClick={() => {
                         setAvailableFeatures(
@@ -148,16 +138,17 @@ const SelectFeatures = ({
                   ))}
               </div>
               <div className='modal-action'>
-                <button
-                  className='btn btn-sm btn-ghost'
+                <Button
+                  variant='ghost'
+                  className='btn btn-sm'
                   onClick={() => {
                     setSearchQuery('')
                     setIsFeatureModalOpen(false)
                   }}
                 >
                   Close
-                </button>
-                <button
+                </Button>
+                <Button
                   className='btn btn-sm btn-primary'
                   onClick={() => {
                     setSearchQuery('')
@@ -166,20 +157,17 @@ const SelectFeatures = ({
                   }}
                 >
                   Save
-                </button>
+                </Button>
               </div>
             </div>
-          </>
-        )}
+          </TabsContent>
 
-        {activeTab === 'define' && (
-          <>
+          <TabsContent value='define'>
             <div className='mt-4'>
               <h3 className='font-bold text-md mb-2'>Define New Feature</h3>
-
-              <label className='label py-1'>
+              <Label className='label py-1'>
                 <span className='label-text'>Feature Type</span>
-              </label>
+              </Label>
               <select
                 className='select select-sm select-bordered w-full mb-2'
                 value={newFeatureType}
@@ -195,9 +183,9 @@ const SelectFeatures = ({
               </select>
 
               {/* Parent Selection */}
-              <label className='label py-1'>
+              <Label className='label py-1'>
                 <span className='label-text'>Parent Feature</span>
-              </label>
+              </Label>
               <select
                 className='select select-sm select-bordered w-full mb-2'
                 value={newFeatureParent}
@@ -215,20 +203,20 @@ const SelectFeatures = ({
                   ))}
               </select>
 
-              <label className='label py-1'>
+              <Label className='label py-1'>
                 <span className='label-text'>Feature Name</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 type='text'
                 className='input input-sm input-bordered w-full mb-2'
                 value={newFeatureName}
                 onChange={(e) => setNewFeatureName(e.target.value)}
               />
 
-              <label className='label py-1'>
+              <Label className='label py-1'>
                 <span className='label-text'>Short Description</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 type='text'
                 className='input input-sm input-bordered w-full mb-2'
                 value={newFeatureDescription}
@@ -236,31 +224,32 @@ const SelectFeatures = ({
               />
 
               {/* Prompt Input */}
-              <label className='label py-1'>
+              <Label className='label py-1'>
                 <span className='label-text'>Prompt</span>
-              </label>
+              </Label>
               <textarea
                 className='textarea textarea-sm textarea-bordered w-full mb-2'
                 value={newFeaturePrompt}
                 onChange={(e) => setNewFeaturePrompt(e.target.value)}
               ></textarea>
               <div className='flex justify-end space-x-2'>
-                <button
-                  className='btn btn-sm btn-ghost'
+                <Button
+                  variant='ghost'
+                  className='btn btn-sm'
                   onClick={() => {
                     setSearchQuery('')
                     setIsFeatureModalOpen(false)
                   }}
                 >
                   Close
-                </button>
-                <button className='btn btn-sm btn-primary' onClick={handleAddNewFeature}>
+                </Button>
+                <Button className='btn btn-sm btn-primary' onClick={handleAddNewFeature}>
                   Add Feature
-                </button>
+                </Button>
               </div>
             </div>
-          </>
-        )}
+          </TabsContent>
+        </Tabs>
       </div>
     </dialog>
   )

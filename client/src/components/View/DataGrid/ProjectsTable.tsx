@@ -41,6 +41,10 @@ export type Projects = {
   name: string
   description: string
   paper_count: number
+  results: {
+    id: string
+    finished: boolean
+  }[]
 }
 
 export type ProjectTableProps = {

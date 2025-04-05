@@ -27,13 +27,19 @@ export default function useOverviewData(pageSize: number = 50) {
         }
         setProjects(
           response.data.project.map(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (project: { id: string; title: string; description: string; papers: any[] }) => {
+            (project: {
+              id: string
+              title: string
+              description: string
+              papers: unknown[]
+              results: { id: string; finished: boolean }[]
+            }) => {
               return {
                 id: project.id,
                 name: project.title,
                 description: project.description,
-                paper_count: project.papers.length,
+                paper_count: project.results.length,
+                results: project.results,
               } as Projects
             },
           ),
@@ -57,13 +63,19 @@ export default function useOverviewData(pageSize: number = 50) {
       }
       setProjects(
         response.data.project.map(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (project: { id: string; title: string; description: string; papers: any[] }) => {
+          (project: {
+            id: string
+            title: string
+            description: string
+            papers: unknown[]
+            results: { id: string; finished: boolean }[]
+          }) => {
             return {
               id: project.id,
               name: project.title,
               description: project.description,
-              paper_count: project.papers.length,
+              paper_count: project.results.length,
+              results: project.results,
             } as Projects
           },
         ),

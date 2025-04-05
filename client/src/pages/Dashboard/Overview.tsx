@@ -31,7 +31,12 @@ const Overview = () => {
         <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
           <div className='bg-white rounded-lg shadow-md p-4'>
             <h2 className='text-lg font-semibold'>Running jobs</h2>
-            <p className='text-sm text-gray-500'>0 In progress</p>
+            <p className='text-sm text-gray-500'>
+              {projects
+                .map((project) => project.results.filter((result) => result.finished).length)
+                .reduce((a, b) => a + b, 0)}{' '}
+              in progress
+            </p>
           </div>
           <div className='bg-white rounded-lg shadow-md p-4'>
             <h2 className='text-lg font-semibold'>Available features</h2>

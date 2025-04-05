@@ -22,6 +22,7 @@ class Result(Document):
     quality: float
     feature_list: list
     project_id: Link[Project]
+    finished: bool = False
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()
 

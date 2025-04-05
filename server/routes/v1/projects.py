@@ -17,6 +17,7 @@ from routes.error_handler import error_handler
 from sanic import Blueprint
 from sanic import json as json_response
 from sanic.request import Request
+from bunnet.operators import In
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,12 @@ async def project(request: Request):
     if request.method == "GET":
         projects = Project.find(Project.user.id == user.id).to_list()
 
+        results: Project = Result.find(
+            In(Result.project_id.id, [p.id for p in projects]),
+            fetch_links=True,
+            nesting_depth=1,
+        ).run()
+
         pr_response = [
             p.model_dump(
                 mode="json",
@@ -69,6 +76,14 @@ async def project(request: Request):
 
         for proj in pr_response:
             proj["papers"] = [str(pap["id"]) for pap in proj["papers"]]
+            proj["results"] = [
+                {
+                    "id": str(r.id),
+                    "finished": r.finished if r.finished else False,
+                }
+                for r in results
+                if str(r.project_id.id) == str(proj["id"])
+            ]
 
         return json_response({"project": pr_response})
 

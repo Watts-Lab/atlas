@@ -2,6 +2,7 @@
 Run the feature collection task for a paper.
 """
 
+from datetime import datetime
 import logging
 import os
 
@@ -50,6 +51,19 @@ def add_paper(
 
     user_features = [feature.feature_identifier for feature in current_project.features]
 
+    result_obj = Result(
+        user=User.find_one(User.email == user_email).run(),
+        json_response={},
+        prompt_token=0,
+        completion_token=0,
+        quality=0.9,
+        feature_list=user_features,
+        run_id=task_id,
+        project_id=current_project,
+    )
+
+    result_obj.save()
+
     logger.info("Running assistant for user %s", user_email)
 
     open_ai_res = run_assistant_api(
@@ -63,16 +77,11 @@ def add_paper(
     logger.info("Assistant run completed for user %s", user_email)
     logger.info("Assistant output: %s", open_ai_res)
 
-    result_obj = Result(
-        user=User.find_one(User.email == user_email).run(),
-        json_response=open_ai_res["output"]["result"],
-        prompt_token=open_ai_res["output"]["prompt_token"],
-        completion_token=open_ai_res["output"]["completion_token"],
-        quality=0.9,
-        feature_list=user_features,
-        run_id=task_id,
-        project_id=current_project,
-    )
+    result_obj.json_response = open_ai_res["output"]["result"]
+    result_obj.prompt_token = open_ai_res["output"]["prompt_token"]
+    result_obj.completion_token = open_ai_res["output"]["completion_token"]
+    result_obj.finished = True
+    result_obj.updated_at = datetime.now()
 
     result_obj.save()
 
