@@ -42,6 +42,7 @@ const SelectFeatures = ({
     const newFeature: Feature = {
       id: '0',
       feature_identifier: `new_${Date.now()}`, // Generate a unique identifier
+      feature_identifier_spaced: newFeatureName.replace(/\s+/g, '_'),
       feature_name: newFeatureName,
       feature_description: newFeatureDescription,
       selected: true,
