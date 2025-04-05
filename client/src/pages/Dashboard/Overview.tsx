@@ -33,7 +33,7 @@ const Overview = () => {
             <h2 className='text-lg font-semibold'>Running jobs</h2>
             <p className='text-sm text-gray-500'>
               {projects
-                .map((project) => project.results.filter((result) => result.finished).length)
+                .map((project) => project.results.filter((result) => !result.finished).length)
                 .reduce((a, b) => a + b, 0)}{' '}
               in progress
             </p>
