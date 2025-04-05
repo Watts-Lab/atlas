@@ -79,7 +79,7 @@ pexpect==4.9.0
 pickleshare==0.7.5
 pillow==11.1.0
 platformdirs==4.2.2
-polars==1.22.0
+# polars==1.22.0
 polars-lts-cpu==1.24.0
 prometheus_client==0.20.0
 prompt_toolkit==3.0.47
