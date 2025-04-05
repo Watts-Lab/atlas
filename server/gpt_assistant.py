@@ -12,6 +12,8 @@ import socketio
 
 from database.models.features import Features
 from database.models.projects import Project
+from workers.utils.socket_emitter import SocketEmmiter
+
 
 load_dotenv()
 
@@ -330,13 +332,7 @@ def emit_status(
     )
 
 
-def call_asssistant_api(
-    file_path: str,
-    sid: str,
-    sio: socketio.RedisManager,
-    task_id: str,
-    project_id: str,
-):
+def call_asssistant_api(file_path: str, project_id: str, emitter: SocketEmmiter):
     """
     Calls the Assistant API to perform a task using OpenAI's GPT-3 model.
 
@@ -352,33 +348,23 @@ def call_asssistant_api(
     client = OpenAI()
 
     try:
-
-        emit_status(
-            sio=sio,
-            status="Fetching all features...",
+        emitter.emit_status(
+            message="Starting task...",
             progress=0,
-            task_id=task_id,
-            sid=sid,
         )
 
         feature_list, feature_obj = get_all_features(project_id)
 
-        emit_status(
-            sio=sio,
-            status="Building feature functions...",
+        emitter.emit_status(
+            message="Building feature functions...",
             progress=5,
-            task_id=task_id,
-            sid=sid,
         )
 
         functions = build_openai_feature_functions(feature_list, feature_obj)
 
-        emit_status(
-            sio=sio,
-            status="Uploading file to vector store...",
+        emitter.emit_status(
+            message="Uploading file to vector store...",
             progress=10,
-            task_id=task_id,
-            sid=sid,
         )
 
         vector_store = upload_file_to_vector_store(
@@ -386,34 +372,20 @@ def call_asssistant_api(
             file_path=file_path,
         )
 
-        emit_status(
-            sio=sio,
-            status="Creating an assistant for your task...",
-            progress=12,
-            task_id=task_id,
-            sid=sid,
+        emitter.emit_status(
+            message="Creating assistant...",
+            progress=15,
         )
 
         my_temporary_assistant = create_temporary_assistant(client)
-
-        emit_status(
-            sio=sio,
-            status="Updating assistant...",
-            progress=15,
-            task_id=task_id,
-            sid=sid,
-        )
 
         updated_assistant = update_assistant(
             client, my_temporary_assistant.id, vector_store, functions
         )
 
-        emit_status(
-            sio=sio,
-            status="Running assistant...",
+        emitter.emit_status(
+            message="Running assistant...",
             progress=20,
-            task_id=task_id,
-            sid=sid,
         )
 
         thread_message = client.beta.threads.create(
@@ -430,12 +402,9 @@ def call_asssistant_api(
             assistant_id=updated_assistant.id,
         )
 
-        emit_status(
-            sio=sio,
-            status="Checking assistant run...",
-            progress=40,
-            task_id=task_id,
-            sid=sid,
+        emitter.emit_status(
+            message="Assistant run completed.",
+            progress=60,
         )
 
         with open("logfile.log", "w", encoding="utf-8") as log_file:
@@ -457,12 +426,9 @@ def call_asssistant_api(
         logger.error("General Error: %s", e)
         raise AssistantException(run.to_json()) from e
     finally:
-        emit_status(
-            sio=sio,
-            status="Cleaning up resources...",
+        emitter.emit_status(
+            message="Cleaning up resources...",
             progress=70,
-            task_id=task_id,
-            sid=sid,
         )
 
         # deleting the vector store

@@ -15,7 +15,7 @@ services:
       - ./server:/app/api
     command: >
       sh -c "python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 --dev"
-    
+
   client:
     container_name: client
     build:
@@ -39,7 +39,7 @@ services:
     depends_on:
       - backend
       - client
-  
+
   celery_worker:
     container_name: celery_worker
     build:
@@ -52,9 +52,11 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - C_FORCE_ROOT=false
+      - CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP=true
     volumes:
       - ./server:/app/api
-    command: bash -c "celery -A workers.celery_config.celery worker --loglevel=info"
+    # command: bash -c "celery -A workers.celery_config.celery worker --loglevel=INFO"
+    command: bash -c "watchmedo auto-restart --directory=/app/api --pattern=*.py --recursive -- celery -A workers.celery_config.celery worker --loglevel=INFO --concurrency=1"
     depends_on:
       - backend
       - redis
@@ -73,11 +75,15 @@ services:
       - C_FORCE_ROOT=false
     volumes:
       - ./server:/app/api
-    command: bash -c "celery -A workers.celery_config.celery flower --port=5555"
+    # command: bash -c "celery -A workers.celery_config.celery flower --port=5555"
+    entrypoint:
+      - /bin/sh
+      - ../start_flower.sh
     expose:
       - 5555
     ports:
       - 5556:5555
     depends_on:
+      - backend
+      - redis
       - celery_worker
-

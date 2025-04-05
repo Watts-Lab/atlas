@@ -3,8 +3,15 @@ WORKDIR /app
 
 RUN mkdir ./api
 COPY server ./api
+COPY nginx/start_flower.sh /app/start_flower.sh
 RUN pip install --upgrade pip
 RUN pip install -r ./api/requirements.txt
+RUN pip install -U 'watchdog[watchmedo]'
+
+# Create a new user and change ownership of /app
+RUN adduser --disabled-password --gecos "" myuser && chown -R myuser:myuser /app
+USER myuser
+
 ENV PYTHON_ENV=production
 
 EXPOSE 8000 8001 8002 

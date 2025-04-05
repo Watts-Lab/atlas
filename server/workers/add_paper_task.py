@@ -4,15 +4,13 @@ Run the feature collection task for a paper.
 
 from datetime import datetime
 import logging
-import os
-
-import socketio
 from celery import Task
 from controllers.assisstant import run_assistant_api
 from database.models.projects import Project
 from database.models.results import Result
 from database.models.users import User
 from workers.celery_config import celery
+from workers.utils.socket_emitter import SocketEmmiter
 
 logger = logging.getLogger(__name__)
 
@@ -29,22 +27,13 @@ def add_paper(
     Task to create a task.
     """
 
-    external_sio = socketio.RedisManager(
-        os.getenv("CELERY_BROKER_URL"), write_only=True
-    )
-
     task_id = self.request.id
 
-    external_sio.emit(
-        "status",
-        {
-            "status": "Starting assistant...",
-            "progress": 0,
-            "task_id": task_id,
-            "done": False,
-        },
-        to=socket_id,
-        namespace="/home",
+    emitter = SocketEmmiter(socket_id, task_id)
+
+    emitter.emit_status(
+        message="Starting task...",
+        progress=0,
     )
 
     current_project = Project.get(project_id, fetch_links=True).run()
@@ -68,14 +57,17 @@ def add_paper(
 
     open_ai_res = run_assistant_api(
         file_path=file_path,
-        sid=socket_id,
-        sio=external_sio,
-        task_id=task_id,
         project_id=project_id,
+        emitter=emitter,
     )
 
     logger.info("Assistant run completed for user %s", user_email)
     logger.info("Assistant output: %s", open_ai_res)
+
+    emitter.emit_status(
+        message="Saving results...",
+        progress=90,
+    )
 
     result_obj.json_response = open_ai_res["output"]["result"]
     result_obj.prompt_token = open_ai_res["output"]["prompt_token"]
@@ -85,29 +77,7 @@ def add_paper(
 
     result_obj.save()
 
-    external_sio.emit(
-        "status",
-        {
-            "status": "Saving results to database...",
-            "progress": 90,
-            "task_id": task_id,
-            "done": False,
-        },
-        to=socket_id,
-        namespace="/home",
-    )
-
-    external_sio.emit(
-        "status",
-        {
-            "status": "Finishing up...",
-            "progress": 100,
-            "task_id": task_id,
-            "done": True,
-        },
-        to=socket_id,
-        namespace="/home",
-    )
+    emitter.emit_done()
 
     return {
         "message": "Success",
