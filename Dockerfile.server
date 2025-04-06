@@ -9,8 +9,15 @@ RUN pip install -r ./api/requirements.txt
 RUN pip install -U 'watchdog[watchmedo]'
 
 # Create a new user and change ownership of /app
-RUN adduser --disabled-password --gecos "" myuser && chown -R myuser:myuser /app
+RUN mkdir -p /app/api/papers
+RUN adduser --disabled-password --gecos "" myuser
+RUN chown -R myuser:myuser /app
+RUN chown -R myuser:myuser /app/api/papers
+RUN chmod -R 755 /app/api/papers
+
 USER myuser
+
+VOLUME /app/api/papers
 
 ENV PYTHON_ENV=production
 
