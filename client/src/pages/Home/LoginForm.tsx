@@ -1,4 +1,4 @@
-import { Globe, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,8 +23,8 @@ export function LoginForm({
         <div className='flex flex-col gap-6'>
           <div className='flex flex-col items-center gap-2'>
             <a href='#' className='flex flex-col items-center gap-2 font-medium'>
-              <div className='flex h-8 w-8 items-center justify-center rounded-md'>
-                <Globe className='size-6 text-gray-50' />
+              <div className='flex h-12 w-12 items-center justify-center rounded-md pb-2'>
+                <img src='/web-app-manifest-512x512-bg-i.png' alt='Acme Inc.' />
               </div>
               <span className='sr-only text-gray-50'>Acme Inc.</span>
             </a>
