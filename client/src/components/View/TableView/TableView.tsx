@@ -1,9 +1,10 @@
 import { useState, DragEvent, useEffect, useCallback } from 'react'
-import { useSocket } from '../../../context/Socket/useSocket'
+
 import ArrageTable from './ArrangeTable'
 import { flattenData, Result } from './hooks/data-handler'
 import { get_failed_data } from './hooks/mock-data'
 import api from '@/service/api'
+import { useSocket } from '@/context/Socket/useSocket'
 
 type RunStatus = {
   status: string
