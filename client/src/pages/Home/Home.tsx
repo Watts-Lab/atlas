@@ -3,6 +3,7 @@ import { createUniverse } from './stars-render'
 import { useNavigate, useParams } from 'react-router-dom'
 import { LoginForm } from './LoginForm'
 import api from '@/service/api'
+import { useUser } from '@/context/User/useUser'
 
 type Params = {
   email?: string
@@ -14,6 +15,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   const emailRef = useRef<HTMLInputElement | null>(null)
   const params: Params = useParams()
   const navigate = useNavigate()
+  const { email, token, login, logout, updateUser } = useUser()
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [submitting, setSubmitting] = useState(false)
@@ -53,8 +55,11 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
         .post(`/validate`, { email: params.email, magic_link: params.magicLink })
         .then((response) => {
           if (response.status === 200) {
-            localStorage.setItem('token', response.headers['authorization'])
-            localStorage.setItem('email', params.email!)
+            login({
+              email: params.email,
+              token: response.headers['authorization'],
+              credits: response.data.credits,
+            })
             navigate('/dashboard')
           } else {
             // ADDED: If invalid magic link
@@ -69,26 +74,26 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
 
   // If user *already* has a token in localStorage, validate it and possibly redirect
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const email = localStorage.getItem('email')
     if (!loggingIn && token && email) {
       setIsLoggingIn(true)
       setLoggingInMessage('Authenticating token... Please wait.')
 
-      api.post(`/check`, { email: email }).then((res) => {
+      api.post(`/check`, { email }).then((res) => {
         if (res.status === 200) {
+          updateUser({
+            credits: res.data.credits,
+          })
           navigate('/dashboard')
         } else {
           setLoggingInMessage('Token authentication failed. Please login again.')
-          localStorage.removeItem('token')
-          localStorage.removeItem('email')
+          logout()
           setTimeout(() => {
             setIsLoggingIn(false)
           }, 3000)
         }
       })
     }
-  }, [])
+  }, [email, token])
 
   // Handle normal login flow via email input
   const submitEmail = async (e: React.FormEvent) => {

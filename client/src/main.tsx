@@ -7,18 +7,21 @@ import { SocketProvider } from './context/Socket/SocketProvider.tsx'
 import { Toaster } from 'sonner'
 import { ReactFlowProvider } from '@xyflow/react'
 import { WorkflowProvider } from './context/Workflow/WorkflowProvider.tsx'
+import { UserProvider } from './context/User/UserProvider.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <ReactFlowProvider>
-        <WorkflowProvider>
-          <SocketProvider>
-            <App />
-            <Toaster richColors />
-          </SocketProvider>
-        </WorkflowProvider>
-      </ReactFlowProvider>
+      <UserProvider>
+        <ReactFlowProvider>
+          <WorkflowProvider>
+            <SocketProvider>
+              <App />
+              <Toaster richColors />
+            </SocketProvider>
+          </WorkflowProvider>
+        </ReactFlowProvider>
+      </UserProvider>
     </Router>
   </React.StrictMode>,
 )

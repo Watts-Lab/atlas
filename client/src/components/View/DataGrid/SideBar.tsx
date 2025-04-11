@@ -10,6 +10,7 @@ import {
 import { NavMain } from './NavMain'
 import { NavUser } from './NavUser'
 import { useEffect } from 'react'
+import { useUser } from '@/context/User/useUser'
 
 const data = {
   navMain: [
@@ -101,9 +102,10 @@ export function AppSidebar({
   sidebarOpen,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { sidebarOpen: boolean }) {
+  const { email } = useUser()
   const user = {
-    name: localStorage.getItem('email')?.split('@')[0] || '',
-    email: localStorage.getItem('email') || '',
+    name: email?.split('@')[0] || '',
+    email: email || '',
   }
 
   const { toggleSidebar } = useSidebar()

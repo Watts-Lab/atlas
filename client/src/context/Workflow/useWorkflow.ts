@@ -1,6 +1,10 @@
 import { useContext } from 'react'
-import { WorkflowContext } from './WorkflowProvider'
+import { WorkflowContext, WorkflowContextType } from './WorkflowProvider'
 
-export function useWorkflow() {
-  return useContext(WorkflowContext)
+export const useWorkflow = (): WorkflowContextType => {
+  const context = useContext(WorkflowContext)
+  if (context === undefined) {
+    throw new Error('useWorkflow must be used within a WorkflowProvider')
+  }
+  return context
 }

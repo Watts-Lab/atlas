@@ -89,7 +89,11 @@ async def validate_user(email: str, token: str):
                     user.magic_link_expired = True
                     user.save()  # Save the User asynchronously
 
-                    response_data = {"message": "Magic link validated."}
+                    response_data = {
+                        "message": "Magic link validated.",
+                        "email": email,
+                        "credits": user.number_of_tokens,
+                    }
                     header = {
                         "Access-Control-Expose-Headers": "Authorization",
                         "Authorization": jwt.encode(
@@ -141,7 +145,10 @@ async def validate_token(email: str, request: Request):
         if user:
             if user.email == email:
                 # Users local storage token is valid
-                response_data = {"message": "Token is valid."}
+                response_data = {
+                    "message": "Token is valid.",
+                    "credits": user.number_of_tokens,
+                }
                 return json_response(body=response_data, status=200)
 
                 # Magic link has expired

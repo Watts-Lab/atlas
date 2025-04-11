@@ -15,7 +15,9 @@ if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
 
-def run_assistant_api(file_path: str, project_id: str, emitter: SocketEmmiter):
+def run_assistant_api(
+    file_path: str, project_id: str, gpt_temperature: float, emitter: SocketEmmiter
+):
     """
     Run the assistant with the uploaded file
     """
@@ -23,6 +25,7 @@ def run_assistant_api(file_path: str, project_id: str, emitter: SocketEmmiter):
         result = call_asssistant_api(
             file_path=file_path,
             project_id=project_id,
+            gpt_temperature=gpt_temperature,
             emitter=emitter,
         )
 
@@ -46,11 +49,3 @@ def run_assistant_api(file_path: str, project_id: str, emitter: SocketEmmiter):
             "output": str(e),
         }
         return response_data
-    finally:
-        # Clean up the file after processing
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-            print("File removed from local storage successfully")
-        else:
-            # If it fails, inform the user.
-            print(f"Error: papers/{emitter.socket_id}-{file_name} file not found")
