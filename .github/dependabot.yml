@@ -5,20 +5,37 @@
 
 version: 2
 updates:
-  # Update npm dependencies in the client folder
+  # Update and group npm dependencies in the client directory
   - package-ecosystem: "npm"
     directory: "/client"
     schedule:
       interval: "weekly"
+    group: "client-deps"
 
-  # Update Python dependencies listed in server/requirements.txt
+  # Update and group Python dependencies in the server directory
   - package-ecosystem: "pip"
     directory: "/server"
     schedule:
       interval: "weekly"
+    group: "server-deps"
 
-  # Update Docker images used in your Dockerfiles (Dockerfile.client and Dockerfile.server)
+  # Update and group Docker images used in Dockerfiles and docker-compose files at the repo root
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
+    group: "docker-deps"
+
+update_groups:
+  client-deps:
+    # The pattern "*" means all npm dependencies will be bundled together.
+    patterns:
+      - "*"
+  server-deps:
+    # All pip dependencies in the server group are included.
+    patterns:
+      - "*"
+  docker-deps:
+    # All docker-related dependency updates will be grouped.
+    patterns:
+      - "*"
