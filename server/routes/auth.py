@@ -32,7 +32,7 @@ def require_jwt(handler):
     async def wrapper(request: Request, *args, **kwargs):
         try:
             secret = request.app.config.JWT_SECRET
-            token = request.token
+            token = request.cookies.get("jwt")
             user_jwt = jwt.decode(token, secret, algorithms=["HS256"])
             user = User.find_one(User.email == user_jwt["email"]).run()
             if not user:

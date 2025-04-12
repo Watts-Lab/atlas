@@ -4,7 +4,7 @@ import { UserContext, UserContextType } from './UserProvider'
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext)
   if (context === undefined) {
-    throw new Error('useWorkflow must be used within a WorkflowProvider')
+    throw new Error('useUser must be used within a UserProvider')
   }
   return context
 }

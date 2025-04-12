@@ -1,99 +1,88 @@
-import { useState, useEffect, useCallback, createContext } from 'react'
+import React, { createContext, useCallback, useState } from 'react'
+import axios from 'axios'
+import api from '@/service/api'
 
 export type UserDetails = {
+  loggedIn: boolean
   email: string | null
-  token: string | null
   credits: number
 }
 
 export interface UserContextType {
-  email: string | null
-  token: string | null
-  credits: number
-  login: (userData: Partial<UserDetails>) => void
-  logout: () => void
+  user: UserDetails
+  login: (credentials: { email: string }) => Promise<void>
+  logout: () => Promise<void>
+  refreshUser: () => Promise<UserDetails>
   updateUser: (updates: Partial<UserDetails>) => void
 }
 
-// Default state for a logged-out user.
-const initialState = {
+const initialUser: UserDetails = {
+  loggedIn: false,
   email: null,
-  token: null,
   credits: 0,
 }
 
-export const UserContext = createContext<UserContextType>(initialState as UserContextType)
+export const UserContext = createContext<UserContextType>({
+  user: initialUser,
+  login: async () => {},
+  logout: async () => {},
+  refreshUser: async () => initialUser,
+  updateUser: () => {},
+})
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
-  const [email, setEmail] = useState<string | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-  const [credits, setCredits] = useState<number>(0)
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserDetails>(initialUser)
 
-  // Load user data from localStorage when the component mounts.
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    const email = localStorage.getItem('email')
-    const credits = localStorage.getItem('credits')
-    if (token && email) {
-      setToken(token)
-      setEmail(email)
-      setCredits(credits ? parseInt(credits, 10) : 0)
+  const refreshUser = useCallback(async () => {
+    try {
+      const { data } = await api.get('/check')
+      if (data.loggedIn) {
+        setUser({
+          loggedIn: true,
+          email: data.email,
+          credits: data.credits,
+        })
+        return data
+      } else {
+        setUser(initialUser)
+        return initialUser
+      }
+    } catch (error) {
+      setUser(initialUser)
+      return initialUser
     }
   }, [])
 
-  const login = (userData: Partial<UserDetails>) => {
-    const updatedUser: UserDetails = {
-      email: userData.email || null,
-      token: userData.token || null,
-      credits: userData.credits !== undefined ? userData.credits : 0,
+  const login = useCallback(
+    async (credentials: { email: string }) => {
+      try {
+        const response = await axios.post('/login', credentials)
+        if (response.status === 200) {
+          await refreshUser()
+        }
+      } catch (error) {
+        console.error('Login error', error)
+        throw error
+      }
+    },
+    [refreshUser],
+  )
+
+  const logout = useCallback(async () => {
+    try {
+      await axios.post('/logout', {}, { withCredentials: true })
+      setUser(initialUser)
+    } catch (error) {
+      console.error('Logout error', error)
+      throw error
     }
-
-    if (updatedUser.token) localStorage.setItem('token', updatedUser.token)
-    if (updatedUser.email) localStorage.setItem('email', updatedUser.email)
-    localStorage.setItem('credits', updatedUser.credits.toString())
-  }
-
-  // logout() clears user session both from state and localStorage.
-  const logout = useCallback(() => {
-    setEmail(null)
-    setToken(null)
-    setCredits(0)
-    // Clear localStorage to remove user data.
-    localStorage.removeItem('token')
-    localStorage.removeItem('email')
-    localStorage.removeItem('credits')
   }, [])
 
-  // Optional function to update user details if needed.
-  const updateUser = (updates: Partial<UserDetails>) => {
-    const updatedUser = {
-      email: updates.email || email,
-      token: updates.token || token,
-      credits: updates.credits !== undefined ? updates.credits : credits,
-    }
+  const updateUser = useCallback((updates: Partial<UserDetails>) => {
+    setUser((prev) => ({ ...prev, ...updates }))
+  }, [])
 
-    // Update localStorage with new user details.
-    if (updatedUser.token) localStorage.setItem('token', updatedUser.token)
-    if (updatedUser.email) localStorage.setItem('email', updatedUser.email)
-    localStorage.setItem('credits', updatedUser.credits.toString())
-
-    setEmail(updatedUser.email)
-    setToken(updatedUser.token)
-    setCredits(updatedUser.credits)
-  }
-
-  const value: UserContextType = {
-    email,
-    token,
-    credits,
-    login,
-    logout,
-    updateUser,
-  }
+  const value = { user, login, logout, refreshUser, updateUser }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }

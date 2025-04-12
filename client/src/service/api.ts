@@ -6,30 +6,20 @@ export const WEB_URL =
   process.env.NODE_ENV === 'production' ? 'https://atlas.seas.upenn.edu' : 'http://localhost:5173'
 
 const api = axios.create({
-  withCredentials: false,
+  withCredentials: true,
   baseURL: API_URL,
 })
-
-// Request interceptor to attach the token automatically
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error),
-)
 
 // Response interceptor to handle authorization errors globally
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // If the backend returns a 401 (Unauthorized), redirect the user to the login page
+  async (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear the token from local storage
-      localStorage.removeItem('token')
+      try {
+        await api.post('/logout')
+      } catch (logoutErr) {
+        console.warn('Logout failed:', logoutErr)
+      }
       window.location.href = '/'
     }
     return Promise.reject(error)

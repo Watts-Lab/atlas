@@ -11,11 +11,12 @@ type Params = {
 }
 
 const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const emailRef = useRef<HTMLInputElement | null>(null)
+  const { user, login, logout, updateUser, refreshUser } = useUser()
   const params: Params = useParams()
   const navigate = useNavigate()
-  const { email, token, login, logout, updateUser } = useUser()
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const emailRef = useRef<HTMLInputElement | null>(null)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [submitting, setSubmitting] = useState(false)
@@ -55,9 +56,9 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
         .post(`/validate`, { email: params.email, magic_link: params.magicLink })
         .then((response) => {
           if (response.status === 200) {
-            login({
-              email: params.email,
-              token: response.headers['authorization'],
+            updateUser({
+              loggedIn: true,
+              email: response.data.email,
               credits: response.data.credits,
             })
             navigate('/dashboard')
@@ -72,17 +73,14 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
     }
   }, [loggingIn])
 
-  // If user *already* has a token in localStorage, validate it and possibly redirect
+  // If user is already logged in, check if the email is valid
   useEffect(() => {
-    if (!loggingIn && token && email) {
+    if (!loggingIn) {
       setIsLoggingIn(true)
       setLoggingInMessage('Authenticating token... Please wait.')
 
-      api.post(`/check`, { email }).then((res) => {
-        if (res.status === 200) {
-          updateUser({
-            credits: res.data.credits,
-          })
+      refreshUser().then((res) => {
+        if (res.loggedIn) {
           navigate('/dashboard')
         } else {
           setLoggingInMessage('Token authentication failed. Please login again.')
@@ -93,7 +91,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
         }
       })
     }
-  }, [email, token])
+  }, [user.email, user.loggedIn])
 
   // Handle normal login flow via email input
   const submitEmail = async (e: React.FormEvent) => {
@@ -101,13 +99,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
     e.preventDefault()
 
     const email = emailRef.current!.value
-    await api
-      .post(`/login`, { email: email })
-      .then((res) => {
-        if (res.status !== 200) {
-          throw new Error('Something went wrong!')
-        }
-      })
+    login({ email: email })
       .then(await new Promise((resolve) => setTimeout(resolve, 3000)))
       .finally(() => {
         setLoggingInMessage('Check your email for the magic link!')

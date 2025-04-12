@@ -1,22 +1,13 @@
 import MainPage from '@/components/View/DataGrid/MainPage'
 import ProjectsTable from '@/components/View/DataGrid/ProjectsTable'
 import PapersTable from '@/components/View/DataGrid/PapersTable'
-import { useNavigate } from 'react-router-dom'
 import useOverviewData from './useOverviewData'
-import { useEffect } from 'react'
 import { useUser } from '@/context/User/useUser'
 
 const Overview = () => {
   const { projects, papers, isLoadingProjects, isLoadingPapers, refetchProjects } =
     useOverviewData(50)
-  const { credits, token } = useUser()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (!token) {
-      navigate('/')
-    }
-  }, [])
+  const { user } = useUser()
 
   return (
     <MainPage
@@ -45,7 +36,7 @@ const Overview = () => {
           </div>
           <div className='bg-white rounded-lg shadow-md p-4'>
             <h2 className='text-lg font-semibold'>Available credit</h2>
-            <p className='text-sm text-gray-500'>{credits} tokens</p>
+            <p className='text-sm text-gray-500'>{user.credits} tokens</p>
           </div>
         </div>
         <ProjectsTable
