@@ -1,17 +1,6 @@
 import MainPage from '@/components/View/DataGrid/MainPage'
-import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
 
 const ProjectSettings = () => {
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate('/')
-    }
-  }, [])
-
   return (
     <MainPage
       breadcrumbs={[

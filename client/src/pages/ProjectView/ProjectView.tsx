@@ -31,9 +31,6 @@ const ProjectView = () => {
     updated_at: '',
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [token, _setToken] = useState<string>(localStorage.getItem('token') || '')
-
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const updateProjectName = useCallback(
@@ -44,10 +41,6 @@ const ProjectView = () => {
       const controller = new AbortController()
       abortControllerRef.current = controller
 
-      const token = localStorage.getItem('token') || ''
-      if (!token) {
-        return
-      }
       try {
         const response = await api.put(
           `/projects?project_id=${params.project_id}`,
@@ -73,11 +66,6 @@ const ProjectView = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-
-      const token = localStorage.getItem('token') || ''
-      if (!token) {
-        return
-      }
 
       try {
         const response = await api.get(`/projects?project_id=${params.project_id}`)
@@ -128,11 +116,7 @@ const ProjectView = () => {
         <div className='md:navbar-end z-10 max-sm:pt-4'></div>
       </div>
       <hr></hr>
-      <TableView
-        project_id={params.project_id || ''}
-        project_results={projectResults}
-        token={token}
-      />
+      <TableView project_id={params.project_id || ''} project_results={projectResults} />
     </main>
   )
 }

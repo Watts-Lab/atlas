@@ -22,7 +22,6 @@ type PaperProcessingStatus = {
 type TableViewProps = {
   project_id: string
   project_results: Result[]
-  token: string
 }
 
 const TableView = ({ project_id, project_results }: TableViewProps) => {

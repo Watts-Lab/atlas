@@ -109,29 +109,15 @@ export function SidebarRight(props: ComponentProps<typeof Sidebar>) {
 
   const handleCreateProject = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        navigate('/')
-        return
-      }
-
       if (!projectName) {
         toast.error('Please enter a project name')
         return
       }
-      const response = await api.post(
-        '/v1/projects',
-        {
-          project_name: projectName,
-          project_description: projectDescription,
-          project_features: selectedFeatureIds,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      const response = await api.post('/v1/projects', {
+        project_name: projectName,
+        project_description: projectDescription,
+        project_features: selectedFeatureIds,
+      })
 
       setProjectName('')
       setProjectDescription('')
