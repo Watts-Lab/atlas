@@ -26,5 +26,8 @@ class AppConfig(Config):
     )
     SECRET = os.getenv("SOCKET_SECRET")
     JWT_SECRET = os.getenv("JWT_SECRET")
+    SECURE_COOKIES = (
+        os.getenv("PYTHON_ENV") != "development"  # Use secure cookies in production
+    )
     JWT_ALGORITHM = "HS256"
     JWT_EXP_DELTA_SECONDS = 3600

@@ -13,6 +13,7 @@ services:
 
     volumes:
       - ./server:/app/api
+      - ./server/papers:/app/api/papers
     command: >
       sh -c "python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 --dev"
 
@@ -55,6 +56,7 @@ services:
       - CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP=true
     volumes:
       - ./server:/app/api
+      - ./server/papers:/app/api/papers
     # command: bash -c "celery -A workers.celery_config.celery worker --loglevel=INFO"
     command: bash -c "watchmedo auto-restart --directory=/app/api --pattern=*.py --recursive -- celery -A workers.celery_config.celery worker --loglevel=INFO --concurrency=1"
     depends_on:

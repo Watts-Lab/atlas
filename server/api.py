@@ -9,7 +9,7 @@ from bunnet import PydanticObjectId
 from bunnet.operators import In, Or
 from celery.result import EagerResult
 from config.app_config import AppConfig
-from controllers.login import login_user, validate_token, validate_user
+from controllers.login import login_user, logout_user, validate_token, validate_user
 from database.database import init_db
 from database.models.features import Features
 from database.models.papers import Paper, PaperView
@@ -22,8 +22,8 @@ from sanic import Sanic
 from sanic import json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
-from sanic_cors import CORS
 from workers.celery_config import add_paper, another_task
+from sanic_ext import Extend
 
 load_dotenv()
 
@@ -33,8 +33,15 @@ WorkerManager.THRESHOLD = 600
 app = Sanic("Atlas", config=AppConfig())
 
 
-# Initialize CORS
-CORS(app, resources={r"/*": {"origins": "*"}})
+app.config.CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://atlas.seas.upenn.edu",
+]
+app.config.CORS_SUPPORTS_CREDENTIALS = True
+app.config.CORS_ALLOW_HEADERS = ["Content-Type", "Authorization"]
+
+Extend(app)
 
 redis_broker_url = os.getenv("CELERY_BROKER_URL")
 redis_result_backend = os.getenv("CELERY_RESULT_BACKEND")
@@ -42,8 +49,13 @@ redis_result_backend = os.getenv("CELERY_RESULT_BACKEND")
 mgr = socketio.AsyncRedisManager(redis_broker_url)
 sio = socketio.AsyncServer(
     async_mode="sanic",
-    cors_allowed_origins=[],
+    cors_allowed_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://atlas.seas.upenn.edu",
+    ],
     client_manager=mgr,
+    cors_credentials=True,
 )
 
 sio.attach(app)
@@ -265,7 +277,7 @@ async def features(request: Request):
         )
 
 
-@app.route("/api/login", methods=["POST"])
+@app.route("/api/login", methods=["POST"], name="login")
 async def login(request: Request):
     """
     Handles the POST request for logging in the user.
@@ -274,6 +286,15 @@ async def login(request: Request):
         data = request.json
         email = data.get("email")
         return await login_user(email=email)
+
+
+@app.route("/api/logout", methods=["POST"], name="logout")
+async def logout(request: Request):
+    """
+    Handles the POST request for logging in the user.
+    """
+    if request.method == "POST":
+        return await logout_user()
 
 
 @app.route("/api/validate", methods=["POST"])
@@ -288,15 +309,14 @@ async def validate(request: Request):
         return await validate_user(email=email, token=token)
 
 
-@app.route("/api/check", methods=["POST"])
+@app.route("/api/check", methods=["GET"], name="check_token")
+@require_jwt
 async def check_token(request: Request):
     """
     Handles the POST request for validating the magic link.
     """
-    if request.method == "POST":
-        data = request.json
-        email = data.get("email")
-        return await validate_token(email=email, request=request)
+    if request.method == "GET":
+        return await validate_token(request=request)
 
 
 @app.route("/api/add_paper", methods=["POST", "GET"], name="add_paper_to_project")

@@ -13,7 +13,7 @@ import {
 import ELK from 'elkjs/lib/elk.bundled.js'
 import { Feature } from '@/components/View/DataGrid/feature.types'
 
-interface WorkflowContextType {
+export interface WorkflowContextType {
   nodes: Node[]
   edges: Edge[]
   selectedFeatureIds: string[]

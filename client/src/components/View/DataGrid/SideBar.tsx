@@ -10,6 +10,7 @@ import {
 import { NavMain } from './NavMain'
 import { NavUser } from './NavUser'
 import { useEffect } from 'react'
+import { useUser } from '@/context/User/useUser'
 
 const data = {
   navMain: [
@@ -101,9 +102,11 @@ export function AppSidebar({
   sidebarOpen,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { sidebarOpen: boolean }) {
-  const user = {
-    name: localStorage.getItem('email')?.split('@')[0] || '',
-    email: localStorage.getItem('email') || '',
+  const { user } = useUser()
+
+  const parsedUser = {
+    name: user.email?.split('@')[0] || '',
+    email: user.email || '',
   }
 
   const { toggleSidebar } = useSidebar()
@@ -118,7 +121,7 @@ export function AppSidebar({
         <NavMain label='Atlas v0.1.4 [Alpha Release]' items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={parsedUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

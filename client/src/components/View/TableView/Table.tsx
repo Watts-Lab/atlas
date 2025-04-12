@@ -1,9 +1,9 @@
-import { useState, DragEvent, useEffect, useCallback } from 'react'
-import { useSocket } from '../../../context/Socket/UseSocket'
+import { DragEvent, useCallback, useEffect, useState } from 'react'
+import { useSocket } from '@/context/Socket/useSocket'
+import api from '@/service/api'
 import ArrageTable from './ArrangeTable'
 import { flattenData, Result } from './hooks/data-handler'
 import { check_data, get_failed_data } from './hooks/mock-data'
-import api from '@/service/api'
 
 type RunStatus = {
   status: string

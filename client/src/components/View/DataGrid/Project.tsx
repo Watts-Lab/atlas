@@ -32,7 +32,7 @@ import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { usePapaParse } from 'react-papaparse'
 import { flattenObject } from '../TableView/hooks/data-handler'
-import { useSocket } from '@/context/Socket/UseSocket'
+import { useSocket } from '@/context/Socket/useSocket'
 import api from '@/service/api'
 
 type ProjectDetails = {
@@ -51,7 +51,6 @@ const Project: React.FC = () => {
   const { socket } = useSocket()
 
   const [loading, setLoading] = useState<boolean>(false)
-
   const [projectResults, setProjectResults] = useState<Record<string, unknown>[]>([
     {
       paper: '...',
@@ -63,8 +62,9 @@ const Project: React.FC = () => {
     created_at: '',
     updated_at: '',
   })
-
   const [availableFeatures, setAvailableFeatures] = useState<Feature[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_tasksMapping, setTasksMapping] = useState<Record<string, string>>({})
 
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -103,7 +103,12 @@ const Project: React.FC = () => {
       try {
         const response = await api.get(`/v1/projects/${params.project_id}/results`)
         const response_data = response.data
-        setProjectResults(response_data.results)
+        setProjectResults(
+          response_data.results.map((result: Record<string, unknown>, id: number) => ({
+            id,
+            ...result,
+          })),
+        )
       } catch (error) {
         console.error('Error:', error)
         return null
@@ -112,7 +117,19 @@ const Project: React.FC = () => {
       }
     }
     fetchResults()
-  }, [params.project_id])
+
+    const handleStatusUpdate = (data: { done: boolean }) => {
+      if (data.done) {
+        fetchResults()
+      }
+    }
+
+    socket?.on('status', handleStatusUpdate)
+
+    return () => {
+      socket?.off('status', handleStatusUpdate)
+    }
+  }, [params.project_id, socket])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -278,24 +295,50 @@ const Project: React.FC = () => {
       data.append('files[]', file, file.name)
     }
     data.append('sid', socket?.id || '')
-    data.append('model', 'gpt')
     data.append('project_id', params.project_id)
-    data.append(
-      'features',
-      JSON.stringify([
-        'experiments.name',
-        'experiments.description',
-        'experiments.participant_source',
-        'experiments.participant_source_category',
-        'experiments.units_randomized',
-        'experiments.units_analyzed',
-      ]),
-    )
 
     try {
+      toast.loading('Uploading files...')
       const response = await api.post(`/add_paper`, data)
       if (response.status === 200) {
-        toast.success('File uploaded successfully')
+        toast.dismiss()
+        toast.success('Files uploaded successfully!')
+        setTasksMapping(response.data)
+
+        const taskIds = Object.values(response.data)
+        const toastId = toast.loading(`Processing ${taskIds.length} tasks...`)
+
+        const waitForTasksCompletion = new Promise<void>((resolve) => {
+          const pendingTasks = new Set(taskIds)
+
+          const handleStatusUpdate = (data: {
+            status: string
+            progress: number
+            task_id: string
+            done: boolean
+          }) => {
+            if (pendingTasks.has(data.task_id) && data.done) {
+              pendingTasks.delete(data.task_id)
+              // Update the toast message with the number of remaining tasks:
+              toast.dismiss(toastId)
+              toast(`Processing ${pendingTasks.size} tasks...`)
+            }
+            if (pendingTasks.size === 0) {
+              socket?.off('status', handleStatusUpdate)
+              resolve()
+            }
+          }
+
+          socket?.on('status', handleStatusUpdate)
+        })
+
+        waitForTasksCompletion.then(() => {
+          toast.dismiss(toastId)
+          toast.success('All files processed!', {
+            dismissible: true,
+            duration: 5000,
+          })
+        })
       } else {
         toast.error('Error uploading file')
       }
@@ -324,7 +367,7 @@ const Project: React.FC = () => {
         <div className='navbar-start z-10 md:pl-5'>
           <div className='flex-none'>
             <Contenteditable
-              className='normal-case text-xl'
+              className='normal-case text-xl w-80'
               value={project.name}
               onChange={(updatedContent) => {
                 setProject({ ...project, name: updatedContent })

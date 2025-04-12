@@ -3,6 +3,7 @@ Results model.
 """
 
 from datetime import datetime
+from typing import Optional
 from bunnet import Document, Link, PydanticObjectId
 from pydantic import BaseModel
 
@@ -22,6 +23,7 @@ class Result(Document):
     quality: float
     feature_list: list
     project_id: Link[Project]
+    task_id: Optional[str] = None
     finished: bool = False
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()

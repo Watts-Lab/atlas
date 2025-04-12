@@ -281,7 +281,7 @@ def check_output_format(output):
     raise AssistantException("Output format is incorrect")
 
 
-def create_temporary_assistant(client: OpenAI):
+def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 1.0):
     """
     Creates a temporary assistant with the given functions.
 
@@ -299,8 +299,8 @@ def create_temporary_assistant(client: OpenAI):
             "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format."
         ),
         name="Atlas explorer",
-        model="gpt-4o",
-        temperature=0.7,
+        model="o3-mini",
+        # temperature=gpt_temperature,
     )
 
     return my_temporary_assistant
@@ -332,7 +332,9 @@ def emit_status(
     )
 
 
-def call_asssistant_api(file_path: str, project_id: str, emitter: SocketEmmiter):
+def call_asssistant_api(
+    file_path: str, project_id: str, gpt_temperature: float, emitter: SocketEmmiter
+):
     """
     Calls the Assistant API to perform a task using OpenAI's GPT-3 model.
 
@@ -377,7 +379,7 @@ def call_asssistant_api(file_path: str, project_id: str, emitter: SocketEmmiter)
             progress=15,
         )
 
-        my_temporary_assistant = create_temporary_assistant(client)
+        my_temporary_assistant = create_temporary_assistant(client, gpt_temperature)
 
         updated_assistant = update_assistant(
             client, my_temporary_assistant.id, vector_store, functions

@@ -65,12 +65,34 @@ async def login_user(email: str):
         return json_response(body=response_data, status=500)
 
 
+async def logout_user():
+    """
+    Handles the POST request for user login.
+    """
+    try:
+        app = Sanic.get_app("Atlas")
+        response = json_response(body={"message": "Logged out"}, status=200)
+        response.add_cookie(
+            "jwt",
+            value="",
+            max_age=0,
+            httponly=True,
+            secure=app.config.SECURE_COOKIES,
+        )
+
+        return response
+    except Exception as e:
+        response_data = {"error": "An error occurred.", "message": str(e)}
+        return json_response(body=response_data, status=500)
+
+
 async def validate_user(email: str, token: str):
     """
     Handles the POST request for validating the magic link.
     """
-    app = Sanic.get_app("Atlas")
     try:
+        app = Sanic.get_app("Atlas")
+
         if not email or not token:
             response_data = {"error": "Email and token are required."}
             return json_response(body=response_data, status=400)
@@ -89,20 +111,32 @@ async def validate_user(email: str, token: str):
                     user.magic_link_expired = True
                     user.save()  # Save the User asynchronously
 
-                    response_data = {"message": "Magic link validated."}
-                    header = {
-                        "Access-Control-Expose-Headers": "Authorization",
-                        "Authorization": jwt.encode(
-                            {
-                                "email": email,
-                                "token": token,
-                                "exp": datetime.now(UTC) + timedelta(hours=48),
-                            },
-                            app.config.JWT_SECRET,
-                            algorithm="HS256",
-                        ),
+                    response_data = {
+                        "message": "Magic link validated.",
+                        "email": email,
+                        "credits": user.number_of_tokens,
                     }
-                    return json_response(body=response_data, headers=header, status=200)
+
+                    jwt_token = jwt.encode(
+                        {
+                            "email": email,
+                            "token": token,
+                            "exp": datetime.now(UTC) + timedelta(hours=48),
+                        },
+                        app.config.JWT_SECRET,
+                        algorithm="HS256",
+                    )
+
+                    response = json_response(body=response_data, status=200)
+                    response.add_cookie(
+                        "jwt",
+                        value=jwt_token,
+                        max_age=60 * 60 * 24 * 2,  # 2 days
+                        httponly=True,
+                        secure=app.config.SECURE_COOKIES,
+                    )
+
+                    return response
 
                 # Magic link has expired
                 response_data = {"error": "Magic link has expired."}
@@ -122,31 +156,23 @@ async def validate_user(email: str, token: str):
         return json_response(body=response_data, status=500)
 
 
-async def validate_token(email: str, request: Request):
+async def validate_token(request: Request):
     """
     Handles the POST request for validating the magic link.
     """
-    app = Sanic.get_app("Atlas")
     try:
-        if not email:
-            response_data = {"error": "Email and auth headers are required."}
-            return json_response(body=response_data, status=400)
-
         # Fetch user asynchronously
-        user_jwt = jwt.decode(
-            request.token, app.config.JWT_SECRET, algorithms=["HS256"]
-        )
-        user = User.find_one(User.email == user_jwt.get("email")).run()
+        user = request.ctx.user
 
         if user:
-            if user.email == email:
-                # Users local storage token is valid
-                response_data = {"message": "Token is valid."}
-                return json_response(body=response_data, status=200)
-
-                # Magic link has expired
-            response_data = {"error": "Token is invalid or expired."}
-            return json_response(body=response_data, status=401)
+            # Users local storage token is valid
+            response_data = {
+                "message": "Token is valid.",
+                "email": user.email,
+                "loggedIn": True,
+                "credits": user.number_of_tokens,
+            }
+            return json_response(body=response_data, status=200)
 
         # Check if the token is valid
         response_data = {"error": "User not found."}
