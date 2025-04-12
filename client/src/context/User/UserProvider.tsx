@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useState } from 'react'
-import axios from 'axios'
 import api from '@/service/api'
 
 export type UserDetails = {
@@ -56,7 +55,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(
     async (credentials: { email: string }) => {
       try {
-        const response = await axios.post('/login', credentials)
+        const response = await api.post('/login', credentials)
         if (response.status === 200) {
           await refreshUser()
         }
@@ -70,7 +69,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = useCallback(async () => {
     try {
-      await axios.post('/logout', {}, { withCredentials: true })
+      await api.post('/logout', {}, { withCredentials: true })
       setUser(initialUser)
     } catch (error) {
       console.error('Logout error', error)
