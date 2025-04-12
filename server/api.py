@@ -310,7 +310,6 @@ async def validate(request: Request):
 
 
 @app.route("/api/check", methods=["GET"], name="check_token")
-@require_jwt
 async def check_token(request: Request):
     """
     Handles the POST request for validating the magic link.

@@ -161,8 +161,11 @@ async def validate_token(request: Request):
     Handles the POST request for validating the magic link.
     """
     try:
-        # Fetch user asynchronously
-        user = request.ctx.user
+        token = request.cookies.get("jwt")
+        user_jwt = jwt.decode(
+            token, request.app.config.JWT_SECRET, algorithms=["HS256"]
+        )
+        user = User.find_one(User.email == user_jwt["email"]).run()
 
         if user:
             # Users local storage token is valid
@@ -179,9 +182,9 @@ async def validate_token(request: Request):
         return json_response(body=response_data, status=404)
 
     except jwt.ExpiredSignatureError:
-        return json_response({"error": "Token has expired."}, status=401)
+        return json_response({"error": "Token has expired."}, status=400)
     except jwt.InvalidTokenError:
-        return json_response({"error": "Invalid token."}, status=401)
+        return json_response({"error": "Invalid token."}, status=400)
     except JSONDecodeError:
         response_data = {"error": "Invalid JSON data."}
         return json_response(body=response_data, status=400)

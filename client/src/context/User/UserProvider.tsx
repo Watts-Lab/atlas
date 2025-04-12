@@ -69,7 +69,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = useCallback(async () => {
     try {
-      await api.post('/logout', {}, { withCredentials: true })
+      await api.post('/logout')
       setUser(initialUser)
     } catch (error) {
       console.error('Logout error', error)

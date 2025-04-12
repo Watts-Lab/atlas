@@ -11,7 +11,7 @@ type Params = {
 }
 
 const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
-  const { user, login, logout, updateUser, refreshUser } = useUser()
+  const { login, logout, updateUser, refreshUser } = useUser()
   const params: Params = useParams()
   const navigate = useNavigate()
 
@@ -76,22 +76,16 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   // If user is already logged in, check if the email is valid
   useEffect(() => {
     if (!loggingIn) {
-      setIsLoggingIn(true)
-      setLoggingInMessage('Authenticating token... Please wait.')
-
       refreshUser().then((res) => {
         if (res.loggedIn) {
           navigate('/dashboard')
         } else {
           setLoggingInMessage('Token authentication failed. Please login again.')
           logout()
-          setTimeout(() => {
-            setIsLoggingIn(false)
-          }, 3000)
         }
       })
     }
-  }, [user.email, user.loggedIn])
+  }, [])
 
   // Handle normal login flow via email input
   const submitEmail = async (e: React.FormEvent) => {
