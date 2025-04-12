@@ -50,7 +50,7 @@ pillow==11.1.0
 platformdirs==4.2.2
 polars-lts-cpu==1.24.0
 prometheus_client==0.20.0
-prompt_toolkit==3.0.47
+prompt_toolkit==3.0.50
 pydantic==2.8.2
 pydantic_core==2.20.1
 PyJWT==2.8.0
