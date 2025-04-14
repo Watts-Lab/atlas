@@ -48,7 +48,7 @@ packaging==24.1
 pdf2image==1.17.0
 pillow==11.1.0
 platformdirs==4.2.2
-polars-lts-cpu==1.24.0
+polars-lts-cpu==1.27.1
 prometheus_client==0.20.0
 prompt_toolkit==3.0.47
 pydantic==2.8.2
