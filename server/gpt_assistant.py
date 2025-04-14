@@ -5,6 +5,7 @@ Functions to interact with the OpenAI API.
 import json
 from datetime import datetime
 import logging
+import time
 from typing import Dict, List
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -31,57 +32,6 @@ class AssistantException(Exception):
 
     def __str__(self):
         return f"AssistantException: {self.message}"
-
-
-def get_all_class_features(user_requested_features: List[str]) -> List[str]:
-    """
-    Gets all the available features.
-
-    Returns:
-    - List of all available features.
-    """
-
-    experiments_features = [
-        "experiments.name",
-        "experiments.description",
-        "experiments.participant_source",
-        "experiments.participant_source_category",
-        "experiments.units_randomized",
-        "experiments.units_analyzed",
-        "experiments.sample_size_randomized",
-        "experiments.sample_size_analyzed",
-        "experiments.sample_size_notes",
-        "experiments.adults",
-        "experiments.age_mean",
-        "experiments.age_sd",
-        "experiments.female_perc",
-        "experiments.male_perc",
-        "experiments.gender_other",
-        "experiments.language",
-        "experiments.language_secondary",
-        "experiments.compensation",
-        "experiments.demographics_conditions",
-        "experiments.population_other",
-        "experiments.conditions.name",
-        "experiments.conditions.description",
-        "experiments.conditions.type",
-        "experiments.conditions.message",
-        "experiments.conditions.behaviors.name",
-        "experiments.conditions.behaviors.description",
-        "experiments.conditions.behaviors.priority",
-        "experiments.conditions.behaviors.focal",
-    ]
-
-    # Check if all user requested features are within available experiments_features
-    for feature in user_requested_features:
-        if feature not in experiments_features:
-            raise AssistantException(
-                f"Feature '{feature}' is not a valid experiment feature."
-            )
-
-    sorted_features = sorted(user_requested_features, key=lambda s: s.count("."))
-
-    return sorted_features
 
 
 def get_all_features(project_id: str) -> List[str]:
@@ -281,7 +231,7 @@ def check_output_format(output):
     raise AssistantException("Output format is incorrect")
 
 
-def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 1.0):
+def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 0.7):
     """
     Creates a temporary assistant with the given functions.
 
@@ -296,7 +246,8 @@ def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 1.0):
         instructions=(
             "You are a research assistnant for a team of scientists. "
             "You are tasked with summarizing the key findings of a scientific paper. "
-            "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format."
+            "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format. "
+            "Just provide the JSON response without any additional text. Do not include ```json or any other formatting."
         ),
         name="Atlas explorer",
         model="o3-mini",
@@ -400,9 +351,35 @@ def call_asssistant_api(
         )
 
         run = client.beta.threads.runs.create_and_poll(
-            thread_id=thread_message.id,
             assistant_id=updated_assistant.id,
+            thread_id=thread_message.id,
         )
+
+        end_states = ["expired", "completed", "failed", "incomplete", "canceled"]
+        while run.status not in end_states:
+            logger.info("Assistant run status: %s", run.status)
+            run = client.beta.threads.runs.retrieve(
+                thread_id=run.thread_id, run_id=run.id
+            )
+            if run.status in end_states:
+                break
+            if run.status == "requires_action":
+                tool_outputs = []
+                run = client.beta.threads.runs.submit_tool_outputs(
+                    thread_id=run.thread_id,
+                    run_id=run.id,
+                    tool_outputs=[
+                        {
+                            "tool_call_id": run.required_action.submit_tool_outputs.tool_calls[
+                                0
+                            ].id,
+                            "output": run.required_action.submit_tool_outputs.tool_calls[
+                                0
+                            ].function.arguments,
+                        }
+                    ],
+                )
+            time.sleep(10)
 
         emitter.emit_status(
             message="Assistant run completed.",
@@ -412,9 +389,9 @@ def call_asssistant_api(
         with open("logfile.log", "w", encoding="utf-8") as log_file:
             log_file.write(f"RUN RESULTS: {run.to_json()}\n")
 
-        tool_outputs = json.loads(
-            run.required_action.submit_tool_outputs.tool_calls[0].function.arguments
-        )
+        messages = client.beta.threads.messages.list(thread_id=run.thread_id)
+
+        tool_outputs = json.loads(messages.data[0].content[0].text.value)
 
         check_output_format(tool_outputs)
 
@@ -434,11 +411,11 @@ def call_asssistant_api(
         )
 
         # deleting the vector store
-        vector_store_files = client.beta.vector_stores.files.list(
+        vector_store_files = client.vector_stores.files.list(
             vector_store_id=vector_store.id
         )
         file_ids = [file.id for file in vector_store_files.data]
-        deleted_vector_store = client.beta.vector_stores.delete(
+        deleted_vector_store = client.vector_stores.delete(
             vector_store_id=vector_store.id
         )
         if deleted_vector_store.deleted:
@@ -460,6 +437,6 @@ def call_asssistant_api(
 
     return {
         "result": tool_outputs,
-        "prompt_token": 5419,
-        "completion_token": 91,
+        "prompt_token": run.usage.prompt_tokens if run.usage else 0,
+        "completion_token": run.usage.completion_tokens if run.usage else 0,
     }

@@ -53,7 +53,9 @@ class BaseTaskWithCleanup(Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         logger.error("Task %s failed after all retries. Error: %s", task_id, exc)
         # Finalize with an empty response.
-        self.update_result(task_id, extra_data={"json_response": {'paper':'failed'}}, finished=True)
+        self.update_result(
+            task_id, extra_data={"json_response": {"paper": "failed"}}, finished=True
+        )
         super().on_failure(exc, task_id, args, kwargs, einfo)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
@@ -71,7 +73,9 @@ class BaseTaskWithCleanup(Task):
 
 
 @celery.task(bind=True, name="add_paper", base=BaseTaskWithCleanup, max_retries=1)
-def add_paper(self, file_path: str, socket_id: str, user_email: str, project_id: str):
+def add_paper(
+    self: Task, file_path: str, socket_id: str, user_email: str, project_id: str
+):
     """
     Process the uploaded paper and run the assistant API.
     """
@@ -89,7 +93,7 @@ def add_paper(self, file_path: str, socket_id: str, user_email: str, project_id:
             json_response={},
             prompt_token=0,
             completion_token=0,
-            quality=0.9,
+            quality=0,
             feature_list=user_features,
             task_id=task_id,
             project_id=current_project,
@@ -102,12 +106,18 @@ def add_paper(self, file_path: str, socket_id: str, user_email: str, project_id:
 
     try:
         emitter.emit_status(message="Starting...", progress=0)
+
         logger.info("Executing API call for user %s", user_email)
+
+        base_temperature = 0.7
+        # Increase by 0.1 per retry attempt (adjust increment as needed)
+        current_temperature = base_temperature + (self.request.retries * 0.2)
+
         open_ai_res = run_assistant_api(
             file_path=file_path,
             project_id=project_id,
             emitter=emitter,
-            gpt_temperature=0.5,
+            gpt_temperature=current_temperature,
         )
         emitter.emit_status(message="Saving results...", progress=90)
 
