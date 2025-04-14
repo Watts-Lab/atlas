@@ -8,6 +8,7 @@ import logging
 import time
 from typing import Dict, List
 from openai import OpenAI
+from openai.types import VectorStore
 from dotenv import load_dotenv
 import socketio
 
@@ -163,7 +164,7 @@ def build_openai_feature_functions(
     return openai_function_object
 
 
-def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
+def upload_file_to_vector_store(client: OpenAI, file_path: str) -> VectorStore:
     """
     Uploads a file to the vector store.
 

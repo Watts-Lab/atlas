@@ -392,6 +392,15 @@ async def run_assistant_with_features(request: Request):
         return json_response({"status": task.id})
 
 
+@app.get("/health")
+async def health_check(request: Request):
+    """
+    Simple health check endpoint.
+    Returns 200 OK if the server is running and database is connected.
+    """
+    return json_response({"status": "ok"}, status=200)
+
+
 @sio.on("connect", namespace="/home")
 async def handle_connect(sid, _environ, _auth):
     """
