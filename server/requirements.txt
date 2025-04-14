@@ -78,7 +78,7 @@ sniffio==1.3.1
 threadpoolctl==3.5.0
 tokenizers==0.19.1
 toml==0.10.2
-tomlkit==0.13.0
+tomlkit==0.13.2
 tornado==6.4.1
 tqdm==4.66.4
 tracerite==1.1.1
