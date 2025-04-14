@@ -47,7 +47,7 @@ openai==1.63.2
 packaging==24.1
 pdf2image==1.17.0
 pillow==11.1.0
-platformdirs==4.2.2
+platformdirs==4.3.7
 polars-lts-cpu==1.24.0
 prometheus_client==0.20.0
 prompt_toolkit==3.0.47
