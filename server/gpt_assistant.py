@@ -228,7 +228,7 @@ def upload_file_to_vector_store(client: OpenAI, file_path: str) -> str:
 
     now = datetime.now()
     date_time = now.strftime("%Y_%m_%d_%H_%M_%S")
-    vector_store = client.beta.vector_stores.create(
+    vector_store = client.vector_stores.create(
         name=f"atlas_run_{date_time}",
         file_ids=[file_info.id],
         expires_after={"anchor": "last_active_at", "days": 1},
