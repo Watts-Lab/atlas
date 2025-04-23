@@ -1,5 +1,5 @@
 # Build step #1: build the React front end
-FROM --platform=linux/amd64 public.ecr.aws/bitnami/node:20 AS build-step
+FROM --platform=linux/amd64 public.ecr.aws/bitnami/node:22 AS build-step
 WORKDIR /app
 ENV PATH=/app/node_modules/.bin:$PATH
 
