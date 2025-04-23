@@ -10,32 +10,27 @@ updates:
     directory: "/client"
     schedule:
       interval: "weekly"
-    group: "client-deps"
+    groups:
+      all:
+        patterns:
+          - "*"
 
   # Update and group Python dependencies in the server directory
   - package-ecosystem: "pip"
     directory: "/server"
     schedule:
       interval: "weekly"
-    group: "server-deps"
+    groups:
+      all:
+        patterns:
+          - "*"
 
   # Update and group Docker images used in Dockerfiles and docker-compose files at the repo root
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
-    group: "docker-deps"
-
-update_groups:
-  client-deps:
-    # The pattern "*" means all npm dependencies will be bundled together.
-    patterns:
-      - "*"
-  server-deps:
-    # All pip dependencies in the server group are included.
-    patterns:
-      - "*"
-  docker-deps:
-    # All docker-related dependency updates will be grouped.
-    patterns:
-      - "*"
+    groups:
+      all:
+        patterns:
+          - "*"
