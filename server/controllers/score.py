@@ -1,4 +1,6 @@
-# controllers/score.py
+"""
+This module contains functions to compute scores for CSV data based on features
+"""
 
 import json
 import logging
@@ -110,7 +112,7 @@ def gpt_function_string_comparison(user_refrence, gpt_answer):
         return "Different"
 
 
-def score_csv_data(file_bytes, project_id):
+def score_csv_data(file_bytes, _project_id):
     """
     Score the CSV data based on the features in the database.
     """

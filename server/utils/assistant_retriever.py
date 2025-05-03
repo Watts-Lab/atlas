@@ -48,15 +48,14 @@ class Assistant:
 
     def upload_file_to_vector_store(self, file_path: str) -> str:
         """Uploads a file to the vector store."""
-        file_info = self.client.files.create(
-            file=open(file_path, "rb"), purpose="assistants"
-        )
+        with open(file_path, "rb") as file:
+            file_info = self.client.files.create(file=file, purpose="assistants")
 
         print("file info:", file_info.id)
         now = datetime.now()
         date_time = now.strftime("%Y_%m_%d_%H_%M_%S")
 
-        vector_store = self.client.beta.vector_stores.create(
+        vector_store = self.client.vector_stores.create(
             name=f"atlas_run_{date_time}",
             file_ids=[file_info.id],
             expires_after={"anchor": "last_active_at", "days": 1},
@@ -131,10 +130,10 @@ class Assistant:
     def cleanup_resources(self, vector_store_id: str, assistant: dict, thread_id: str):
         """Cleans up resources after running the assistant."""
         # Delete vector store and associated files
-        vector_store_files = self.client.beta.vector_stores.files.list(vector_store_id)
+        vector_store_files = self.client.vector_stores.files.list(vector_store_id)
         for file_info in vector_store_files.data:
             self.client.files.delete(file_info.id)
 
-        self.client.beta.vector_stores.delete(vector_store_id)
+        self.client.vector_stores.delete(vector_store_id)
         self.client.beta.threads.delete(thread_id)
         self.client.beta.assistants.delete(assistant.id)

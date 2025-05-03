@@ -43,21 +43,29 @@ app.config.CORS_ALLOW_HEADERS = ["Content-Type", "Authorization"]
 
 Extend(app)
 
+# Initialize redis url
 redis_broker_url = os.getenv("CELERY_BROKER_URL")
 redis_result_backend = os.getenv("CELERY_RESULT_BACKEND")
 
-mgr = socketio.AsyncRedisManager(redis_broker_url)
-sio = socketio.AsyncServer(
-    async_mode="sanic",
-    cors_allowed_origins=[
+# For testing purposes if redis is not set
+mgr = None
+if redis_broker_url:
+    mgr = socketio.AsyncRedisManager(redis_broker_url)
+
+sio_kwargs = {
+    "async_mode": "sanic",
+    "cors_allowed_origins": [
         "http://localhost:3000",
         "http://localhost:5173",
         "https://atlas.seas.upenn.edu",
     ],
-    client_manager=mgr,
-    cors_credentials=True,
-)
+    "cors_credentials": True,
+}
+if mgr:
+    sio_kwargs["client_manager"] = mgr
 
+# Initialize SocketIO
+sio = socketio.AsyncServer(**sio_kwargs)
 sio.attach(app)
 
 
@@ -393,7 +401,7 @@ async def run_assistant_with_features(request: Request):
 
 
 @app.get("/health")
-async def health_check(request: Request):
+async def health_check(_request: Request):
     """
     Simple health check endpoint.
     Returns 200 OK if the server is running and database is connected.

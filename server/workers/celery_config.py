@@ -42,7 +42,7 @@ s3 = boto3.client(
 @worker_process_init.connect
 def init_celery_worker(**kwargs):
     """
-    Initialize the Beanie/MongoDB connection for each worker process.
+    Initialize the Bunnet/MongoDB connection for each worker process.
     """
     global DB_INITIALIZED
     if not DB_INITIALIZED:
@@ -53,7 +53,7 @@ def init_celery_worker(**kwargs):
 @worker_process_shutdown.connect
 def shutdown_celery_worker(**kwargs):
     """
-    Shutdown the Beanie/MongoDB connection for each worker process.
+    Shutdown the Bunnet/MongoDB connection for each worker process.
     """
     global DB_INITIALIZED
     if DB_INITIALIZED:
