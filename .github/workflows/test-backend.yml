@@ -8,6 +8,8 @@ jobs:
     strategy:
       matrix:
         python-version: [3.11]
+    env:
+      PYTHONPATH: ${{ github.workspace }}/server
 
     steps:
       - name: Checkout code
@@ -27,12 +29,12 @@ jobs:
           pip install pylint pytest
 
       - name: Lint with pylint
-        working-directory: server
+        working-directory: .
         run: |
           # will exit non-zero if there are lint errors
-          pylint --rcfile=.pylintrc .
+          pylint --rcfile=server/.pylintrc server
 
       - name: Run pytest
-        working-directory: server
+        working-directory: .
         run: |
-          pytest tests --maxfail=1 --disable-warnings -q
+          pytest server/tests --maxfail=1 --disable-warnings -q
