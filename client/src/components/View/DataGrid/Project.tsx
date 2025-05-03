@@ -18,15 +18,6 @@ import {
 } from '@/components/ui/dialog'
 import { FolderDown, Loader2 } from 'lucide-react'
 import { MultiSelect } from '@/components/ui/multi-select'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
@@ -204,9 +195,14 @@ const Project: React.FC = () => {
   const [selectableHeaders, setSelectableHeaders] = useState<string[]>([])
 
   useEffect(() => {
+    const notIncluded = ['id', 'paper']
     const allKeys = new Set<string>()
     flattenObject(projectResults).forEach((obj) => {
-      Object.keys(obj).forEach((key) => allKeys.add(key))
+      Object.keys(obj).forEach((key) => {
+        if (!notIncluded.includes(key)) {
+          allKeys.add(key)
+        }
+      })
     })
     setSelectableHeaders(Array.from(allKeys))
   }, [projectResults])
@@ -361,44 +357,43 @@ const Project: React.FC = () => {
     }
   }
 
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([])
+
   return (
     <main className={`${loading ? 'blur-sm' : ''}`}>
-      <div className='navbar bg-base-100 flex flex-col sm:flex-row'>
-        <div className='navbar-start z-10 md:pl-5'>
-          <div className='flex-none'>
-            <Contenteditable
-              className='normal-case text-xl w-80'
-              value={project.name}
-              onChange={(updatedContent) => {
-                setProject({ ...project, name: updatedContent })
-                updateProjectName(updatedContent)
-              }}
-            />
-          </div>
+      <header className='bg-gray-50 rounded-md shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-y-4 sm:gap-y-0 p-4'>
+        <div className='w-full sm:w-auto'>
+          <Contenteditable
+            className='w-full sm:w-60 text-xl font-semibold text-gray-800'
+            value={project.name}
+            onChange={(updatedContent) => {
+              setProject({ ...project, name: updatedContent })
+              updateProjectName(updatedContent)
+            }}
+          />
         </div>
-        <div className='navbar-center text-center'>
-          <div className='flex flex-row justify-center '>{project.id}</div>
-        </div>
-        <div className='md:navbar-end z-10 max-md:pt-4'>
-          <Button onClick={handleButtonClick} className='mr-2'>
-            Upload file
-          </Button>
+
+        <div className='text-center text-gray-600 font-medium flex-1'>{project.id}</div>
+
+        <div className='flex flex-wrap justify-end items-center space-x-2 w-full sm:w-auto'>
+          <Button onClick={handleButtonClick}>Upload file</Button>
           <input
             type='file'
             ref={fileInputRef}
             onChange={handleUploadFileChange}
-            style={{ display: 'none' }}
             accept='application/pdf'
             multiple
+            className='hidden'
           />
-          <Dialog open={open} onOpenChange={setOpen}>
+
+          <Dialog open={open} onOpenChange={setOpen} modal={false}>
             <DialogTrigger asChild>
               <Button>
-                <FolderDown />
-                &nbsp;Load truth
+                <FolderDown className='inline-block mr-1' />
+                Load truth
               </Button>
             </DialogTrigger>
-            <DialogContent className='sm:max-w-[600px]'>
+            <DialogContent className='max-w-lg'>
               <DialogHeader>
                 <DialogTitle>Create truth input</DialogTitle>
                 <DialogDescription>
@@ -407,54 +402,36 @@ const Project: React.FC = () => {
                   on your features.
                 </DialogDescription>
               </DialogHeader>
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(() => {})} className='space-y-8'>
-                  <FormField
-                    control={form.control}
-                    name='frameworks'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Columns</FormLabel>
-                        <FormControl>
-                          <MultiSelect
-                            options={selectableHeaders.map((feature) => ({
-                              label: feature.replace(/\s/g, ' → ').toLowerCase(),
-                              value: feature,
-                            }))}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            placeholder='Select columns'
-                            variant='inverted'
-                            maxCount={3}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Choose the columns/features you are interested in.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type='submit' onClick={handleJsonToCSV}>
-                      Export CSV Base Template
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-
-              <Separator />
-
+              <MultiSelect
+                modalPopover={false}
+                options={selectableHeaders.map((feature) => ({
+                  label: feature.replace(/\s/g, ' → ').toLowerCase(),
+                  value: feature,
+                }))}
+                onValueChange={setSelectedFrameworks}
+                defaultValue={selectedFrameworks}
+                placeholder='Select columns'
+                variant='inverted'
+                maxCount={3}
+              />
+              <DialogDescription>
+                Choose the columns/features you are interested in.
+              </DialogDescription>
+              <DialogFooter>
+                <Button type='submit' onClick={handleJsonToCSV}>
+                  Export CSV Base Template
+                </Button>
+              </DialogFooter>
+              <Separator className='my-4' />
               <div className='space-y-2'>
                 <div className='font-semibold'>Import Ground Truth</div>
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-sm text-gray-500'>
                   Upload your modified ground truth CSV to score your features.
                 </p>
                 <Input type='file' accept='.csv' onChange={handleFileChange} />
                 <DialogFooter>
                   <Button type='submit' onClick={handleLoadCSV} disabled={loadingAccuracy}>
-                    {loadingAccuracy && <Loader2 className='animate-spin' />}
+                    {loadingAccuracy && <Loader2 className='animate-spin mr-2' />}
                     Load CSV Ground Truth
                   </Button>
                 </DialogFooter>
@@ -462,8 +439,7 @@ const Project: React.FC = () => {
             </DialogContent>
           </Dialog>
         </div>
-      </div>
-      <hr></hr>
+      </header>
 
       <GridTable
         data={projectResults}

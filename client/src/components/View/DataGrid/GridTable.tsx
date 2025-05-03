@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
-import { ColDef } from 'ag-grid-community'
 import { flattenObject } from '../TableView/hooks/data-handler'
 
+import { AgGridReact } from 'ag-grid-react'
+import {
+  ColDef,
+  ModuleRegistry,
+  AllCommunityModule,
+  provideGlobalGridOptions,
+} from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-balham.css'
 
-import { AgGridReact } from 'ag-grid-react'
+ModuleRegistry.registerModules([AllCommunityModule])
+provideGlobalGridOptions({ theme: 'legacy' })
 
 import SelectFeatures from './SelectFeatures'
 import { Feature, NewFeature } from './feature.types'
@@ -130,8 +137,7 @@ const GridTable = ({
             rowData={rowData}
             columnDefs={colDefs}
             suppressDragLeaveHidesColumns={true}
-            suppressMakeColumnVisibleAfterUnGroup={true}
-            suppressRowGroupHidesColumns={true}
+            suppressGroupChangesColumnVisibility='suppressHideOnGroup'
             tooltipShowDelay={100}
           />
         </div>

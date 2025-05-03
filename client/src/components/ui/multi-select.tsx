@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { CheckIcon, XCircle, ChevronDown, XIcon, WandSparkles } from 'lucide-react'
+import { CheckIcon, XCircle, ChevronDown, XIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -76,12 +75,6 @@ interface MultiSelectProps
   placeholder?: string
 
   /**
-   * Animation duration in seconds for the visual effects (e.g., bouncing badges).
-   * Optional, defaults to 0 (no animation).
-   */
-  animation?: number
-
-  /**
    * Maximum number of items to display. Extra selected items will be summarized.
    * Optional, defaults to 3.
    */
@@ -108,30 +101,20 @@ interface MultiSelectProps
 }
 
 export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
-  (
-    {
-      options,
-      onValueChange,
-      variant,
-      defaultValue = [],
-      placeholder = 'Select options',
-      animation = 0,
-      maxCount = 3,
-      modalPopover = false,
-      asChild = false,
-      className,
-      ...props
-    },
-    ref,
-  ) => {
+  ({
+    options,
+    onValueChange,
+    variant,
+    defaultValue = [],
+    placeholder = 'Select options',
+    maxCount = 3,
+    modalPopover = false,
+    className,
+  }) => {
     const [selectedValues, setSelectedValues] = React.useState<string[]>(defaultValue)
-    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false)
-    const [isAnimating, setIsAnimating] = React.useState(false)
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
-        setIsPopoverOpen(true)
-      } else if (event.key === 'Backspace' && !event.currentTarget.value) {
+      if (event.key === 'Backspace' && !event.currentTarget.value) {
         const newSelectedValues = [...selectedValues]
         newSelectedValues.pop()
         setSelectedValues(newSelectedValues)
@@ -152,10 +135,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
       onValueChange([])
     }
 
-    const handleTogglePopover = () => {
-      setIsPopoverOpen((prev) => !prev)
-    }
-
     const clearExtraOptions = () => {
       const newSelectedValues = selectedValues.slice(0, maxCount)
       setSelectedValues(newSelectedValues)
@@ -173,12 +152,10 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     }
 
     return (
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={modalPopover}>
-        <PopoverTrigger asChild>
+      <Popover modal={modalPopover}>
+        <PopoverTrigger>
           <Button
-            ref={ref}
-            {...props}
-            onClick={handleTogglePopover}
+            variant='outline'
             className={cn(
               'flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto',
               className,
@@ -191,14 +168,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                     const option = options.find((o) => o.value === value)
                     const IconComponent = option?.icon
                     return (
-                      <Badge
-                        key={value}
-                        className={cn(
-                          isAnimating ? 'animate-bounce' : '',
-                          multiSelectVariants({ variant }),
-                        )}
-                        style={{ animationDuration: `${animation}s` }}
-                      >
+                      <Badge key={value} className={cn(multiSelectVariants({ variant }))}>
                         {IconComponent && <IconComponent className='h-4 w-4 mr-2' />}
                         {option?.label}
                         <XCircle
@@ -215,10 +185,8 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                     <Badge
                       className={cn(
                         'bg-transparent text-foreground border-foreground/1 hover:bg-transparent',
-                        isAnimating ? 'animate-bounce' : '',
                         multiSelectVariants({ variant }),
                       )}
-                      style={{ animationDuration: `${animation}s` }}
                     >
                       {`+ ${selectedValues.length - maxCount} more`}
                       <XCircle
@@ -251,11 +219,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className='w-auto p-0'
-          align='start'
-          onEscapeKeyDown={() => setIsPopoverOpen(false)}
-        >
+        <PopoverContent className='w-[--radix-popover-trigger-width] p-0' align='start'>
           <Command>
             <CommandInput placeholder='Search...' onKeyDown={handleInputKeyDown} />
             <CommandList>
@@ -311,29 +275,13 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                       >
                         Clear
                       </CommandItem>
-                      <Separator orientation='vertical' className='flex min-h-6 h-full' />
                     </>
                   )}
-                  <CommandItem
-                    onSelect={() => setIsPopoverOpen(false)}
-                    className='flex-1 justify-center cursor-pointer max-w-full'
-                  >
-                    Close
-                  </CommandItem>
                 </div>
               </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
-        {animation > 0 && selectedValues.length > 0 && (
-          <WandSparkles
-            className={cn(
-              'cursor-pointer my-2 text-foreground bg-background w-3 h-3',
-              isAnimating ? '' : 'text-muted-foreground',
-            )}
-            onClick={() => setIsAnimating(!isAnimating)}
-          />
-        )}
       </Popover>
     )
   },
