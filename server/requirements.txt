@@ -30,6 +30,7 @@ httpx==0.28.1
 huggingface-hub==0.30.2
 humanize==4.12.3
 idna==3.10
+iniconfig==2.1.0
 isort==6.0.1
 Jinja2==3.1.6
 jiter==0.9.0
@@ -47,6 +48,7 @@ packaging==25.0
 pdf2image==1.17.0
 pillow==11.2.1
 platformdirs==4.3.7
+pluggy==1.5.0
 polars-lts-cpu==1.29.0
 prometheus_client==0.21.1
 prompt_toolkit==3.0.51
@@ -55,6 +57,8 @@ pydantic_core==2.33.2
 PyJWT==2.10.1
 pylint==3.3.6
 pymongo==4.12.1
+pytest==8.3.5
+pytest-asyncio==0.26.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 python-engineio==4.12.0
@@ -68,6 +72,7 @@ sanic==25.3.0
 sanic-ext==24.12.0
 sanic-jwt==1.8.0
 sanic-routing==23.12.0
+sanic-testing==24.6.0
 scikit-learn==1.6.1
 scipy==1.15.2
 setuptools==80.3.0
