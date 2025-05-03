@@ -1,5 +1,5 @@
 """
-This file is responsible for initializing the database connection and the beanie model.
+This file is responsible for initializing the database connection and the bunnet model.
 """
 
 import os
@@ -14,10 +14,10 @@ from database.models.users import User
 from database.models.results import Result
 
 
-# Call this from within your event loop to get beanie setup.
+# Call this from within your event loop to get bunnet setup.
 def init_db():
     """
-    Initialize the database connection and the beanie model.
+    Initialize the database connection and the bunnet model.
     """
     load_dotenv()
     # Create Motor client
@@ -26,7 +26,7 @@ def init_db():
     client.admin.command("ping")
     print("Connected to the database.")
 
-    # Init beanie with the Product document class
+    # Init bunnet with the Product document class
     init_bunnet(
         database=client.atlas_main,
         document_models=[User, Paper, Result, Project, Features],
