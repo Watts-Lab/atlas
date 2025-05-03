@@ -10,7 +10,6 @@ from typing import Dict, List
 from openai import OpenAI
 from openai.types import VectorStore
 from dotenv import load_dotenv
-import socketio
 
 from database.models.features import Features
 from database.models.projects import Project
@@ -175,7 +174,8 @@ def upload_file_to_vector_store(client: OpenAI, file_path: str) -> VectorStore:
     - URL to the uploaded file.
     """
 
-    file_info = client.files.create(file=open(file_path, "rb"), purpose="assistants")
+    with open(file_path, "rb") as file:
+        file_info = client.files.create(file=file, purpose="assistants")
 
     now = datetime.now()
     date_time = now.strftime("%Y_%m_%d_%H_%M_%S")
@@ -242,6 +242,11 @@ def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 0.7):
     Returns:
         - The created assistant.
     """
+    logger.info(
+        "Creating temporary assistant with model: %s and temperature: %s",
+        "o3-mini",
+        gpt_temperature,
+    )
 
     my_temporary_assistant = client.beta.assistants.create(
         instructions=(
@@ -256,32 +261,6 @@ def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 0.7):
     )
 
     return my_temporary_assistant
-
-
-def emit_status(
-    sio: socketio.RedisManager, status: str, progress: int, task_id: str, sid: str
-):
-    """
-    Emits a status message to the client.
-
-    Args:
-    - sio: The socketio server.
-    - status: The status message to send.
-    - progress: The progress percentage.
-    - task_id: The task ID.
-    """
-
-    sio.emit(
-        "status",
-        {
-            "status": status,
-            "progress": progress,
-            "task_id": task_id,
-            "done": False,
-        },
-        to=sid,
-        namespace="/home",
-    )
 
 
 def call_asssistant_api(

@@ -393,7 +393,7 @@ async def run_assistant_with_features(request: Request):
 
 
 @app.get("/health")
-async def health_check(request: Request):
+async def health_check():
     """
     Simple health check endpoint.
     Returns 200 OK if the server is running and database is connected.
