@@ -27,12 +27,12 @@ jobs:
           pip install pylint pytest
 
       - name: Lint with pylint
-        working-directory: .
+        working-directory: server
         run: |
           # will exit non-zero if there are lint errors
-          pylint --rcfile=server/.pylintrc server
+          pylint --rcfile=.pylintrc .
 
       - name: Run pytest
-        working-directory: .
+        working-directory: server
         run: |
-          pytest server/tests --maxfail=1 --disable-warnings -q
+          pytest tests --maxfail=1 --disable-warnings -q
