@@ -78,7 +78,6 @@ function getParentIdentifier(identifier: string): string | null {
 function getParentChain(identifier: string): string[] {
   const chain: string[] = []
   let current = identifier
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const parent = getParentIdentifier(current)
     if (!parent || parent === current) break

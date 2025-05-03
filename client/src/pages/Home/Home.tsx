@@ -18,7 +18,6 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const emailRef = useRef<HTMLInputElement | null>(null)
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [submitting, setSubmitting] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(loggingIn)
   const [loggingInMessage, setLoggingInMessage] = useState('Authenticating... Please wait.')

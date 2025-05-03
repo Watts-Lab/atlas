@@ -46,7 +46,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(initialUser)
         return initialUser
       }
-    } catch (error) {
+    } catch {
       setUser(initialUser)
       return initialUser
     }

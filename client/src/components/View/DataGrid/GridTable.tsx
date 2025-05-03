@@ -29,7 +29,7 @@ const GridTable = ({
   const [rowData, setRowData] = useState<Record<string, unknown>[]>(flattenObject(data))
 
   const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(document.createElement('dialog'))
   useEffect(() => {
     if (dialogRef.current?.open && !isFeatureModalOpen) {
       dialogRef.current?.close()

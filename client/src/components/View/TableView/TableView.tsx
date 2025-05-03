@@ -45,7 +45,7 @@ const TableView = ({ project_id, project_results }: TableViewProps) => {
       try {
         flattenData([obj], true, true, true)
         return obj
-      } catch (error) {
+      } catch {
         return get_failed_data(`Failed - ${obj.task_id}`, false, obj.task_id)
       }
     })

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 type LoginFormProps = {
-  emailRef: React.RefObject<HTMLInputElement>
+  emailRef: React.RefObject<HTMLInputElement | null>
   submitEmail: (e: React.FormEvent<HTMLFormElement>) => void
   submitting: boolean
 }
