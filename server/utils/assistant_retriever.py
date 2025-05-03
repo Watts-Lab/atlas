@@ -55,7 +55,7 @@ class Assistant:
         now = datetime.now()
         date_time = now.strftime("%Y_%m_%d_%H_%M_%S")
 
-        vector_store = self.client.beta.vector_stores.create(
+        vector_store = self.client.vector_stores.create(
             name=f"atlas_run_{date_time}",
             file_ids=[file_info.id],
             expires_after={"anchor": "last_active_at", "days": 1},
