@@ -52,7 +52,7 @@ polars-lts-cpu==1.29.0
 prometheus_client==0.21.1
 prompt_toolkit==3.0.51
 pydantic==2.11.4
-pydantic_core==2.34.1
+pydantic_core==2.33.2
 PyJWT==2.10.1
 pylint==3.3.6
 pymongo==4.12.1
