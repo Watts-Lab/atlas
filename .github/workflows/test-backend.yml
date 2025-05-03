@@ -32,7 +32,7 @@ jobs:
         working-directory: .
         run: |
           # will exit non-zero if there are lint errors
-          pylint --rcfile=server/.pylintrc server
+          pylint --rcfile=server/.pylintrc server --fail-under 5 --fail-on E
 
       - name: Run pytest
         working-directory: .
