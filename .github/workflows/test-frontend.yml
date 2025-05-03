@@ -3,7 +3,7 @@ name: Run Tests (Frontend)
 on: [push]
 
 jobs:
-  vite-test:
+  test-frontend:
     runs-on: ubuntu-latest
     defaults:
       run:

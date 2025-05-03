@@ -3,7 +3,7 @@ name: Run Tests (Backend)
 on: [push]
 
 jobs:
-  lint-and-test:
+  test-backend:
     runs-on: ubuntu-latest
     strategy:
       matrix:
