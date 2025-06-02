@@ -92,15 +92,20 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
     e.preventDefault()
 
     const email = emailRef.current!.value
-    login({ email: email })
-      .then(await new Promise((resolve) => setTimeout(resolve, 3000)))
-      .finally(() => {
-        setLoggingInMessage('Check your email for the magic link!')
-        setSubmitting(false)
-        if (emailRef.current) {
-          emailRef.current.value = ''
-        }
-      })
+
+    try {
+      await login({ email: email })
+      // Wait 3 seconds after successful login
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+    } catch (error) {
+      console.error('Login failed:', error)
+    } finally {
+      setLoggingInMessage('Check your email for the magic link!')
+      setSubmitting(false)
+      if (emailRef.current) {
+        emailRef.current.value = ''
+      }
+    }
   }
 
   return (
