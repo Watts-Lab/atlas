@@ -20,7 +20,6 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [email, setEmail] = useState<string>('')
-
   const [submitting, setSubmitting] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(loggingIn)
   const [loggingInMessage, setLoggingInMessage] = useState('Authenticating... Please wait.')
@@ -65,7 +64,6 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
             })
             navigate('/dashboard')
           } else {
-            // ADDED: If invalid magic link
             setLoggingInMessage('Invalid or expired magic link. Please try logging in again.')
             setTimeout(() => {
               setIsLoggingIn(false)
@@ -89,7 +87,6 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
     }
   }, [])
 
-  // Updated to use onClick handler instead of form submission
   const handleLogin = async () => {
     setSubmitting(true)
 
@@ -100,8 +97,6 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
 
     try {
       await login({ email: email })
-
-      // Wait 3 seconds after successful login
       await new Promise((resolve) => setTimeout(resolve, 3000))
       setLoggingInMessage('Check your email for the magic link!')
     } catch {
@@ -111,75 +106,94 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
       }, 3000)
     } finally {
       setSubmitting(false)
-      if (email) {
-        setEmail('') // Clear email input after login attempt
-      }
+      setEmail('')
     }
   }
 
   return (
-    <div className='p-0 m-0 w-full h-full fixed flex justify-center items-center contrast-120'>
+    <div className='fixed inset-0 flex items-center justify-center contrast-120'>
       <div className='w-full h-full container-gradient'>
-        <div className='w-inherit h-inherit'>
-          <canvas ref={canvasRef} id='universe' className='w-full h-full'></canvas>
-          <div className='absolute top-1/4 w-full text-center'>
-            <div className='w-full max-w-sm mx-auto'>
-              <div className='flex flex-col gap-6'>
-                {/* Remove form wrapper, just use div */}
-                <div>
-                  <div className='flex flex-col gap-6'>
-                    <div className='flex flex-col items-center gap-2'>
-                      <a href='#' className='flex flex-col items-center gap-2 font-medium'>
-                        <div className='flex h-12 w-12 items-center justify-center rounded-md pb-2'>
-                          <img src='/web-app-manifest-512x512-bg-i.png' alt='Acme Inc.' />
-                        </div>
-                        <span className='sr-only text-gray-50'>Acme Inc.</span>
-                      </a>
-                      <h1 className='text-2xl font-bold text-gray-50'>Welcome to Atlas</h1>
-                      <p className='text-base text-gray-50'>
-                        Atlas is a platform for research cartography and data visualization. <br />
-                      </p>
-                    </div>
-                    <div className='flex flex-col gap-6'>
-                      <div className='grid gap-2 text-gray-50'>
-                        <Label htmlFor='email'>Email</Label>
-                        {!submitting ? (
-                          <Input
-                            data-testid='email-input'
-                            onChange={(e) => setEmail(e.target.value)}
-                            value={email}
-                            id='email'
-                            type='email'
-                            placeholder='example@scaledhumanity.org'
-                            required
-                          />
-                        ) : (
-                          <p className='text-slate-200 pt-4 fade-in'>
-                            Please check your email for a login link
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        disabled={submitting}
-                        type='button' // Changed from 'submit' to 'button'
-                        onClick={handleLogin} // Add onClick handler
-                        className='w-full bg-gray-700'
-                      >
-                        {submitting && <Loader2 className='animate-spin' />}
-                        Login
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className='text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary text-gray-100'>
-                  By clicking continue, you agree to our{' '}
-                  <a href='https://github.com/Watts-Lab/atlas?tab=coc-ov-file'>Code of Conduct</a>{' '}
-                  and{' '}
-                  <a href='https://github.com/Watts-Lab/atlas?tab=AGPL-3.0-1-ov-file'>License</a>.
+        <canvas ref={canvasRef} id='universe' className='w-full h-full' />
+
+        <div className='absolute inset-0 flex items-center justify-center pt-20'>
+          <div className='w-full max-w-sm space-y-6'>
+            {/* Header Section */}
+            <div className='text-center space-y-4'>
+              <div className='flex justify-center'>
+                <div className='w-12 flex items-center justify-center'>
+                  <img
+                    src='/web-app-manifest-512x512-bg-i.png'
+                    alt='Atlas Logo'
+                    className='w-full h-full'
+                  />
                 </div>
               </div>
+              <div>
+                <h1 className='text-2xl font-bold text-gray-50'>Welcome to Atlas</h1>
+                <p className='text-gray-50 mt-2'>
+                  Atlas is a platform for research cartography and data visualization.
+                </p>
+              </div>
             </div>
-            {isLoggingIn ? <p className='text-slate-200 pt-4 fade-in'>{loggingInMessage}</p> : null}
+
+            {/* Login Form */}
+            <div className='space-y-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='email' className='text-gray-50'>
+                  Email
+                </Label>
+                {!submitting ? (
+                  <Input
+                    data-testid='email-input'
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                    id='email'
+                    type='email'
+                    placeholder='example@scaledhumanity.org'
+                    required
+                    className='w-full text-white'
+                  />
+                ) : (
+                  <p className='text-slate-200 py-4 fade-in'>
+                    Please check your email for a login link
+                  </p>
+                )}
+              </div>
+
+              <Button
+                disabled={submitting}
+                type='button'
+                onClick={handleLogin}
+                className='w-full bg-gray-700 hover:bg-gray-600'
+              >
+                {submitting && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+                Login
+              </Button>
+            </div>
+
+            {/* Footer */}
+            <div className='text-center text-xs text-gray-100 space-x-1'>
+              <span>By clicking continue, you agree to our</span>
+              <a
+                href='https://github.com/Watts-Lab/atlas?tab=coc-ov-file'
+                className='underline hover:text-white'
+              >
+                Code of Conduct
+              </a>
+              <span>and</span>
+              <a
+                href='https://github.com/Watts-Lab/atlas?tab=AGPL-3.0-1-ov-file'
+                className='underline hover:text-white'
+              >
+                License
+              </a>
+              <span>.</span>
+            </div>
+
+            {/* Status Messages */}
+            {isLoggingIn && (
+              <p className='text-slate-200 text-center fade-in'>{loggingInMessage}</p>
+            )}
           </div>
         </div>
       </div>
