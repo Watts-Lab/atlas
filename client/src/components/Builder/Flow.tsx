@@ -35,6 +35,7 @@ const Flow = () => {
           onInit={onInit}
           nodeTypes={nodeTypes}
           proOptions={{ hideAttribution: true }}
+          nodesConnectable={false}
           fitView
         >
           <Background />

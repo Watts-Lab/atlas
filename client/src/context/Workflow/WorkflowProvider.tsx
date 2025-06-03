@@ -137,7 +137,8 @@ export const WorkflowProvider = ({ children }: { children: React.ReactNode }) =>
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
-      setEdges((eds) => applyEdgeChanges(changes, eds))
+      const filtered = changes.filter((change) => change.type !== 'remove')
+      setEdges((eds) => applyEdgeChanges(filtered, eds))
     },
     [setEdges],
   )

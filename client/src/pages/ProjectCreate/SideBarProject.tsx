@@ -147,7 +147,7 @@ export function SidebarRight(props: ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <div className='p-4 space-y-3 border-b'>
           {/* Project Info */}
-          <div>
+          <div className='grid w-full max-w-sm items-center gap-2'>
             <Label htmlFor='projectname'>Project Name*</Label>
             <Input
               id='projectname'
@@ -157,7 +157,7 @@ export function SidebarRight(props: ComponentProps<typeof Sidebar>) {
               required
             />
           </div>
-          <div>
+          <div className='grid w-full max-w-sm items-center gap-2'>
             <Label htmlFor='projectdescription'>Description</Label>
             <Input
               id='projectdescription'
@@ -168,35 +168,37 @@ export function SidebarRight(props: ComponentProps<typeof Sidebar>) {
           </div>
         </div>
 
-        <ToggleGroup type='single'>
-          <ToggleGroupItem
-            onClick={() => setCompactMode('name-only')}
-            value='name-only'
-            aria-label="Toggle 'name-only'"
-            title='Show only feature name'
-          >
-            <Rows4 size={2} />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            onClick={() => setCompactMode('name-trail')}
-            value='name-trail'
-            aria-label="Toggle 'name-trail'"
-            title='Show feature name and trail'
-          >
-            <Rows3 size={2} />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            onClick={() => setCompactMode('name-description')}
-            value='name-description'
-            aria-label="Toggle 'name-description'"
-            title='Show feature name, trail and description'
-          >
-            <Rows2 size={2} />
-          </ToggleGroupItem>
-          <Button variant='ghost' size='icon' title='reset' onClick={() => resetWorkflow()}>
-            <CircleX />
-          </Button>
-        </ToggleGroup>
+        <div className='flex justify-center'>
+          <ToggleGroup type='single' className='gap-2'>
+            <ToggleGroupItem
+              onClick={() => setCompactMode('name-only')}
+              value='name-only'
+              aria-label="Toggle 'name-only'"
+              title='Show only feature name'
+            >
+              <Rows4 size={2} />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              onClick={() => setCompactMode('name-trail')}
+              value='name-trail'
+              aria-label="Toggle 'name-trail'"
+              title='Show feature name and trail'
+            >
+              <Rows3 size={2} />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              onClick={() => setCompactMode('name-description')}
+              value='name-description'
+              aria-label="Toggle 'name-description'"
+              title='Show feature name, trail and description'
+            >
+              <Rows2 size={2} />
+            </ToggleGroupItem>
+            <Button variant='ghost' size='icon' title='reset' onClick={() => resetWorkflow()}>
+              <CircleX />
+            </Button>
+          </ToggleGroup>
+        </div>
 
         <div className='px-4'>
           {loading && <p>Loading features...</p>}

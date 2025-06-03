@@ -254,13 +254,14 @@ async def features(request: Request):
         feature_description = data.get("feature_description", "")
         feature_identifier = data.get("feature_identifier")
         gpt_interface = data.get("gpt_interface")
+        feature_parent = data.get("feature_parent", "")
 
         if not feature_name or not feature_identifier:
             return json_response({"error": "Missing required fields."}, status=400)
 
         new_feature = Features(
             feature_name=feature_name,
-            feature_parent="",
+            feature_parent=feature_parent,
             feature_identifier=feature_identifier,
             feature_description=feature_description,
             feature_gpt_interface=gpt_interface,

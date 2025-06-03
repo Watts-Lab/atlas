@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { addFeature, fetchFeatures } from './feature.service'
-import { Feature, NewFeature } from './feature.types'
+import { fetchFeatures } from './feature.service'
+import { Feature } from './feature.types'
 import GridTable from './GridTable'
 import { useParams } from 'react-router-dom'
 import Contenteditable from '../../../pages/ProjectView/Contenteditable'
@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/dialog'
 import { FolderDown, Loader2 } from 'lucide-react'
 import { MultiSelect } from '@/components/ui/multi-select'
-import { useForm } from 'react-hook-form'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { usePapaParse } from 'react-papaparse'
@@ -164,15 +163,6 @@ const Project: React.FC = () => {
     loadFeatures()
   }, [params.project_id])
 
-  const addNewFeatureHandler = async (newFeatureData: NewFeature) => {
-    try {
-      const addedFeature = await addFeature(newFeatureData)
-      setAvailableFeatures((prevFeatures) => [...prevFeatures, addedFeature])
-    } catch (error) {
-      console.error('Error adding feature:', error)
-    }
-  }
-
   const updateProjectFeatures = async () => {
     const projectId = params.project_id
     const selectedFeatures = availableFeatures.filter((feature) => feature.selected)
@@ -191,7 +181,6 @@ const Project: React.FC = () => {
       })
   }
 
-  const form = useForm()
   const [selectableHeaders, setSelectableHeaders] = useState<string[]>([])
 
   useEffect(() => {
@@ -210,13 +199,14 @@ const Project: React.FC = () => {
   const { jsonToCSV } = usePapaParse()
 
   const handleJsonToCSV = () => {
-    const selectedColumns = form.watch('frameworks') || []
     const data = flattenObject(projectResults)
     if (!data.length) return
 
+    console.log('Selected columns:', selectedFrameworks)
+    console.log('Available headers:', selectableHeaders)
     const finalCols = selectableHeaders.reduce((acc, col) => {
       acc.push(col)
-      if (selectedColumns.includes(col)) acc.push(`${col}_truth`)
+      if (selectedFrameworks.includes(col)) acc.push(`${col}_truth`)
       return acc
     }, [] as string[])
 
@@ -442,11 +432,11 @@ const Project: React.FC = () => {
       </header>
 
       <GridTable
+        projectId={params.project_id ?? ''}
         data={projectResults}
         availableFeatures={availableFeatures}
         accuracyScores={accuracyScores}
         setAvailableFeatures={setAvailableFeatures}
-        addNewFeature={addNewFeatureHandler}
         updateProjectFeatures={updateProjectFeatures}
       />
     </main>

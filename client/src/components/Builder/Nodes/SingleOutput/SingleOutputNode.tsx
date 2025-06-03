@@ -32,7 +32,7 @@ function SingleOutputNode({ isConnectable, selected, data }: SingleOutputNodePro
           bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-800
         `}
       >
-        <CardHeader className='p-2 pb-1'>
+        <CardHeader className='px-2 pt-1.5'>
           <div className='flex justify-between items-center'>
             <CardTitle className='text-sm font-bold truncate'>{name}</CardTitle>
             {measurement !== 'Choose an option' && (

@@ -101,16 +101,20 @@ interface MultiSelectProps
 }
 
 export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
-  ({
-    options,
-    onValueChange,
-    variant,
-    defaultValue = [],
-    placeholder = 'Select options',
-    maxCount = 3,
-    modalPopover = false,
-    className,
-  }) => {
+  (
+    {
+      options,
+      onValueChange,
+      variant,
+      defaultValue = [],
+      placeholder = 'Select options',
+      maxCount = 3,
+      modalPopover = false,
+      className,
+    },
+    ref,
+  ) => {
+    console.log('MultiSelect rendered with options:', ref)
     const [selectedValues, setSelectedValues] = React.useState<string[]>(defaultValue)
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -220,7 +224,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-[--radix-popover-trigger-width] p-0' align='start'>
-          <Command>
+          <Command className='max-w-[460px]'>
             <CommandInput placeholder='Search...' onKeyDown={handleInputKeyDown} />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
