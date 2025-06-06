@@ -97,25 +97,6 @@ const SelectFeatures = ({
     }
   }
 
-  const mapFeatureTypeToGPTType = (
-    type: 'text' | 'number' | 'enum' | 'boolean' | 'parent',
-  ): 'string' | 'number' | 'array' | 'boolean' => {
-    switch (type) {
-      case 'text':
-        return 'string'
-      case 'number':
-        return 'number'
-      case 'enum':
-        return 'string'
-      case 'parent':
-        return 'array'
-      case 'boolean':
-        return 'boolean'
-      default:
-        return 'string'
-    }
-  }
-
   const handleAddNewFeature = async () => {
     if (!newFeatureName.trim()) {
       alert('Feature name is required')
@@ -130,22 +111,14 @@ const SelectFeatures = ({
     setIsSubmitting(true)
 
     try {
-      const featureIdentifier = generateFeatureIdentifier()
-
       const newFeatureData: NewFeature = {
         feature_name: newFeatureName.trim(),
+        feature_identifier: generateFeatureIdentifier(),
+        feature_parent: newFeatureParent.replace('.parent', ''),
         feature_description: newFeatureDescription.trim(),
-        feature_identifier: featureIdentifier,
-        feature_identifier_spaced: newFeatureName.trim().replace(/_/g, ' '),
-        feature_parent: newFeatureParent,
         feature_type: newFeatureType,
-        gpt_interface: {
-          type: mapFeatureTypeToGPTType(newFeatureType),
-          description: newFeaturePrompt.trim(),
-          ...(newFeatureType === 'enum' && {
-            enum: enumOptions.filter((opt) => opt.trim()),
-          }),
-        },
+        feature_prompt: newFeaturePrompt.trim(),
+        enum_options: newFeatureType === 'enum' ? enumOptions.filter((o) => o.trim()) : undefined,
       }
 
       // Call the addNewFeature function passed from parent
@@ -332,6 +305,7 @@ const SelectFeatures = ({
                   value={newFeatureDescription}
                   onChange={(e) => setNewFeatureDescription(e.target.value)}
                   placeholder='Brief description of what this feature captures'
+                  spellCheck
                 />
               </div>
 
@@ -344,6 +318,7 @@ const SelectFeatures = ({
                     onChange={(e) => setNewFeaturePrompt(e.target.value)}
                     placeholder='Prompt for AI to extract this feature from text'
                     className='min-h-[100px]'
+                    spellCheck
                   />
                 </div>
               )}

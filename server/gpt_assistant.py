@@ -48,7 +48,10 @@ def get_all_features(project_id: str) -> List[str]:
     user_features = {}
 
     for feature in current_project.features:
-        user_features[feature.feature_identifier] = feature.feature_gpt_interface
+        user_features[feature.feature_identifier] = (
+            feature.feature_gpt_interface.model_dump(exclude_none=True)
+        )
+
         feature_list.append(feature.feature_identifier)
 
     sorted_features = sorted(feature_list, key=lambda s: s.count("."))
@@ -86,7 +89,9 @@ def build_parent_objects(feature_list: list[str], feature_object: dict) -> dict:
                     Features.feature_identifier == f"{key}.parent"
                 ).run()
                 if feature_class:
-                    schema = feature_class.feature_gpt_interface
+                    schema = feature_class.feature_gpt_interface.parent_dump()
+                    logger.info("Enforcing additional properties %s", schema)
+                    # Ensure that the schema has additionalProperties set to False
                     schema = enforce_additional_properties(schema)
                     current_dict[key] = schema
                 else:
@@ -201,6 +206,9 @@ def update_assistant(
     - assistant_id: ID of the assistant to update.
     - function: List of dictionaries containing the feature function.
     """
+    logger.info(
+        "Updating assistant with ID: %s with new function %s", assistant_id, function
+    )
     try:
         my_updated_assistant = client.beta.assistants.update(
             assistant_id=assistant_id,

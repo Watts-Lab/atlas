@@ -52,16 +52,7 @@ const GridTable = ({
   const handleAddNewFeature = async (newFeatureData: NewFeature) => {
     try {
       // First, create the feature via API
-      const response = await api.post('/features', {
-        feature_name: newFeatureData.feature_name,
-        feature_description: newFeatureData.feature_description,
-        feature_identifier: newFeatureData.feature_identifier,
-        gpt_interface: newFeatureData.gpt_interface,
-        feature_type: newFeatureData.feature_type,
-        feature_parent: newFeatureData.feature_parent.replace('.parent', ''),
-      })
-
-      console.log('Feature created:', response.status, response.data)
+      const response = await api.post('/features', newFeatureData)
 
       if (response.status !== 201) {
         throw new Error('Failed to create feature')
@@ -78,16 +69,15 @@ const GridTable = ({
         trail: newFeatureData.feature_parent
           ? `${newFeatureData.feature_parent} → ${newFeatureData.feature_name}`
           : newFeatureData.feature_name,
-        ...(newFeatureData.gpt_interface.enum && {
-          enum_options: newFeatureData.gpt_interface.enum,
-        }),
       }
 
       // Update local state
       setAvailableFeatures((prevFeatures) => [...prevFeatures, newFeature])
 
-      // Optionally, immediately add to project
-      await addFeatureToProject(response.data.feature.id)
+      // immediately add to project if it's not a parent feature
+      if (newFeatureData.feature_type !== 'parent') {
+        await addFeatureToProject(response.data.feature.id)
+      }
     } catch (error) {
       console.error('Error creating feature:', error)
       throw error

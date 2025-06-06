@@ -7,6 +7,7 @@ from bunnet import Document, Link, PydanticObjectId
 from pydantic import BaseModel
 
 from database.models.users import User
+from database.schemas.gpt_interface import GPTInterface
 
 
 class Features(Document):
@@ -17,7 +18,7 @@ class Features(Document):
     feature_parent: str
     feature_identifier: str
     feature_description: str
-    feature_gpt_interface: dict
+    feature_gpt_interface: GPTInterface
     user: Optional[Link[User]] = None
 
     class Settings:

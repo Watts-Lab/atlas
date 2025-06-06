@@ -14,6 +14,7 @@ from database.database import init_db
 from database.models.features import Features
 from database.models.papers import Paper, PaperView
 from database.models.projects import Project
+from database.schemas.gpt_interface import FeatureCreate
 from dotenv import load_dotenv
 from routes.auth import require_jwt
 from routes.error_handler import error_handler
@@ -22,8 +23,8 @@ from sanic import Sanic
 from sanic import json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
-from workers.celery_config import add_paper, another_task
 from sanic_ext import Extend
+from workers.celery_config import add_paper, another_task
 
 load_dotenv()
 
@@ -82,7 +83,7 @@ app.blueprint(v1_blueprint, url_prefix="/api")
 
 
 @app.route(
-    "/api/projects/<project_id>/features",
+    "/api/projects/<project_id:str>/features",
     methods=["GET", "POST", "PUT", "DELETE"],
     name="project_features",
 )
@@ -248,38 +249,31 @@ async def features(request: Request):
 
     # Create a new feature
     if request.method == "POST":
-        data = request.json
 
-        feature_name = data.get("feature_name")
-        feature_description = data.get("feature_description", "")
-        feature_identifier = data.get("feature_identifier")
-        gpt_interface = data.get("gpt_interface")
-        feature_parent = data.get("feature_parent", "")
+        payload = FeatureCreate(**request.json)
+        # build the JSON-schema for GPT
+        gpt_iface = payload.to_gpt_interface()
 
-        if not feature_name or not feature_identifier:
-            return json_response({"error": "Missing required fields."}, status=400)
-
-        new_feature = Features(
-            feature_name=feature_name,
-            feature_parent=feature_parent,
-            feature_identifier=feature_identifier,
-            feature_description=feature_description,
-            feature_gpt_interface=gpt_interface,
+        feat = Features(
+            feature_name=payload.feature_name,
+            feature_identifier=payload.feature_identifier,
+            feature_parent=payload.feature_parent,
+            feature_description=payload.feature_description,
+            feature_gpt_interface=gpt_iface,
             user=user.id,
         )
+        feat.save()
 
-        new_feature.save()
-
-        o = new_feature.model_dump()
+        out = feat.model_dump()
 
         return json_response(
             {
                 "response": "success",
                 "feature": {
-                    "id": str(o["id"]),
-                    "feature_name": o["feature_name"],
-                    "feature_description": o["feature_description"],
-                    "feature_identifier": o["feature_identifier"],
+                    "id": str(out["id"]),
+                    "feature_name": out["feature_name"],
+                    "feature_identifier": out["feature_identifier"],
+                    "feature_description": out["feature_description"],
                 },
             },
             status=201,
