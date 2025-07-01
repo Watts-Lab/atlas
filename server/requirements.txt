@@ -46,7 +46,7 @@ numpy==2.2.4
 openai==1.77.0
 packaging==25.0
 pdf2image==1.17.0
-pillow==11.2.1
+pillow==11.3.0
 platformdirs==4.3.7
 pluggy==1.5.0
 polars-lts-cpu==1.29.0
