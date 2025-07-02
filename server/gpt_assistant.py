@@ -267,9 +267,7 @@ def create_temporary_assistant(
     )
 
     my_temporary_assistant = client.beta.assistants.create(
-        instructions=instructions,
-        name="Atlas explorer",
-        model="o3-mini",
+        instructions=instructions, name="Atlas explorer", model="gpt-4.1"
     )
 
     return my_temporary_assistant
