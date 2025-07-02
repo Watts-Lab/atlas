@@ -177,17 +177,15 @@ const SelectFeatures = ({
             <div className='max-h-80 overflow-y-auto space-y-2'>
               {filteredFeatures
                 .filter((feature) => !feature.feature_identifier.endsWith('.parent'))
-                .map((feature, index) => (
+                .map((feature) => (
                   <div
-                    key={`${feature.feature_name}-${index}`}
+                    key={feature.id}
                     className='flex items-start hover:bg-accent p-1 rounded-md cursor-pointer'
                     title={feature.feature_description}
                     onClick={() => {
                       setAvailableFeatures(
                         availableFeatures.map((f) =>
-                          f.feature_identifier === feature.feature_identifier
-                            ? { ...f, selected: !f.selected }
-                            : f,
+                          f.id === feature.id ? { ...f, selected: !f.selected } : f,
                         ),
                       )
                     }}
@@ -204,9 +202,7 @@ const SelectFeatures = ({
                           e.stopPropagation()
                           setAvailableFeatures(
                             availableFeatures.map((f) =>
-                              f.feature_identifier === feature.feature_identifier
-                                ? { ...f, selected: e.target.checked }
-                                : f,
+                              f.id === feature.id ? { ...f, selected: e.target.checked } : f,
                             ),
                           )
                         }}
