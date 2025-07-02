@@ -24,10 +24,12 @@ import { usePapaParse } from 'react-papaparse'
 import { flattenObject } from '../TableView/hooks/data-handler'
 import { useSocket } from '@/context/Socket/useSocket'
 import api from '@/service/api'
+import PromptEditorModal from './PromptEditorModal'
 
 type ProjectDetails = {
-  name: string
   id: string
+  name: string
+  prompt: string
   created_at: string
   updated_at: string
 }
@@ -47,11 +49,15 @@ const Project: React.FC = () => {
     },
   ])
   const [project, setProject] = useState<ProjectDetails>({
-    name: '',
     id: '',
+    name: '',
+    prompt: '',
     created_at: '',
     updated_at: '',
   })
+
+  const defaultPrompt = `You are a research assistant for a team of scientists tasked with research cartography. You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format. Just provide the JSON response without any additional text. Do not include \`\`\`json or any other formatting.`
+
   const [availableFeatures, setAvailableFeatures] = useState<Feature[]>([])
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_tasksMapping, setTasksMapping] = useState<Record<string, string>>({})
@@ -127,8 +133,10 @@ const Project: React.FC = () => {
       try {
         const response = await api.get(`/v1/projects/${params.project_id}`)
         setProject({
-          name: response.data.project.title,
           id: response.data.project.id,
+          name: response.data.project.title,
+          prompt:
+            response.data.project.prompt === '' ? defaultPrompt : response.data.project.prompt,
           created_at: response.data.project.created_at,
           updated_at: response.data.project.updated_at,
         })
@@ -162,6 +170,26 @@ const Project: React.FC = () => {
 
     loadFeatures()
   }, [params.project_id])
+
+  const updateProjectPrompt = async (newPrompt: string) => {
+    try {
+      const response = await api.put(`/v1/projects/${params.project_id}`, {
+        project_name: project.name,
+        project_prompt: newPrompt,
+      })
+
+      if (response.status === 200) {
+        setProject((prevProject) => ({
+          ...prevProject,
+          prompt: response.data.project.prompt,
+        }))
+        toast.success('Prompt updated successfully')
+      }
+    } catch (error) {
+      console.error('Error updating prompt:', error)
+      throw error
+    }
+  }
 
   const updateProjectFeatures = async () => {
     const projectId = params.project_id
@@ -366,6 +394,12 @@ const Project: React.FC = () => {
         <div className='text-center text-gray-600 font-medium flex-1'>{project.id}</div>
 
         <div className='flex flex-wrap justify-end items-center space-x-2 w-full sm:w-auto'>
+          <PromptEditorModal
+            currentPrompt={project.prompt}
+            onPromptUpdate={updateProjectPrompt}
+            isLoading={loading}
+          />
+
           <Button onClick={handleButtonClick}>Upload file</Button>
           <input
             type='file'

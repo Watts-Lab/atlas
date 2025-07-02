@@ -33,6 +33,7 @@ class Project(Document):
     user: Link[User]
     title: str
     description: str = "Created on " + str(datetime.now())
+    prompt: str = ""
     slug: UUID = Field(default_factory=uuid4)
     papers: List[Link[Paper]] = []
     features: List[Link[Features]] = []

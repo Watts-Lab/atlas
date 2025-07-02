@@ -74,9 +74,6 @@ def get_project_detail(project_id: str):
     project_dict["updated_at"] = str(project_dict["updated_at"])
     project_dict["papers"] = [str(pap.id) for pap in user_project.papers]
 
-    for proj in user_project.papers:
-        print("proj ", len(proj.truth_ids))
-
     papers = [
         {
             "task_id": pap.title,
@@ -90,7 +87,7 @@ def get_project_detail(project_id: str):
     return project_dict, papers
 
 
-def update_project(project_id: str, project_name: str):
+def update_project(project_id: str, project_name: str, project_prompt: str):
     """Update the project name.
     We should also update the project description and features in the future.
 
@@ -117,6 +114,10 @@ def update_project(project_id: str, project_name: str):
     if not user_project:
         return None
     user_project.title = project_name
+
+    if project_prompt is not None:
+        user_project.prompt = project_prompt
+
     user_project.save()
     project_dict = user_project.model_dump(
         mode="json", exclude=["user"], serialize_as_any=True

@@ -110,7 +110,9 @@ async def project_detail(request: Request, project_id: str):
     if request.method == "PUT":
         # Update project details
         project_name = request.json.get("project_name")
-        updated = update_project(project_id, project_name)
+        project_prompt = request.json.get("project_prompt")
+
+        updated = update_project(project_id, project_name, project_prompt)
         if not updated:
             return json_response({"error": "Project not found."}, status=404)
         return json_response({"message": "Project updated.", "project": updated})
