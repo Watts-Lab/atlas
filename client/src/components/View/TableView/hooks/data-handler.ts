@@ -424,41 +424,58 @@ export const flattenExperiment = (
 }
 
 export function flattenObject(
-  obj: Record<string, unknown>[] | Record<string, unknown>,
-  parents_to_expand: string[] = [],
+  obj: Record<string, unknown> | Record<string, unknown>[],
+  pathsToCollapse: string[] = [],
+  currentPath = '',
 ): Record<string, unknown>[] {
+  // ------------- convenience helpers ---------------------------------
+  const joinPath = (p: string, k: string) => (p ? `${p}.${k}` : k)
+
+  /** prefix (“experiments accuracy” …) every key of `row` with `prefix`   */
+  const prefixKeys = (row: Record<string, unknown>, prefix: string) =>
+    Object.fromEntries(Object.entries(row).map(([k, v]) => [`${prefix} ${k}`, v]))
+
+  // ------------- handle an ARRAY --------------------------------------
   if (Array.isArray(obj)) {
-    return obj.flatMap((item) => flattenObject(item))
+    return obj.flatMap((item) => flattenObject(item, pathsToCollapse, currentPath))
   }
 
-  const arrayKey = Object.keys(obj).find((key) => Array.isArray(obj[key]))
+  // ------------- handle an OBJECT -------------------------------------
+  let rows: Record<string, unknown>[] = [{}] // start with one empty row
 
-  if (arrayKey) {
-    if (!parents_to_expand.includes(arrayKey)) {
-      const otherProperties = { ...obj }
-      delete otherProperties[arrayKey]
+  for (const [key, value] of Object.entries(obj)) {
+    const fullPath = joinPath(currentPath, key)
 
-      return (obj[arrayKey] as unknown[]).flatMap((arrayValue: unknown) => {
-        const newObject = { ...otherProperties }
+    // ---------- value is an ARRAY ----------------------------------
+    if (Array.isArray(value)) {
+      if (pathsToCollapse.includes(fullPath)) {
+        // collapse ⇒ one cell with the count
+        rows.forEach((r) => (r[key] = `${value.length} ${key}`))
+      } else {
+        // expand ⇒ one row per element
+        const childRows =
+          value.length === 0
+            ? [{}]
+            : value.flatMap((elem) => flattenObject(elem, pathsToCollapse, fullPath))
 
-        if (typeof arrayValue === 'object' && arrayValue !== null) {
-          for (const [key, value] of Object.entries(arrayValue)) {
-            newObject[`${arrayKey} ${key}`] = value
-          }
-        } else {
-          newObject[arrayKey] = arrayValue
-        }
-
-        return flattenObject(newObject, parents_to_expand)
-      })
-    } else {
-      const newObject = { ...obj }
-      newObject[arrayKey] = `${(obj[arrayKey] as unknown[]).length} ${arrayKey}`
-      return flattenObject(newObject, parents_to_expand)
+        rows = rows.flatMap((r) => childRows.map((cr) => ({ ...r, ...prefixKeys(cr, key) })))
+      }
+      continue
     }
+
+    // ---------- value is a NESTED OBJECT ---------------------------
+    if (value && typeof value === 'object') {
+      const childRows = flattenObject(value as Record<string, unknown>, pathsToCollapse, fullPath)
+
+      rows = rows.flatMap((r) => childRows.map((cr) => ({ ...r, ...prefixKeys(cr, key) })))
+      continue
+    }
+
+    // ---------- value is PRIMITIVE ---------------------------------
+    rows.forEach((r) => (r[key] = value))
   }
 
-  return [obj]
+  return rows
 }
 
 export function nestFlatKeys(flatObj: Record<string, unknown>) {

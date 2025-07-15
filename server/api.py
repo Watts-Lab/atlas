@@ -108,12 +108,13 @@ async def project_features(request: Request, project_id: str):
                 "feature_name": f.feature_name,
                 "feature_description": f.feature_description,
                 "feature_identifier": f.feature_identifier,
+                "created_by": "user" if f.user else "provider",
             }
             for f in user_project.features
         ]
 
         return json_response(
-            {"message": "Feature added.", "features": project_feature_list},
+            {"message": "Project feature list.", "features": project_feature_list},
             status=200,
         )
 
@@ -212,13 +213,12 @@ async def features(request: Request):
     """
     A protected route.
     """
-
     # Validate user from JWT
     user = request.ctx.user
 
     # Get all the features for the user and public features
     if request.method == "GET":
-        # Get the user features
+        # Get the user features and public features (user.id == None)
         experiment_feature = Features.find(
             Or(
                 Features.user.id == None,  # pylint: disable=C0121
@@ -235,6 +235,12 @@ async def features(request: Request):
                     "feature_name": o["feature_name"],
                     "feature_description": o["feature_description"],
                     "feature_identifier": o["feature_identifier"],
+                    "feature_type": o["feature_gpt_interface"].get("type", "string"),
+                    "feature_prompt": o["feature_gpt_interface"].get(
+                        "description", "No prompt found."
+                    ),
+                    "feature_enum_options": o["feature_gpt_interface"].get("enum", []),
+                    "created_by": "user" if o.get("user") else "provider",
                 }
             )
 
@@ -278,6 +284,27 @@ async def features(request: Request):
             },
             status=201,
         )
+
+
+@app.route("/api/features/<feature_id:str>", methods=["DELETE"], name="delete_feature")
+@require_jwt
+@error_handler
+async def delete_feature(request: Request, feature_id: str):
+    """
+    A protected route for deleting a feature by its ID.
+    """
+    user = request.ctx.user
+
+    try:
+        feat: Features = Features.get(feature_id, fetch_links=True).run()
+    except Exception:
+        return json_response({"error": "Feature not found."}, status=404)
+
+    if feat.user != user:
+        return json_response({"error": "Forbidden."}, status=403)
+
+    feat.delete()
+    return json_response({"response": "success"}, status=200)
 
 
 @app.route("/api/login", methods=["POST"], name="login")

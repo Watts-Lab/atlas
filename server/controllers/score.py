@@ -132,7 +132,9 @@ def score_csv_data(file_bytes, _project_id):
     ).to_list()
     feature_columns = []
     for feature_db in features_from_db:
-        gpt_interface = feature_db.feature_gpt_interface or {}
+        gpt_interface = (
+            feature_db.feature_gpt_interface.model_dump(exclude_none=True) or {}
+        )
         feature_type = gpt_interface.get("type", "string")
         enum_vals = gpt_interface.get("enum", [])
         if enum_vals:

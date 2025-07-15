@@ -3,6 +3,8 @@ This module contains the routes for the projects API.
 """
 
 import logging
+
+from bunnet import PydanticObjectId
 from controllers.project import (
     create_project,
     delete_project,
@@ -110,9 +112,15 @@ async def project_detail(request: Request, project_id: str):
     if request.method == "PUT":
         # Update project details
         project_name = request.json.get("project_name")
+        project_description = request.json.get("project_description")
         project_prompt = request.json.get("project_prompt")
 
-        updated = update_project(project_id, project_name, project_prompt)
+        updated = update_project(
+            project_id=project_id,
+            project_name=project_name,
+            project_description=project_description,
+            project_prompt=project_prompt,
+        )
         if not updated:
             return json_response({"error": "Project not found."}, status=404)
         return json_response({"message": "Project updated.", "project": updated})
@@ -126,30 +134,71 @@ async def project_detail(request: Request, project_id: str):
         return json_response({"message": "Project deleted."})
 
 
-@projects_bp.route("/<project_id>/results", methods=["GET"], name="project_results")
+@projects_bp.route(
+    "/<project_id>/results", methods=["GET", "DELETE"], name="project_results"
+)
 @require_jwt
 @error_handler
-async def project_results(_request: Request, project_id: str):
+async def project_results(request: Request, project_id: str):
     """
     A protected route for getting results of a project.
     """
+    user = request.ctx.user
 
-    # Validate user from JWT
-    # user = request.ctx.user
+    user_project: Project = Project.get(project_id, fetch_links=True).run()
 
-    user_project: Project = Project.get(project_id).run()
-
-    # TODO: Should check if the user is the owner of the project
     if not user_project:
         return json_response({"error": "Project not found."}, status=404)
 
-    project_result = Result.find(Result.project_id.id == user_project.id).to_list()
+    if request.method == "GET":
 
-    project_json_responses = [r.json_response for r in project_result]
+        # TODO: Should check if the user is the owner of the project
+        project_result = Result.find(Result.project_id.id == user_project.id).to_list()
 
-    return json_response(
-        {"message": "results found.", "results": project_json_responses}
-    )
+        project_json_responses = [
+            {
+                **r.json_response,
+                "created_at": (
+                    r.created_at.strftime("%Y-%m-%d %H:%M:%S") if r.created_at else None
+                ),
+            }
+            for r in project_result
+        ]
+
+        project_response_ids = [str(r.id) for r in project_result]
+
+        return json_response(
+            {
+                "message": "results found.",
+                "results": project_json_responses,
+                "ids": project_response_ids,
+            }
+        )
+
+    if request.method == "DELETE":
+        # Delete multiple results for a project
+        result_ids = request.json.get("result_ids", [])
+
+        if user_project.user.id != user.id:
+            return json_response(
+                {"error": "You do not have permission to delete these results."},
+                status=403,
+            )
+
+        if not result_ids:
+            return json_response({"error": "No result IDs provided."}, status=400)
+
+        results = Result.find(
+            In(Result.id, [PydanticObjectId(r_id) for r_id in result_ids])
+        ).run()
+
+        if not results:
+            return json_response({"error": "No results found."}, status=404)
+
+        for result in results:
+            result.delete()
+
+        return json_response({"message": "Results deleted."})
 
 
 @projects_bp.route("/<project_id>/score_csv", methods=["POST"], name="project_analysis")

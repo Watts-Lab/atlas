@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react'
 import api from '../../../service/api'
 import { Feature, NewFeature } from './feature.types'
 
+export const featureTypeMap: Record<'string' | 'number' | 'array' | 'integer', string> = {
+  string: 'text',
+  number: 'number',
+  array: 'parent',
+  integer: 'number',
+}
+
 export const fetchFeatures = async (): Promise<Feature[]> => {
   const response = await api.get('/features')
   return response.data.features.map(
@@ -10,6 +17,10 @@ export const fetchFeatures = async (): Promise<Feature[]> => {
       feature_name: string
       feature_description: string
       feature_identifier: string
+      feature_type: 'string' | 'number' | 'array' | 'integer'
+      feature_prompt: string
+      feature_enum_options: string[]
+      created_by: 'user' | 'provider'
     }) => {
       let trail = feature.feature_identifier
       if (trail.endsWith('.parent')) {
@@ -23,9 +34,17 @@ export const fetchFeatures = async (): Promise<Feature[]> => {
         feature_name: feature.feature_name,
         feature_description: feature.feature_description,
         feature_identifier: feature.feature_identifier,
+        feature_type:
+          (feature.feature_enum_options?.length ?? 0) > 0 &&
+          featureTypeMap[feature.feature_type] === 'text'
+            ? 'enum'
+            : featureTypeMap[feature.feature_type] || 'text',
+        feature_prompt: feature.feature_prompt,
+        feature_enum_options: feature.feature_enum_options || [],
         feature_identifier_spaced: feature.feature_identifier.replace(/\./g, ' '),
         trail,
         selected: false,
+        created_by: feature.created_by,
       }
     },
   )

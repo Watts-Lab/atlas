@@ -16,16 +16,19 @@ import { toast } from 'sonner'
 
 interface PromptEditorModalProps {
   currentPrompt: string
-  onPromptUpdate: (newPrompt: string) => Promise<void>
+  isOpen: boolean
+  onClose: () => void
+  onSave: (newPrompt: string) => Promise<void>
   isLoading?: boolean
 }
 
 const PromptEditorModal = ({
   currentPrompt,
-  onPromptUpdate,
+  isOpen,
+  onClose,
+  onSave,
   isLoading = false,
 }: PromptEditorModalProps) => {
-  const [open, setOpen] = useState(false)
   const [prompt, setPrompt] = useState(currentPrompt)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -38,28 +41,27 @@ const PromptEditorModal = ({
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      await onPromptUpdate(prompt)
-      toast.success('Assistant prompt updated successfully')
-      setOpen(false)
-    } catch (error) {
-      console.error('Error updating prompt:', error)
-      toast.error('Failed to update assistant prompt')
+      await onSave(prompt)
+      toast.success('Prompt updated')
+      onClose()
+    } catch {
+      toast.error('Failed to update')
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleCancel = () => {
+    setPrompt(currentPrompt)
+    onClose()
   }
 
   const handleReset = () => {
     setPrompt(defaultPrompt)
   }
 
-  const handleCancel = () => {
-    setPrompt(currentPrompt) // Reset to original value
-    setOpen(false)
-  }
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTrigger asChild>
         <Button variant='outline' disabled={isLoading}>
           <Settings className='w-4 h-4 mr-2' />
