@@ -25,6 +25,7 @@ from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_ext import Extend
 from workers.celery_config import add_paper, another_task
+from workers.strategies.strategy_factory import ExtractionStrategyFactory
 
 load_dotenv()
 
@@ -352,36 +353,45 @@ async def check_token(request: Request):
 @require_jwt
 @error_handler
 async def run_assistant_projects(request: Request):
-    """
-    Handles the POST request for running the assistant.
-    """
+    """Handles the POST request for running the assistant."""
     user = request.ctx.user
 
     if request.method == "POST":
-        # Get the file and the socket id
         files = request.files.getlist("files[]")
         if not files:
             return json_response({"error": "No file uploaded."}, status=400)
 
-        # files = request.files.getlist("files[]")
         socket_id = request.form.get("sid")
         project_id = request.form.get("project_id")
+        strategy_type = request.form.get("strategy_type", "assistant_api")
+
+        # Validate strategy type
+        available_strategies = ExtractionStrategyFactory.get_available_strategies()
+        if strategy_type not in available_strategies:
+            return json_response(
+                {"error": f"Invalid strategy type. Available: {available_strategies}"},
+                status=400,
+            )
 
         user_email = user.email
         gpt_process = {}
 
+        # Save files temporarily
         for file in files:
             file_path = f"papers/{socket_id}-{file.name}"
             with open(file_path, "wb") as f:
                 f.write(file.body)
 
+        # Process files
         for file in files:
             file_path = f"papers/{socket_id}-{file.name}"
-            task: EagerResult = add_paper.delay(
+            task = add_paper.delay(
                 file_path,
                 socket_id,
                 user_email,
                 project_id,
+                strategy_type,
+                original_filename=file.name,  # Pass original filename
             )
             gpt_process[file.name] = task.id
 

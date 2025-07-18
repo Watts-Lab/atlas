@@ -5,6 +5,7 @@ This module contains the routes for the projects API.
 import logging
 
 from bunnet import PydanticObjectId
+from bunnet.operators import In
 from controllers.project import (
     create_project,
     delete_project,
@@ -19,7 +20,6 @@ from routes.error_handler import error_handler
 from sanic import Blueprint
 from sanic import json as json_response
 from sanic.request import Request
-from bunnet.operators import In
 
 logger = logging.getLogger(__name__)
 

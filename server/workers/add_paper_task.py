@@ -12,7 +12,8 @@ from database.models.projects import Project
 from database.models.results import Result
 from database.models.users import User
 from workers.celery_config import celery
-from workers.utils.socket_emitter import SocketEmmiter
+from workers.services.file_s3_service import FileService
+from workers.services.socket_emitter import SocketEmmiter
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,9 @@ logger = logging.getLogger(__name__)
 
 class BaseTaskWithCleanup(Task):
     """Base task to handle cleanup and result updates."""
+
+    def __init__(self, *args, **kwargs):
+        self.file_service = FileService()
 
     def run(self, *args, **kwargs):
         """
@@ -74,7 +78,12 @@ class BaseTaskWithCleanup(Task):
 
 @celery.task(bind=True, name="add_paper", base=BaseTaskWithCleanup, max_retries=1)
 def add_paper(
-    self: Task, file_path: str, socket_id: str, user_email: str, project_id: str
+    self: Task,
+    file_path: str,
+    socket_id: str,
+    user_email: str,
+    project_id: str,
+    strategy_type: str = "assistant_api",
 ):
     """
     Process the uploaded paper and run the assistant API.
@@ -107,10 +116,11 @@ def add_paper(
     try:
         emitter.emit_status(message="Starting...", progress=0)
 
-        logger.info("Executing API call for user %s", user_email)
+        logger.info(
+            "Executing API call for user %s with strategy %s", user_email, strategy_type
+        )
 
         base_temperature = 0.7
-        # Increase by 0.1 per retry attempt (adjust increment as needed)
         current_temperature = base_temperature + (self.request.retries * 0.2)
 
         open_ai_res = run_assistant_api(
@@ -118,6 +128,7 @@ def add_paper(
             project_id=project_id,
             emitter=emitter,
             gpt_temperature=current_temperature,
+            strategy_type=strategy_type,
         )
         emitter.emit_status(message="Saving results...", progress=90)
 

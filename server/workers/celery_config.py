@@ -26,6 +26,7 @@ celery.conf.broker_connection_retry_on_startup = True
 
 
 AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+AWS_REGION = os.getenv("AWS_REGION")
 AWS_S3_KEY = os.getenv("AWS_S3_KEY")
 AWS_S3_SECRET = os.getenv("AWS_S3_SECRET")
 

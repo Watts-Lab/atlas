@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 from database.models.features import Features
 from database.models.projects import Project
-from workers.utils.socket_emitter import SocketEmmiter
+from workers.services.socket_emitter import SocketEmmiter
 
 
 load_dotenv()
