@@ -8,6 +8,7 @@ import boto3
 from celery import Celery
 from celery.signals import worker_process_init, worker_process_shutdown
 from dotenv import load_dotenv
+from redis import Redis
 
 from database.database import init_db
 
@@ -29,6 +30,9 @@ AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 AWS_REGION = os.getenv("AWS_REGION")
 AWS_S3_KEY = os.getenv("AWS_S3_KEY")
 AWS_S3_SECRET = os.getenv("AWS_S3_SECRET")
+
+REDIS_URL = os.getenv("CELERY_BROKER_URL")
+
 
 # Global variable to hold the initialized database
 DB_INITIALIZED = False
@@ -61,12 +65,16 @@ def shutdown_celery_worker(**kwargs):
         DB_INITIALIZED = False
 
 
+redis_client = Redis.from_url(REDIS_URL)
+
 # Import the tasks to register them with Celery
 from workers.add_paper_task import add_paper
 from workers.save_to_s3_task import save_file_to_s3
 from workers.sample_task import another_task
+from workers.add_paper_task import reprocess_paper
 
 
 celery.register_task(add_paper)
 celery.register_task(save_file_to_s3)
 celery.register_task(another_task)
+celery.register_task(reprocess_paper)

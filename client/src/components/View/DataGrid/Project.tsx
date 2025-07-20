@@ -61,6 +61,8 @@ const Project: React.FC = () => {
 
   const [loadingAccuracy, setLoadingAccuracy] = useState<boolean>(false)
   const [accuracyScores, setAccuracyScores] = useState<Record<string, number> | null>(null)
+  const [showVersions, setShowVersions] = useState<boolean>(false)
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_tasksMapping, setTasksMapping] = useState<Record<string, string>>({})
   type FeatureModalState = { open: boolean; initialTab: 'select' | 'define' }
@@ -180,6 +182,7 @@ const Project: React.FC = () => {
     }
     data.append('sid', socket?.id || '')
     data.append('project_id', params.project_id)
+    data.append('strategy_type', 'json_schema') // 'json_schema' or 'assistant_api' for backend processing
 
     try {
       toast.loading('Uploading files...')
@@ -370,7 +373,11 @@ const Project: React.FC = () => {
     const fetchResults = async () => {
       setLoading(true)
       try {
-        const response = await api.get(`/v1/projects/${params.project_id}/results`)
+        const url = showVersions
+          ? `/v1/projects/${params.project_id}/results?include_versions=true`
+          : `/v1/projects/${params.project_id}/results`
+
+        const response = await api.get(url)
         const responseData = response.data
         const results = responseData.results.map((result: Record<string, unknown>, id: number) => ({
           id,
@@ -380,7 +387,10 @@ const Project: React.FC = () => {
         setResultIds(responseData.ids || [])
         setProjectStats((prev) => ({
           ...prev,
-          papersProcessed: results.length,
+          papersProcessed: showVersions
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              results.filter((r: any) => r._is_latest !== false).length
+            : results.length,
         }))
       } catch (error) {
         console.error('Error fetching results:', error)
@@ -403,7 +413,7 @@ const Project: React.FC = () => {
         socket?.off('status', handleStatusUpdate)
       }
     }
-  }, [params.project_id, socket])
+  }, [params.project_id, socket, showVersions])
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -482,6 +492,183 @@ const Project: React.FC = () => {
     setSelectableHeaders(Array.from(allKeys))
   }, [projectResults])
 
+  const handleToggleVersions = () => {
+    setShowVersions((prev) => !prev)
+  }
+
+  const [bulkReprocessing, setBulkReprocessing] = useState<boolean>(false)
+
+  const reprocessPaper = async (paperId: string) => {
+    if (!params.project_id || !paperId) return
+
+    try {
+      const response = await api.post(`/reprocess_paper/${paperId}`, {
+        project_id: params.project_id,
+        strategy_type: 'json_schema',
+        sid: socket?.id || '',
+      })
+
+      if (response.status === 200) {
+        toast.success('Paper queued for reprocessing')
+
+        const taskId = response.data.task_id
+        const toastId = toast.loading('Reprocessing paper...')
+
+        const handleReprocessComplete = (data: {
+          task_id: string
+          done: boolean
+          status?: string
+          message?: string
+          progress?: number
+        }) => {
+          // Check if this is the task we're waiting for
+          if (data.task_id === taskId) {
+            // Update progress if available
+            if (data.progress !== undefined && data.progress < 100 && !data.done) {
+              toast.loading(`Reprocessing paper... ${data.progress}%`, {
+                id: toastId, // Use the same toast ID
+              })
+            }
+
+            // Handle completion
+            if (data.done) {
+              toast.dismiss(toastId)
+
+              // Check status
+              if (data.status === 'FAILURE' || data.message?.includes('failed')) {
+                toast.error('Paper reprocessing failed')
+              } else {
+                toast.success('Paper reprocessed successfully!')
+              }
+
+              // Clean up listener
+              socket?.off('status', handleReprocessComplete)
+
+              // Refresh the data properly instead of reload
+              const fetchResults = async () => {
+                try {
+                  const url = showVersions
+                    ? `/v1/projects/${params.project_id}/results?include_versions=true`
+                    : `/v1/projects/${params.project_id}/results`
+
+                  const response = await api.get(url)
+                  const responseData = response.data
+                  const results = responseData.results.map(
+                    (result: Record<string, unknown>, id: number) => ({
+                      id,
+                      ...result,
+                    }),
+                  )
+                  setProjectResults(results)
+                  setResultIds(responseData.ids || [])
+                } catch (error) {
+                  console.error('Error fetching results:', error)
+                }
+              }
+
+              fetchResults()
+            }
+          }
+        }
+
+        socket?.on('status', handleReprocessComplete)
+
+        // Cleanup timeout - also dismiss the toast
+        const timeoutId = setTimeout(() => {
+          socket?.off('status', handleReprocessComplete)
+          toast.dismiss(toastId)
+          toast.error('Reprocessing timed out')
+        }, 120000) // 2 minutes timeout
+
+        // Store cleanup function in case component unmounts
+        return () => {
+          clearTimeout(timeoutId)
+          socket?.off('status', handleReprocessComplete)
+          toast.dismiss(toastId)
+        }
+      }
+    } catch (error) {
+      console.error('Error reprocessing paper:', error)
+      toast.error('Failed to reprocess paper')
+    }
+  }
+
+  const reprocessAllPapers = async () => {
+    if (!params.project_id) return
+
+    setBulkReprocessing(true)
+
+    try {
+      const response = await api.post(`/reprocess_project/${params.project_id}`, {
+        strategy_type: 'json_schema',
+        sid: socket?.id || '',
+      })
+
+      if (response.status === 200) {
+        const { task_ids, total_papers } = response.data
+        const taskIdsList = Object.values(task_ids) as string[]
+
+        toast.success(`Started reprocessing ${total_papers} papers`)
+
+        let toastId = toast.loading(`Reprocessing ${total_papers} papers...`)
+        const completedTasks = new Set<string>()
+
+        const handleBulkReprocessComplete = (data: {
+          task_id: string
+          done: boolean
+          status?: string
+          message?: string
+          progress?: number
+        }) => {
+          // Only handle tasks from our bulk operation
+          if (taskIdsList.includes(data.task_id)) {
+            // Handle task completion
+            if (data.done) {
+              completedTasks.add(data.task_id)
+
+              const remaining = total_papers - completedTasks.size
+
+              // Update progress
+              if (remaining > 0) {
+                toast.dismiss(toastId)
+                toastId = toast.loading(`Reprocessing ${remaining}/${total_papers} papers...`)
+              } else {
+                // All tasks completed
+                toast.dismiss(toastId)
+                toast.success('All papers reprocessed successfully!', {
+                  duration: 5000,
+                })
+
+                // Clean up
+                socket?.off('status', handleBulkReprocessComplete)
+                setBulkReprocessing(false)
+
+                // Refresh data
+                setTimeout(() => {
+                  window.location.reload() // Or call your data refresh function
+                }, 1000)
+              }
+            }
+          }
+        }
+
+        socket?.on('status', handleBulkReprocessComplete)
+
+        // Cleanup timeout
+        setTimeout(() => {
+          socket?.off('status', handleBulkReprocessComplete)
+          toast.dismiss(toastId)
+          toast.error('Bulk reprocessing timed out')
+          setBulkReprocessing(false)
+        }, 600000) // 10 minutes timeout for bulk operations
+      }
+    } catch (error) {
+      console.error('Error reprocessing all papers:', error)
+      toast.error('Failed to start bulk reprocessing')
+      setBulkReprocessing(false)
+    }
+  }
+
   return (
     <main className={`min-h-screen ${loading ? 'opacity-50' : ''}`}>
       <ProjectHeader
@@ -501,6 +688,8 @@ const Project: React.FC = () => {
         featureModal={featureModal}
         setFeatureModal={setFeatureModal}
         onAddFeature={handleAddNewFeature}
+        onReprocessAll={reprocessAllPapers}
+        bulkReprocessing={bulkReprocessing}
       />
 
       <input
@@ -517,6 +706,9 @@ const Project: React.FC = () => {
         availableFeatures={availableFeatures}
         accuracyScores={accuracyScores}
         onDeletePapers={deletePapers}
+        showVersions={showVersions}
+        onToggleVersions={handleToggleVersions}
+        reprocessPaper={reprocessPaper}
       />
 
       <SelectFeatures

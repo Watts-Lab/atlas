@@ -78,9 +78,7 @@ def get_project_detail(project_id: str):
     papers = [
         {
             "task_id": pap.title,
-            "status": "success" if pap.truth_ids else "failed",
             "file_name": pap.title,
-            "experiments": pap.experiments,
         }
         for pap in user_project.papers
     ]

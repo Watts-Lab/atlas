@@ -192,10 +192,7 @@ def upload_file_to_vector_store(client: OpenAI, file_path: str) -> VectorStore:
 
 
 def update_assistant(
-    client: OpenAI,
-    assistant_id: str,
-    vector_store,
-    function: Dict,
+    client: OpenAI, assistant_id: str, vector_store, function: Dict, schema: Dict = None
 ):
     """
     Updates the assistant with the new function.
@@ -215,6 +212,20 @@ def update_assistant(
                 {"type": "file_search"},
                 {"type": "function", "function": function},
             ],
+            **(
+                {
+                    "response_format": {
+                        "type": "json_schema",
+                        "json_schema": {
+                            "name": "extract_features",
+                            "strict": True,
+                            "schema": schema,
+                        },
+                    }
+                }
+                if schema
+                else {}
+            ),
         )
     except Exception as e:
         logger.error("Failed to update assistant: %s", e)
@@ -262,7 +273,7 @@ def create_temporary_assistant(
 
     logger.info(
         "Creating temporary assistant with model: %s and temperature: %s",
-        "o3-mini",
+        "gpt-4.1",
         gpt_temperature,
     )
 

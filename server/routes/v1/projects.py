@@ -62,8 +62,8 @@ async def project(request: Request):
     if request.method == "GET":
         projects = Project.find(Project.user.id == user.id).to_list()
 
-        results: Project = Result.find(
-            In(Result.project_id.id, [p.id for p in projects]),
+        results: Result = Result.find(
+            In(Result.project.id, [p.id for p in projects]),
             fetch_links=True,
             nesting_depth=1,
         ).run()
@@ -82,9 +82,10 @@ async def project(request: Request):
                 {
                     "id": str(r.id),
                     "finished": r.finished if r.finished else False,
+                    "paper_id": str(r.paper.id) if r.paper else None,
                 }
                 for r in results
-                if str(r.project_id.id) == str(proj["id"])
+                if str(r.project.id) == str(proj["id"])
             ]
 
         return json_response({"project": pr_response})
@@ -144,28 +145,51 @@ async def project_results(request: Request, project_id: str):
     A protected route for getting results of a project.
     """
     user = request.ctx.user
-
     user_project: Project = Project.get(project_id, fetch_links=True).run()
-
     if not user_project:
         return json_response({"error": "Project not found."}, status=404)
 
     if request.method == "GET":
+        # Get query parameter for including all versions
+        include_versions = (
+            request.args.get("include_versions", "false").lower() == "true"
+        )
 
         # TODO: Should check if the user is the owner of the project
-        project_result = Result.find(Result.project_id.id == user_project.id).to_list()
+        if include_versions:
+            # Get all results including historical versions, sorted by paper_id first, then by creation time
+            project_result = (
+                Result.find(Result.project.id == user_project.id, fetch_links=True)
+                .sort(["+paper", "-created_at"])
+                .to_list()
+            )
+        else:
+            # Get only latest results, sorted by paper_id
+            project_result = (
+                Result.find(
+                    Result.project.id == user_project.id,
+                    Result.is_latest == True,
+                    fetch_links=True,
+                )
+                .sort([("-paper", 1), ("-created_at", 1)])
+                .to_list()
+            )
 
-        project_json_responses = [
-            {
+        project_json_responses = []
+        project_response_ids = []
+        for r in project_result:
+            response_data = {
                 **r.json_response,
                 "created_at": (
                     r.created_at.strftime("%Y-%m-%d %H:%M:%S") if r.created_at else None
                 ),
+                "_version": getattr(r, "version", 1),
+                "_is_latest": getattr(r, "is_latest", True),
+                "_result_id": str(r.id),
+                "_paper_id": str(r.paper.id) if r.paper else None,
             }
-            for r in project_result
-        ]
-
-        project_response_ids = [str(r.id) for r in project_result]
+            project_json_responses.append(response_data)
+            project_response_ids.append(str(r.id))
 
         return json_response(
             {
@@ -189,13 +213,38 @@ async def project_results(request: Request, project_id: str):
             return json_response({"error": "No result IDs provided."}, status=400)
 
         results = Result.find(
-            In(Result.id, [PydanticObjectId(r_id) for r_id in result_ids])
+            In(Result.id, [PydanticObjectId(r_id) for r_id in result_ids]),
+            fetch_links=True,
+            nesting_depth=1,
         ).run()
 
         if not results:
             return json_response({"error": "No results found."}, status=404)
 
+        # Process each result to handle is_latest flag properly
         for result in results:
+            # If this result was the latest version, find the previous version and mark it as latest
+            if result.is_latest and result.paper:
+                # Find the most recent previous version for this paper in this project
+                previous_version = (
+                    Result.find(
+                        Result.project.id == user_project.id,
+                        Result.paper.id == result.paper.id,
+                        Result.id
+                        != result.id,  # Exclude the current result being deleted
+                        fetch_links=True,
+                    )
+                    .sort("-created_at")  # Get the most recent one
+                    .limit(1)
+                    .to_list()
+                )
+
+                # If there's a previous version, mark it as latest
+                if previous_version:
+                    previous_version[0].is_latest = True
+                    previous_version[0].save()
+
+            # Delete the result
             result.delete()
 
         return json_response({"message": "Results deleted."})

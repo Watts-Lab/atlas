@@ -71,7 +71,7 @@ class JSONSchemaStrategy(ExtractionStrategy):
             ]
 
             response = self.client.chat.completions.create(
-                model="gpt-4-turbo-preview",  # or "o3" when available
+                model="o4-mini",
                 messages=messages,
                 response_format={
                     "type": "json_schema",
@@ -81,8 +81,7 @@ class JSONSchemaStrategy(ExtractionStrategy):
                         "schema": schema,
                     },
                 },
-                temperature=temperature,
-                reasoning_effort="medium",  # Add when using o3
+                reasoning_effort="medium",
             )
 
             self.emitter.emit_status(message="Processing response...", progress=60)

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,6 +34,7 @@ import {
   Layers,
   Loader2,
   Share2,
+  Download,
 } from 'lucide-react'
 import { Feature, NewFeature } from './feature.types'
 import PromptEditorModal from './PromptEditorModal'
@@ -72,6 +74,8 @@ interface ProjectHeaderProps {
     React.SetStateAction<{ open: boolean; initialTab: 'select' | 'define' }>
   >
   onAddFeature: (nf: NewFeature) => Promise<void>
+  onReprocessAll: () => Promise<void>
+  bulkReprocessing: boolean
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -89,6 +93,8 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   loadingAccuracy,
   setAvailableFeatures,
   setFeatureModal,
+  onReprocessAll,
+  bulkReprocessing,
 }) => {
   // Dialog open states
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -101,6 +107,13 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   const [tempProject, setTempProject] = useState<ProjectDetails>(project)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [truthFile, setTruthFile] = useState<File | null>(null)
+
+  const [reprocessConfirmOpen, setReprocessConfirmOpen] = useState(false)
+
+  const handleReprocessAllConfirm = useCallback(async () => {
+    setReprocessConfirmOpen(false)
+    await onReprocessAll()
+  }, [onReprocessAll])
 
   // Sync project → tempProject
   useEffect(() => {
@@ -159,6 +172,16 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
     toast.success('Share link copied to clipboard!')
   }, [project.id])
 
+  const handleExportTableData = useCallback(() => {
+    // Call the export function from the GridTable component
+    if ((window as any).exportCurrentTableData) {
+      ;(window as any).exportCurrentTableData()
+      toast.success('Table data exported successfully!')
+    } else {
+      toast.error('Export function not available')
+    }
+  }, [])
+
   return (
     <div className='w-full border-b border-gray-200 bg-white shadow-sm'>
       {/* Top Menu */}
@@ -182,6 +205,10 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 Upload Papers
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleExportTableData}>
+                <Download className='w-4 h-4 mr-2' />
+                Export Table Data
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setGroundTruthDialogOpen(true)}>
                 <FolderDown className='w-4 h-4 mr-2' />
                 Ground Truth
@@ -239,6 +266,32 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+                disabled={isLoading || bulkReprocessing}
+              >
+                Processing <ChevronDown className='w-3 h-3 ml-1' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='start' className='w-56'>
+              <DropdownMenuItem
+                onClick={() => setReprocessConfirmOpen(true)}
+                disabled={bulkReprocessing || projectStats.papersProcessed === 0}
+              >
+                {bulkReprocessing ? (
+                  <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                ) : (
+                  <Settings className='w-4 h-4 mr-2' />
+                )}
+                Reprocess All Papers
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Help */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -282,6 +335,40 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         </div>
         {project.description && <p className='text-sm text-gray-600 mt-2'>{project.description}</p>}
       </div>
+
+      {/* ————— Reprocess Confirmation Dialog ————— */}
+      <Dialog open={reprocessConfirmOpen} onOpenChange={setReprocessConfirmOpen}>
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Reprocess All Papers?</DialogTitle>
+            <DialogDescription>
+              This will reprocess all {projectStats.papersProcessed} papers in the project with the
+              current settings. This action will create new versions of your results and may take
+              several minutes to complete.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-3'>
+            <div className='flex'>
+              <Info className='w-5 h-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5' />
+              <div className='text-sm text-yellow-800'>
+                <strong>Note:</strong> This will use your current project prompt and feature
+                settings. Make sure your prompt is configured as desired before proceeding.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setReprocessConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleReprocessAllConfirm} disabled={bulkReprocessing}>
+              {bulkReprocessing ? <Loader2 className='w-4 h-4 mr-2 animate-spin' /> : null}
+              Reprocess All
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* ————— Edit Project Dialog ————— */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>

@@ -8,6 +8,8 @@ import logging
 from typing import Dict, Any, Optional
 
 from gpt_assistant import (
+    build_parent_objects,
+    enforce_additional_properties,
     get_all_features,
     build_openai_feature_functions,
     upload_file_to_vector_store,
@@ -47,6 +49,7 @@ class AssistantAPIStrategy(ExtractionStrategy):
             self.emitter.emit_status(
                 message="Building feature functions...", progress=5
             )
+
             functions = build_openai_feature_functions(feature_list, feature_obj)
 
             self.emitter.emit_status(
@@ -55,12 +58,15 @@ class AssistantAPIStrategy(ExtractionStrategy):
             vector_store = upload_file_to_vector_store(self.client, file_path)
 
             self.emitter.emit_status(message="Creating assistant...", progress=15)
+
             assistant = create_temporary_assistant(
                 self.client, temperature, custom_prompt
             )
 
+            schema = self._build_json_schema(feature_list, feature_obj)
+
             updated_assistant = update_assistant(
-                self.client, assistant.id, vector_store, functions
+                self.client, assistant.id, vector_store, functions, schema=schema
             )
 
             self.emitter.emit_status(message="Running assistant...", progress=20)
@@ -127,6 +133,20 @@ class AssistantAPIStrategy(ExtractionStrategy):
             raise
         finally:
             self._cleanup(vector_store, assistant, thread)
+
+    def _build_json_schema(self, feature_list: list, feature_obj: dict) -> dict:
+        """Build the JSON schema from features."""
+        properties = build_parent_objects(feature_list, feature_obj)
+
+        schema = {
+            "type": "object",
+            "properties": properties,
+            "required": ["paper"],
+            "additionalProperties": False,
+        }
+
+        # Ensure all objects have additionalProperties: False
+        return enforce_additional_properties(schema)
 
     def _cleanup(self, vector_store, assistant, thread):
         """Clean up resources."""

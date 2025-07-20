@@ -13,6 +13,7 @@ from controllers.login import login_user, logout_user, validate_token, validate_
 from database.database import init_db
 from database.models.features import Features
 from database.models.papers import Paper, PaperView
+from database.models.project_paper_result import ProjectPaperResult
 from database.models.projects import Project
 from database.schemas.gpt_interface import FeatureCreate
 from dotenv import load_dotenv
@@ -24,7 +25,7 @@ from sanic import json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_ext import Extend
-from workers.celery_config import add_paper, another_task
+from workers.celery_config import add_paper, another_task, reprocess_paper
 from workers.strategies.strategy_factory import ExtractionStrategyFactory
 
 load_dotenv()
@@ -355,33 +356,26 @@ async def check_token(request: Request):
 async def run_assistant_projects(request: Request):
     """Handles the POST request for running the assistant."""
     user = request.ctx.user
-
     if request.method == "POST":
         files = request.files.getlist("files[]")
         if not files:
             return json_response({"error": "No file uploaded."}, status=400)
-
         socket_id = request.form.get("sid")
         project_id = request.form.get("project_id")
         strategy_type = request.form.get("strategy_type", "assistant_api")
-
-        # Validate strategy type
         available_strategies = ExtractionStrategyFactory.get_available_strategies()
         if strategy_type not in available_strategies:
             return json_response(
                 {"error": f"Invalid strategy type. Available: {available_strategies}"},
                 status=400,
             )
-
         user_email = user.email
         gpt_process = {}
-
         # Save files temporarily
         for file in files:
             file_path = f"papers/{socket_id}-{file.name}"
             with open(file_path, "wb") as f:
                 f.write(file.body)
-
         # Process files
         for file in files:
             file_path = f"papers/{socket_id}-{file.name}"
@@ -391,16 +385,90 @@ async def run_assistant_projects(request: Request):
                 user_email,
                 project_id,
                 strategy_type,
-                original_filename=file.name,  # Pass original filename
+                original_filename=file.name,
             )
             gpt_process[file.name] = task.id
-
         return json_response(gpt_process)
-
     if request.method == "GET":
         task_id = request.args.get("task_id")
         task = add_paper.AsyncResult(task_id)
         return json_response(task.result)
+
+
+@app.route(
+    "/api/reprocess_paper/<paper_id>", methods=["POST"], name="reprocess_paper_from_s3"
+)
+@require_jwt
+@error_handler
+async def reprocess_paper_from_s3(request: Request, paper_id: str):
+    """Reprocess an existing paper."""
+    user = request.ctx.user
+    data = request.json
+    project_id = data.get("project_id")
+    strategy_type = data.get("strategy_type", "assistant_api")
+    socket_id = data.get("sid")
+
+    if not project_id:
+        return json_response({"error": "project_id is required"}, status=400)
+
+    task = reprocess_paper.delay(
+        paper_id=paper_id,
+        socket_id=socket_id,
+        user_email=user.email,
+        project_id=project_id,
+        strategy_type=strategy_type,
+    )
+
+    return json_response({"task_id": task.id, "paper_id": paper_id})
+
+
+@app.route(
+    "/api/reprocess_project/<project_id>",
+    methods=["POST"],
+    name="reprocess_all_papers_in_project",
+)
+@require_jwt
+@error_handler
+async def reprocess_all_papers_in_project(request: Request, project_id: str):
+    """Reprocess all papers in a project."""
+    user = request.ctx.user
+    data = request.json
+    strategy_type = data.get("strategy_type", "assistant_api")
+    socket_id = data.get("sid")
+
+    try:
+        # Get the project and verify ownership
+        project: Project = Project.get(
+            project_id, fetch_links=True, nesting_depth=1
+        ).run()
+
+        if not project:
+            return json_response({"error": "Project not found"}, status=404)
+
+        # Start reprocessing tasks for all papers
+        task_ids = {}
+        for ppr in project.papers:
+            paper_id = str(ppr.id)
+            task = reprocess_paper.delay(
+                paper_id=paper_id,
+                socket_id=socket_id,
+                user_email=user.email,
+                project_id=project_id,
+                strategy_type=strategy_type,
+            )
+            task_ids[paper_id] = task.id
+
+        return json_response(
+            {
+                "message": f"Started reprocessing {len(task_ids)} papers",
+                "task_ids": task_ids,
+                "total_papers": len(task_ids),
+            }
+        )
+
+    except Exception as e:
+
+        return json_response({"error": str(e)}, status=500)
 
 
 @app.route("/api/run_paper", methods=["POST", "GET"], name="run_paper_assistant")
