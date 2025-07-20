@@ -70,12 +70,8 @@ redis_client = Redis.from_url(REDIS_URL)
 
 # Import the tasks to register them with Celery
 from workers.add_paper_task import add_paper
-from workers.save_to_s3_task import save_file_to_s3
-from workers.sample_task import another_task
 from workers.add_paper_task import reprocess_paper
 
 
 celery.register_task(add_paper)
-celery.register_task(save_file_to_s3)
-celery.register_task(another_task)
 celery.register_task(reprocess_paper)

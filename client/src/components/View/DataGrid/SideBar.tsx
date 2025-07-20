@@ -37,10 +37,10 @@ const data = {
           title: 'Create Project',
           url: '/projects/create',
         },
-        {
-          title: 'Project Settings',
-          url: '/projects/settings',
-        },
+        // {
+        //   title: 'Project Settings',
+        //   url: '/projects/settings',
+        // },
       ],
     },
     {
@@ -48,16 +48,16 @@ const data = {
       url: '/docs',
       icon: BookOpen,
       isActive: true,
-      isDefaultOpen: false,
+      isDefaultOpen: true,
       items: [
         {
           title: 'Introduction',
           url: '/docs/introduction',
         },
-        {
-          title: 'Get Started',
-          url: '/docs/get-started',
-        },
+        // {
+        //   title: 'Get Started',
+        //   url: '/docs/get-started',
+        // },
         {
           title: 'Tutorials',
           url: '/docs/tutorials',
@@ -69,6 +69,7 @@ const data = {
         {
           title: 'API Reference',
           url: '/docs/api-reference',
+          isActive: false,
         },
       ],
     },

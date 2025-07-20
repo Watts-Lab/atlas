@@ -68,7 +68,7 @@ async def update_paper_results(request: Request, paper_id: str):
         )
 
     except Exception as e:
-        logger.error(f"Error updating paper results: {e}")
+        logger.error("Error updating paper results: %s", e)
         return json_response({"error": str(e)}, status=500)
 
 
@@ -120,11 +120,11 @@ async def batch_update_papers(request: Request):
                 tasks[paper_id] = {"status": "processing", "task_id": task.id}
 
             except Exception as e:
-                logger.error(f"Error processing paper {paper_id}: {e}")
+                logger.error("Error processing paper %s: %s", paper_id, e)
                 tasks[paper_id] = {"status": "error", "error": str(e)}
 
         return json_response({"message": "Batch update started", "tasks": tasks})
 
     except Exception as e:
-        logger.error(f"Error in batch update: {e}")
+        logger.error("Error in batch update: %s", e)
         return json_response({"error": str(e)}, status=500)

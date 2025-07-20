@@ -1,19 +1,16 @@
 """This module contains the RESTful API endpoint for atlas."""
 
 import argparse
-import json
 import os
 
 import socketio
 from bunnet import PydanticObjectId
 from bunnet.operators import In, Or
-from celery.result import EagerResult
 from config.app_config import AppConfig
 from controllers.login import login_user, logout_user, validate_token, validate_user
 from database.database import init_db
 from database.models.features import Features
 from database.models.papers import Paper, PaperView
-from database.models.project_paper_result import ProjectPaperResult
 from database.models.projects import Project
 from database.schemas.gpt_interface import FeatureCreate
 from dotenv import load_dotenv
@@ -25,7 +22,7 @@ from sanic import json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_ext import Extend
-from workers.celery_config import add_paper, another_task, reprocess_paper
+from workers.celery_config import add_paper, reprocess_paper
 from workers.strategies.strategy_factory import ExtractionStrategyFactory
 
 load_dotenv()
@@ -469,35 +466,6 @@ async def reprocess_all_papers_in_project(request: Request, project_id: str):
     except Exception as e:
 
         return json_response({"error": str(e)}, status=500)
-
-
-@app.route("/api/run_paper", methods=["POST", "GET"], name="run_paper_assistant")
-@require_jwt
-@error_handler
-async def run_assistant_with_features(request: Request):
-    """
-    Handles the POST request for running the assistant.
-    """
-    user = request.ctx.user
-    if request.method == "POST":
-        # Get the file and the socket id
-        file = request.files.get("file")
-        requested_features = request.form.get("features")
-        socket_id = request.form.get("sid")
-
-        file_path = f"papers/{socket_id}-{file.name}"
-        with open(file_path, "wb") as f:
-            f.write(file.body)
-
-        task: EagerResult = another_task.delay(
-            file_path,
-            socket_id,
-            str(user.id),
-        )
-
-        print(json.loads(requested_features))
-
-        return json_response({"status": task.id})
 
 
 @app.get("/health")
