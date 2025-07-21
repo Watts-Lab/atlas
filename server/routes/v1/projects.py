@@ -272,7 +272,7 @@ async def score_csv_endpoint(request: Request, project_id: str):
         file_id = str(uuid.uuid4())
 
         # Save CSV file temporarily (following the same pattern as add_paper)
-        file_path = f"csv_files/{file_id}-{csv_file.name}"
+        file_path = f"papers/{file_id}-{csv_file.name}"
 
         # Ensure directory exists
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
