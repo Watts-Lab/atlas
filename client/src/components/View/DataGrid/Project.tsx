@@ -319,6 +319,7 @@ const Project: React.FC = () => {
         feature_type: newFeatureData.feature_type,
         feature_prompt: newFeatureData.feature_prompt || '',
         feature_enum_options: newFeatureData.enum_options || [],
+        is_shared: newFeatureData.is_shared,
       }
       setAvailableFeatures((prev) => [...prev, newFeature])
 

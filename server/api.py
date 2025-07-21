@@ -222,6 +222,7 @@ async def features(request: Request):
             Or(
                 Features.user.id == None,  # pylint: disable=C0121
                 Features.user.id == user.id,
+                Features.is_shared == True,
             )
         ).to_list()
 
@@ -239,6 +240,7 @@ async def features(request: Request):
                         "description", "No prompt found."
                     ),
                     "feature_enum_options": o["feature_gpt_interface"].get("enum", []),
+                    "is_shared": o.get("is_shared", False),
                     "created_by": "user" if o.get("user") else "provider",
                 }
             )
@@ -264,6 +266,7 @@ async def features(request: Request):
             feature_identifier=payload.feature_identifier,
             feature_parent=payload.feature_parent,
             feature_description=payload.feature_description,
+            is_shared=payload.is_shared,
             feature_gpt_interface=gpt_iface,
             user=user.id,
         )

@@ -18,6 +18,7 @@ import { Feature, NewFeature } from './feature.types'
 import api from '@/service/api'
 import { toast } from 'sonner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Switch } from '@/components/ui/switch'
 
 export type SelectFeaturesProps = {
   isFeatureModalOpen: boolean
@@ -41,7 +42,7 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
   // Tabs + search + owner‐filter state
   const [tab, setTab] = useState<'select' | 'define'>(initialTab)
   const [search, setSearch] = useState('')
-  const [ownerFilter, setOwnerFilter] = useState<'all' | 'mine' | 'provided'>('all')
+  const [ownerFilter, setOwnerFilter] = useState<'all' | 'mine' | 'provided' | 'shared'>('all')
   const [showParents, setShowParents] = useState(false)
   const [filtered, setFiltered] = useState<Feature[]>(availableFeatures)
 
@@ -53,6 +54,7 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
   const [prompt, setPrompt] = useState('')
   const [enumOpts, setEnumOpts] = useState<string[]>([''])
   const [submitting, setSubmitting] = useState(false)
+  const [isSharedFeature, setIsSharedFeature] = useState(false)
 
   // reset tab/search when opened
   useEffect(() => {
@@ -61,7 +63,8 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
       setSearch('')
       setOwnerFilter('all')
     }
-  }, [isFeatureModalOpen, initialTab])
+    console.log(isSharedFeature)
+  }, [isFeatureModalOpen, initialTab, isSharedFeature])
 
   // filtering + fuzzysort
   useEffect(() => {
@@ -71,6 +74,9 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
     }
     if (ownerFilter === 'provided') {
       pool = pool.filter((f) => f.created_by === 'provider')
+    }
+    if (ownerFilter === 'shared') {
+      pool = pool.filter((f) => f.is_shared)
     }
     if (search) {
       const res = fuzzysort.go(search, pool, {
@@ -104,6 +110,7 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
       feature_type: type,
       feature_prompt: type !== 'parent' ? prompt.trim() : '',
       enum_options: type === 'enum' ? enumOpts.filter((o) => o.trim()) : undefined,
+      is_shared: isSharedFeature,
     }
 
     try {
@@ -183,6 +190,16 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
                 <Tooltip>
                   <TooltipTrigger>Provided</TooltipTrigger>
                   <TooltipContent>Features freely provided by Atlas</TooltipContent>
+                </Tooltip>
+              </Button>
+              <Button
+                size='sm'
+                variant={ownerFilter === 'shared' ? 'secondary' : 'outline'}
+                onClick={() => setOwnerFilter('shared')}
+              >
+                <Tooltip>
+                  <TooltipTrigger>Shared</TooltipTrigger>
+                  <TooltipContent>Shared feature by other users</TooltipContent>
                 </Tooltip>
               </Button>
 
@@ -333,23 +350,34 @@ const SelectFeatures: React.FC<SelectFeaturesProps> = ({
             <div className='space-y-4'>
               <div className='space-y-2'>
                 <Label htmlFor='feature-type'>Feature Type</Label>
-                <Select
-                  value={type}
-                  onValueChange={(v) =>
-                    setType(v as 'number' | 'boolean' | 'text' | 'parent' | 'enum')
-                  }
-                >
-                  <SelectTrigger className='w-[180px]'>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='parent'>Parent (Container)</SelectItem>
-                    <SelectItem value='text'>Text</SelectItem>
-                    <SelectItem value='number'>Number</SelectItem>
-                    <SelectItem value='boolean'>Boolean</SelectItem>
-                    <SelectItem value='enum'>Multiple Choice</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className='flex items-center space-x-4'>
+                  <Select
+                    value={type}
+                    onValueChange={(v) =>
+                      setType(v as 'number' | 'boolean' | 'text' | 'parent' | 'enum')
+                    }
+                  >
+                    <SelectTrigger className='w-[180px]'>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='parent'>Parent (Container)</SelectItem>
+                      <SelectItem value='text'>Text</SelectItem>
+                      <SelectItem value='number'>Number</SelectItem>
+                      <SelectItem value='boolean'>Boolean</SelectItem>
+                      <SelectItem value='enum'>Multiple Choice</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className='flex items-center space-x-2'>
+                    <Switch
+                      onCheckedChange={() => setIsSharedFeature((prev) => !prev)}
+                      id='airplane-mode'
+                    />
+                    <Label htmlFor='airplane-mode'>
+                      Is shared ({`${isSharedFeature ? 'Yes' : 'No'}`})
+                    </Label>
+                  </div>
+                </div>
               </div>
 
               <div className='space-y-2'>

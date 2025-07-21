@@ -69,7 +69,6 @@ const data = {
         {
           title: 'API Reference',
           url: '/docs/api-reference',
-          isActive: false,
         },
       ],
     },
