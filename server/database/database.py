@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from database.models.features import Features
+from database.models.features_quality import FeaturesQuality
 from database.models.papers import Paper
 from database.models.project_paper_result import ProjectPaperResult
 from database.models.projects import Project
@@ -30,5 +31,13 @@ def init_db():
     # Init bunnet with the Product document class
     init_bunnet(
         database=client.atlas_main,
-        document_models=[User, Paper, Result, Project, Features, ProjectPaperResult],
+        document_models=[
+            User,
+            Paper,
+            Result,
+            Project,
+            Features,
+            ProjectPaperResult,
+            FeaturesQuality,
+        ],
     )

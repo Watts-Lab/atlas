@@ -278,23 +278,95 @@ const Project: React.FC = () => {
     formData.append('file', file)
 
     try {
+      // Start the task
       const response = await api.post(`/v1/projects/${params.project_id}/score_csv`, formData)
 
       if (response.status === 200) {
-        const scores = response.data.aggregate_scores
-        const formattedScores: Record<string, number> = {}
-        Object.entries(scores).forEach(([key, value]) => {
-          formattedScores[key.split('.').join(' ')] = value as number
-        })
-        setAccuracyScores(formattedScores)
-        toast.success('Ground truth loaded successfully')
+        const { task_id } = response.data
+        toast.success('Processing started... Please wait')
+
+        // Poll for results with timeout
+        const pollForResult = async (attempts = 0, maxAttempts = 60): Promise<void> => {
+          if (attempts >= maxAttempts) {
+            toast.error('Processing timeout - please try again')
+            setLoadingAccuracy(false)
+            return
+          }
+
+          try {
+            const resultResponse = await api.get(
+              `/v1/projects/${params.project_id}/score_csv?task_id=${task_id}`,
+            )
+
+            if (resultResponse.status === 200) {
+              const { status, result } = resultResponse.data
+
+              switch (status) {
+                case 'SUCCESS':
+                  if (result?.status === 'success') {
+                    // Process successful result
+                    const scores = result.aggregate_scores
+                    const formattedScores: Record<string, number> = {}
+
+                    Object.entries(scores).forEach(([key, value]) => {
+                      formattedScores[key.split('.').join(' ')] = value as number
+                    })
+
+                    setAccuracyScores(formattedScores)
+                    toast.success('Ground truth loaded successfully')
+                  } else {
+                    // Task completed but with error
+                    toast.error(result?.message || 'Error processing ground truth')
+                  }
+                  setLoadingAccuracy(false)
+                  return
+
+                case 'FAILURE':
+                  toast.error(result?.message || 'Failed to process ground truth')
+                  setLoadingAccuracy(false)
+                  return
+
+                case 'PENDING':
+                case 'STARTED':
+                  // Update progress message if needed
+                  if (attempts % 5 === 0 && attempts > 0) {
+                    toast.info(`Still processing... (${attempts * 2}s elapsed)`)
+                  }
+                  // Continue polling
+                  setTimeout(() => pollForResult(attempts + 1, maxAttempts), 2000)
+                  break
+
+                default:
+                  // Unknown status, continue polling but with warning
+                  console.warn('Unknown task status:', status)
+                  setTimeout(() => pollForResult(attempts + 1, maxAttempts), 2000)
+                  break
+              }
+            } else {
+              throw new Error(`HTTP ${resultResponse.status}: Failed to get task status`)
+            }
+          } catch (pollError) {
+            console.error('Error polling for result:', pollError)
+
+            // Retry a few times on polling errors
+            if (attempts < 3) {
+              setTimeout(() => pollForResult(attempts + 1, maxAttempts), 3000)
+            } else {
+              toast.error('Error checking processing status')
+              setLoadingAccuracy(false)
+            }
+          }
+        }
+
+        // Start polling after initial delay
+        setTimeout(() => pollForResult(), 1000)
       } else {
-        toast.error('Error loading ground truth')
+        toast.error('Error starting ground truth processing')
+        setLoadingAccuracy(false)
       }
     } catch (error) {
       console.error('Error loading ground truth:', error)
-      toast.error('Failed to load ground truth')
-    } finally {
+      toast.error('Failed to start ground truth processing')
       setLoadingAccuracy(false)
     }
   }
@@ -449,6 +521,28 @@ const Project: React.FC = () => {
   }, [params.project_id])
 
   useEffect(() => {
+    const fetchProjectScores = async () => {
+      if (!params.project_id) return
+      try {
+        const response = await api.get(`/v1/projects/${params.project_id}/ground_truth`)
+        const projectData = response.data.feature_scores
+
+        const formattedScores: Record<string, number> = {}
+
+        projectData.map((score: { feature_identifier: string; feature_score: number }) => {
+          formattedScores[score.feature_identifier.split('.').join(' ')] = score.feature_score
+        })
+
+        setAccuracyScores(formattedScores)
+      } catch (error) {
+        console.error('Error fetching project:', error)
+      }
+    }
+
+    fetchProjectScores()
+  }, [params.project_id])
+
+  useEffect(() => {
     const loadFeatures = async () => {
       if (!params.project_id) return
 
@@ -479,7 +573,16 @@ const Project: React.FC = () => {
 
   // Update selectable headers when project results change
   useEffect(() => {
-    const notIncluded = ['id', 'paper']
+    const notIncluded = [
+      'id',
+      'paper',
+      'created_at',
+      'updated_at',
+      '_version',
+      '_is_latest',
+      '_result_id',
+      '_paper_id',
+    ]
     const allKeys = new Set<string>()
 
     flattenObject(projectResults).forEach((obj) => {

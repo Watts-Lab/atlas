@@ -2,8 +2,9 @@
 This module contains the routes for the projects API.
 """
 
+import os
 import logging
-
+import uuid
 from bunnet import PydanticObjectId
 from bunnet.operators import In
 from controllers.project import (
@@ -12,9 +13,11 @@ from controllers.project import (
     get_project_detail,
     update_project,
 )
-from controllers.score import score_csv_data
+
+from database.models.features_quality import FeaturesQuality
 from database.models.projects import Project
 from database.models.results import Result
+from workers.celery_config import score_csv_data
 from routes.auth import require_jwt
 from routes.error_handler import error_handler
 from sanic import Blueprint
@@ -250,18 +253,98 @@ async def project_results(request: Request, project_id: str):
         return json_response({"message": "Results deleted."})
 
 
-@projects_bp.route("/<project_id>/score_csv", methods=["POST"], name="project_analysis")
+@projects_bp.route(
+    "/<project_id>/score_csv", methods=["POST", "GET"], name="project_analysis"
+)
 @require_jwt
 @error_handler
 async def score_csv_endpoint(request: Request, project_id: str):
     """
     A protected route for scoring CSV data.
     """
-    csv_file = request.files.get("file")
-    if not csv_file:
-        return json_response({"error": "No CSV file provided."}, status=400)
-    result = score_csv_data(csv_file.body, project_id)
-    return json_response(result)
+    user = request.ctx.user  # Get user from JWT context
+
+    if request.method == "POST":
+        csv_file = request.files.get("file")
+        if not csv_file:
+            return json_response({"error": "No CSV file provided."}, status=400)
+
+        file_id = str(uuid.uuid4())
+
+        # Save CSV file temporarily (following the same pattern as add_paper)
+        file_path = f"csv_files/{file_id}-{csv_file.name}"
+
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        with open(file_path, "wb") as f:
+            f.write(csv_file.body)
+
+        # Call the Celery task with the file path and user email
+        task = score_csv_data.delay(file_path, project_id, user.email)
+
+        return json_response(
+            {
+                "task_id": task.id,
+                "message": "CSV scoring task started",
+                "file_name": csv_file.name,
+                "project_id": project_id,
+            }
+        )
+
+    elif request.method == "GET":
+        task_id = request.args.get("task_id")
+        if not task_id:
+            return json_response({"error": "task_id is required"}, status=400)
+
+        task = score_csv_data.AsyncResult(task_id)
+
+        # Return task status and result
+        return json_response(
+            {
+                "task_id": task_id,
+                "status": task.status,
+                "result": task.result if task.ready() else None,
+            }
+        )
+
+
+@projects_bp.route("/<project_id>/ground_truth", methods=["GET"], name="project_scores")
+@require_jwt
+@error_handler
+async def get_feature_scores(request: Request, project_id: str):
+    """
+    A protected route for scoring CSV data.
+    """
+    if request.method == "GET":
+        feature_qualities: FeaturesQuality = FeaturesQuality.find(
+            FeaturesQuality.project.id == PydanticObjectId(project_id),
+            fetch_links=True,
+            nesting_depth=1,
+        ).to_list()
+
+        result = []
+        for fq in feature_qualities:
+            result.append(
+                {
+                    "feature_id": str(fq.feature.id),
+                    "feature_identifier": fq.feature.feature_identifier,
+                    "feature_score": fq.feature_score,
+                    "project_id": str(fq.project.id),
+                    "paper_ids": [str(paper.id) for paper in fq.paper_ids],
+                    "results_ids": [str(result.id) for result in fq.results_ids],
+                    "created_at": fq.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    "updated_at": fq.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+                }
+            )
+
+        # Return task status and result
+        return json_response(
+            {
+                "message": "Feature scores retrieved successfully",
+                "feature_scores": result,
+            }
+        )
 
 
 # • /api/projects/:
