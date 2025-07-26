@@ -2,6 +2,7 @@
 This file contains the controller for the project
 """
 
+from datetime import datetime
 from bunnet import PydanticObjectId
 from bunnet.operators import In
 from database.models.features import Features
@@ -74,15 +75,10 @@ def get_project_detail(project_id: str):
     project_dict["updated_at"] = str(project_dict["updated_at"])
     project_dict["papers"] = [str(pap.id) for pap in user_project.papers]
 
-    for proj in user_project.papers:
-        print("proj ", len(proj.truth_ids))
-
     papers = [
         {
             "task_id": pap.title,
-            "status": "success" if pap.truth_ids else "failed",
             "file_name": pap.title,
-            "experiments": pap.experiments,
         }
         for pap in user_project.papers
     ]
@@ -90,7 +86,9 @@ def get_project_detail(project_id: str):
     return project_dict, papers
 
 
-def update_project(project_id: str, project_name: str):
+def update_project(
+    project_id: str, project_name: str, project_description: str, project_prompt: str
+):
     """Update the project name.
     We should also update the project description and features in the future.
 
@@ -116,7 +114,18 @@ def update_project(project_id: str, project_name: str):
     user_project: Project = Project.get(project_id).run()
     if not user_project:
         return None
-    user_project.title = project_name
+
+    if project_name is not None and project_name != "":
+        user_project.title = project_name
+
+    if project_description is not None and project_description != "":
+        user_project.description = project_description
+
+    if project_prompt is not None:
+        user_project.prompt = project_prompt
+
+    user_project.updated_at = datetime.now()
+
     user_project.save()
     project_dict = user_project.model_dump(
         mode="json", exclude=["user"], serialize_as_any=True

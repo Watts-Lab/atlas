@@ -20,6 +20,7 @@ class Features(Document):
     feature_description: str
     feature_gpt_interface: GPTInterface
     user: Optional[Link[User]] = None
+    is_shared: Optional[bool] = False
 
     class Settings:
         """Settings for the Features model."""

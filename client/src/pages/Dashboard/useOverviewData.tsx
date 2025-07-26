@@ -32,13 +32,16 @@ export default function useOverviewData(pageSize: number = 50) {
               title: string
               description: string
               papers: unknown[]
-              results: { id: string; finished: boolean }[]
+              results: { id: string; finished: boolean; paper_id: string }[]
             }) => {
+              const uniquePaperIds = Array.from(
+                new Set(project.results.map((result) => result.paper_id)),
+              )
               return {
                 id: project.id,
                 name: project.title,
                 description: project.description,
-                paper_count: project.results.length,
+                paper_count: uniquePaperIds.length,
                 results: project.results,
               } as Projects
             },
@@ -61,6 +64,7 @@ export default function useOverviewData(pageSize: number = 50) {
       if (response.status !== 200) {
         throw new Error('Network response was not ok')
       }
+
       setProjects(
         response.data.project.map(
           (project: {
@@ -68,13 +72,16 @@ export default function useOverviewData(pageSize: number = 50) {
             title: string
             description: string
             papers: unknown[]
-            results: { id: string; finished: boolean }[]
+            results: { id: string; finished: boolean; paper_id: string }[]
           }) => {
+            const uniquePaperIds = Array.from(
+              new Set(project.results.map((result) => result.paper_id)),
+            )
             return {
               id: project.id,
               name: project.title,
               description: project.description,
-              paper_count: project.results.length,
+              paper_count: uniquePaperIds.length,
               results: project.results,
             } as Projects
           },
@@ -98,9 +105,12 @@ export default function useOverviewData(pageSize: number = 50) {
 
         setPapers(
           response.data.papers.map(
-            (paper: { id: string; title: string; file_hash: string; updated_at: string }) => {
+            (
+              paper: { id: string; title: string; file_hash: string; updated_at: string },
+              index: number,
+            ) => {
               return {
-                id: paper.id,
+                id: String(index + 1),
                 title: paper.title,
                 file_hash: paper.file_hash,
                 uploaded_at: paper.updated_at, // If you prefer to rename it

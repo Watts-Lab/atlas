@@ -44,6 +44,7 @@ export type Projects = {
   results: {
     id: string
     finished: boolean
+    paper_id?: string
   }[]
 }
 
