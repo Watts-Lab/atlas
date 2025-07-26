@@ -80,6 +80,7 @@ class FeatureCreate(BaseModel):
     feature_type: Literal["text", "number", "boolean", "enum", "parent"]
     feature_prompt: str
     enum_options: Optional[List[str]] = None
+    is_shared: bool = False
 
     @model_validator(mode="before")
     def check_enum_options(cls, values):  # pylint: disable=no-self-argument

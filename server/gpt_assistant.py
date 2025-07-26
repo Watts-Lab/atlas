@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 from database.models.features import Features
 from database.models.projects import Project
-from workers.utils.socket_emitter import SocketEmmiter
+from workers.services.socket_emitter import SocketEmmiter
 
 
 load_dotenv()
@@ -48,10 +48,11 @@ def get_all_features(project_id: str) -> List[str]:
     user_features = {}
 
     for feature in current_project.features:
+        if feature.feature_identifier.endswith("parent"):
+            continue
         user_features[feature.feature_identifier] = (
             feature.feature_gpt_interface.model_dump(exclude_none=True)
         )
-
         feature_list.append(feature.feature_identifier)
 
     sorted_features = sorted(feature_list, key=lambda s: s.count("."))
@@ -151,11 +152,8 @@ def build_openai_feature_functions(
     """
 
     openai_function_object = {
-        "name": "define_experiments_and_conditions_and_behaviors",
-        "description": (
-            "Define the conditions and behaviors in each experiment. Each condition and behavior "
-            "should be a separate object with specified properties and values under the experiments object."
-        ),
+        "name": "extract_features",
+        "description": ("Extract features from a scientific paper. "),
         "strict": True,
         "parameters": {
             "type": "object",
@@ -194,10 +192,7 @@ def upload_file_to_vector_store(client: OpenAI, file_path: str) -> VectorStore:
 
 
 def update_assistant(
-    client: OpenAI,
-    assistant_id: str,
-    vector_store,
-    function: Dict,
+    client: OpenAI, assistant_id: str, vector_store, function: Dict, schema: Dict = None
 ):
     """
     Updates the assistant with the new function.
@@ -217,6 +212,20 @@ def update_assistant(
                 {"type": "file_search"},
                 {"type": "function", "function": function},
             ],
+            **(
+                {
+                    "response_format": {
+                        "type": "json_schema",
+                        "json_schema": {
+                            "name": "extract_features",
+                            "strict": True,
+                            "schema": schema,
+                        },
+                    }
+                }
+                if schema
+                else {}
+            ),
         )
     except Exception as e:
         logger.error("Failed to update assistant: %s", e)
@@ -240,32 +249,36 @@ def check_output_format(output):
     raise AssistantException("Output format is incorrect")
 
 
-def create_temporary_assistant(client: OpenAI, gpt_temperature: float = 0.7):
+def create_temporary_assistant(
+    client: OpenAI, gpt_temperature: float = 0.7, custom_prompt: str = None
+):
     """
     Creates a temporary assistant with the given functions.
 
     Args:
         - client: OpenAI client object.
+        - custom_prompt: Custom prompt for the assistant.
 
     Returns:
         - The created assistant.
     """
+
+    default_prompt = (
+        "You are a research assistnant for a team of scientists tasked with research cartography. "
+        "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format. "
+        "Just provide the JSON response without any additional text. Do not include ```json or any other formatting."
+    )
+
+    instructions = custom_prompt if custom_prompt else default_prompt
+
     logger.info(
         "Creating temporary assistant with model: %s and temperature: %s",
-        "o3-mini",
+        "gpt-4.1",
         gpt_temperature,
     )
 
     my_temporary_assistant = client.beta.assistants.create(
-        instructions=(
-            "You are a research assistnant for a team of scientists. "
-            "You are tasked with summarizing the key findings of a scientific paper. "
-            "You are given a PDF of the paper and are asked to provide a summary of the key findings. Your response should be in JSON format. "
-            "Just provide the JSON response without any additional text. Do not include ```json or any other formatting."
-        ),
-        name="Atlas explorer",
-        model="o3-mini",
-        # temperature=gpt_temperature,
+        instructions=instructions, name="Atlas explorer", model="gpt-4.1"
     )
 
     return my_temporary_assistant
@@ -294,6 +307,10 @@ def call_asssistant_api(
             progress=0,
         )
 
+        # Fetch project to get custom prompt
+        project = Project.get(project_id).run()
+        custom_prompt = project.prompt if project and project.prompt.strip() else None
+
         feature_list, feature_obj = get_all_features(project_id)
 
         emitter.emit_status(
@@ -318,7 +335,9 @@ def call_asssistant_api(
             progress=15,
         )
 
-        my_temporary_assistant = create_temporary_assistant(client, gpt_temperature)
+        my_temporary_assistant = create_temporary_assistant(
+            client, gpt_temperature, custom_prompt
+        )
 
         updated_assistant = update_assistant(
             client, my_temporary_assistant.id, vector_store, functions
@@ -333,7 +352,11 @@ def call_asssistant_api(
             messages=[
                 {
                     "role": "user",
-                    "content": "Please define the experiments, conditions and behaviors in the paper.",
+                    "content": (
+                        "Please use the defined function to extract features from the paper."
+                        "Use the tool call `extract_features` to extract the features "
+                        f"which would conform to the following schema: {json.dumps(functions)}"
+                    ),
                 }
             ],
         )
@@ -373,9 +396,6 @@ def call_asssistant_api(
             message="Assistant run completed.",
             progress=60,
         )
-
-        with open("logfile.log", "w", encoding="utf-8") as log_file:
-            log_file.write(f"RUN RESULTS: {run.to_json()}\n")
 
         messages = client.beta.threads.messages.list(thread_id=run.thread_id)
 

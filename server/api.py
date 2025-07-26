@@ -1,13 +1,11 @@
 """This module contains the RESTful API endpoint for atlas."""
 
 import argparse
-import json
 import os
 
 import socketio
 from bunnet import PydanticObjectId
 from bunnet.operators import In, Or
-from celery.result import EagerResult
 from config.app_config import AppConfig
 from controllers.login import login_user, logout_user, validate_token, validate_user
 from database.database import init_db
@@ -24,7 +22,8 @@ from sanic import json as json_response
 from sanic.request import Request
 from sanic.worker.manager import WorkerManager
 from sanic_ext import Extend
-from workers.celery_config import add_paper, another_task
+from workers.celery_config import add_paper, reprocess_paper
+from workers.strategies.strategy_factory import ExtractionStrategyFactory
 
 load_dotenv()
 
@@ -108,12 +107,13 @@ async def project_features(request: Request, project_id: str):
                 "feature_name": f.feature_name,
                 "feature_description": f.feature_description,
                 "feature_identifier": f.feature_identifier,
+                "created_by": "user" if f.user else "provider",
             }
             for f in user_project.features
         ]
 
         return json_response(
-            {"message": "Feature added.", "features": project_feature_list},
+            {"message": "Project feature list.", "features": project_feature_list},
             status=200,
         )
 
@@ -212,17 +212,17 @@ async def features(request: Request):
     """
     A protected route.
     """
-
     # Validate user from JWT
     user = request.ctx.user
 
     # Get all the features for the user and public features
     if request.method == "GET":
-        # Get the user features
+        # Get the user features and public features (user.id == None)
         experiment_feature = Features.find(
             Or(
                 Features.user.id == None,  # pylint: disable=C0121
                 Features.user.id == user.id,
+                Features.is_shared == True,
             )
         ).to_list()
 
@@ -235,6 +235,13 @@ async def features(request: Request):
                     "feature_name": o["feature_name"],
                     "feature_description": o["feature_description"],
                     "feature_identifier": o["feature_identifier"],
+                    "feature_type": o["feature_gpt_interface"].get("type", "string"),
+                    "feature_prompt": o["feature_gpt_interface"].get(
+                        "description", "No prompt found."
+                    ),
+                    "feature_enum_options": o["feature_gpt_interface"].get("enum", []),
+                    "is_shared": o.get("is_shared", False),
+                    "created_by": "user" if o.get("user") else "provider",
                 }
             )
 
@@ -259,6 +266,7 @@ async def features(request: Request):
             feature_identifier=payload.feature_identifier,
             feature_parent=payload.feature_parent,
             feature_description=payload.feature_description,
+            is_shared=payload.is_shared,
             feature_gpt_interface=gpt_iface,
             user=user.id,
         )
@@ -278,6 +286,27 @@ async def features(request: Request):
             },
             status=201,
         )
+
+
+@app.route("/api/features/<feature_id:str>", methods=["DELETE"], name="delete_feature")
+@require_jwt
+@error_handler
+async def delete_feature(request: Request, feature_id: str):
+    """
+    A protected route for deleting a feature by its ID.
+    """
+    user = request.ctx.user
+
+    try:
+        feat: Features = Features.get(feature_id, fetch_links=True).run()
+    except Exception:
+        return json_response({"error": "Feature not found."}, status=404)
+
+    if feat.user != user:
+        return json_response({"error": "Forbidden."}, status=403)
+
+    feat.delete()
+    return json_response({"response": "success"}, status=200)
 
 
 @app.route("/api/login", methods=["POST"], name="login")
@@ -325,74 +354,121 @@ async def check_token(request: Request):
 @require_jwt
 @error_handler
 async def run_assistant_projects(request: Request):
-    """
-    Handles the POST request for running the assistant.
-    """
+    """Handles the POST request for running the assistant."""
     user = request.ctx.user
-
     if request.method == "POST":
-        # Get the file and the socket id
         files = request.files.getlist("files[]")
         if not files:
             return json_response({"error": "No file uploaded."}, status=400)
-
-        # files = request.files.getlist("files[]")
         socket_id = request.form.get("sid")
         project_id = request.form.get("project_id")
-
+        strategy_type = request.form.get("strategy_type", "assistant_api")
+        available_strategies = ExtractionStrategyFactory.get_available_strategies()
+        if strategy_type not in available_strategies:
+            return json_response(
+                {"error": f"Invalid strategy type. Available: {available_strategies}"},
+                status=400,
+            )
         user_email = user.email
         gpt_process = {}
-
+        # Save files temporarily
         for file in files:
             file_path = f"papers/{socket_id}-{file.name}"
             with open(file_path, "wb") as f:
                 f.write(file.body)
-
+        # Process files
         for file in files:
             file_path = f"papers/{socket_id}-{file.name}"
-            task: EagerResult = add_paper.delay(
+            task = add_paper.delay(
                 file_path,
                 socket_id,
                 user_email,
                 project_id,
+                strategy_type,
+                original_filename=file.name,
             )
             gpt_process[file.name] = task.id
-
         return json_response(gpt_process)
-
     if request.method == "GET":
         task_id = request.args.get("task_id")
         task = add_paper.AsyncResult(task_id)
         return json_response(task.result)
 
 
-@app.route("/api/run_paper", methods=["POST", "GET"], name="run_paper_assistant")
+@app.route(
+    "/api/reprocess_paper/<paper_id>", methods=["POST"], name="reprocess_paper_from_s3"
+)
 @require_jwt
 @error_handler
-async def run_assistant_with_features(request: Request):
-    """
-    Handles the POST request for running the assistant.
-    """
+async def reprocess_paper_from_s3(request: Request, paper_id: str):
+    """Reprocess an existing paper."""
     user = request.ctx.user
-    if request.method == "POST":
-        # Get the file and the socket id
-        file = request.files.get("file")
-        requested_features = request.form.get("features")
-        socket_id = request.form.get("sid")
+    data = request.json
+    project_id = data.get("project_id")
+    strategy_type = data.get("strategy_type", "assistant_api")
+    socket_id = data.get("sid")
 
-        file_path = f"papers/{socket_id}-{file.name}"
-        with open(file_path, "wb") as f:
-            f.write(file.body)
+    if not project_id:
+        return json_response({"error": "project_id is required"}, status=400)
 
-        task: EagerResult = another_task.delay(
-            file_path,
-            socket_id,
-            str(user.id),
+    task = reprocess_paper.delay(
+        paper_id=paper_id,
+        socket_id=socket_id,
+        user_email=user.email,
+        project_id=project_id,
+        strategy_type=strategy_type,
+    )
+
+    return json_response({"task_id": task.id, "paper_id": paper_id})
+
+
+@app.route(
+    "/api/reprocess_project/<project_id>",
+    methods=["POST"],
+    name="reprocess_all_papers_in_project",
+)
+@require_jwt
+@error_handler
+async def reprocess_all_papers_in_project(request: Request, project_id: str):
+    """Reprocess all papers in a project."""
+    user = request.ctx.user
+    data = request.json
+    strategy_type = data.get("strategy_type", "assistant_api")
+    socket_id = data.get("sid")
+
+    try:
+        # Get the project and verify ownership
+        project: Project = Project.get(
+            project_id, fetch_links=True, nesting_depth=1
+        ).run()
+
+        if not project:
+            return json_response({"error": "Project not found"}, status=404)
+
+        # Start reprocessing tasks for all papers
+        task_ids = {}
+        for ppr in project.papers:
+            paper_id = str(ppr.id)
+            task = reprocess_paper.delay(
+                paper_id=paper_id,
+                socket_id=socket_id,
+                user_email=user.email,
+                project_id=project_id,
+                strategy_type=strategy_type,
+            )
+            task_ids[paper_id] = task.id
+
+        return json_response(
+            {
+                "message": f"Started reprocessing {len(task_ids)} papers",
+                "task_ids": task_ids,
+                "total_papers": len(task_ids),
+            }
         )
 
-        print(json.loads(requested_features))
+    except Exception as e:
 
-        return json_response({"status": task.id})
+        return json_response({"error": str(e)}, status=500)
 
 
 @app.get("/health")
