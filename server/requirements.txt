@@ -66,7 +66,7 @@ python-socketio==5.13.0
 pytz==2025.2
 PyYAML==6.0.2
 redis==5.2.1
-requests==2.32.3
+requests==2.32.4
 s3transfer==0.12.0
 sanic==25.3.0
 sanic-ext==24.12.0
