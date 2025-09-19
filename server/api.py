@@ -215,10 +215,12 @@ async def features(request: Request):
     # Validate user from JWT
     user = request.ctx.user
 
-    # Get all the features for the user and public features
+    # Get all the features for the user and public features, and optionally project features
     if request.method == "GET":
-        # Get the user features and public features (user.id == None)
-        experiment_feature = Features.find(
+        project_id = request.args.get("project_id")
+
+        # Find user features, shared features, and unowned features
+        experiment_features = Features.find(
             Or(
                 Features.user.id == None,  # pylint: disable=C0121
                 Features.user.id == user.id,
@@ -226,8 +228,22 @@ async def features(request: Request):
             )
         ).to_list()
 
+        # If project_id is provided, fetch features assigned to that project
+        project_owned_features = []
+        if project_id:
+            project = Project.get(project_id, fetch_links=True).run()
+            if project and hasattr(project, "features"):
+                project_owned_features = project.features or []
+
+        # Merge features, avoiding duplicates by id
+        all_features_dict = {}
+        for feature in experiment_features:
+            all_features_dict[str(feature.id)] = feature
+        for feature in project_owned_features:
+            all_features_dict[str(feature.id)] = feature
+
         res = []
-        for feature in experiment_feature:
+        for feature in all_features_dict.values():
             o = feature.model_dump()
             res.append(
                 {

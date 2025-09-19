@@ -547,12 +547,14 @@ const Project: React.FC = () => {
       if (!params.project_id) return
 
       try {
-        const [allFeatures, projectFeaturesResponse] = await Promise.all([
-          fetchFeatures(),
-          api.get(`/projects/${params.project_id}/features`),
-        ])
+        // Fetch all features relevant to the project in one request
+        const allFeatures = await fetchFeatures(params.project_id)
 
+        // Fetch features currently assigned to the project
+        const projectFeaturesResponse = await api.get(`/projects/${params.project_id}/features`)
         const projectFeatures: Feature[] = projectFeaturesResponse.data.features
+
+        // Mark selected features
         const featuresWithSelection = allFeatures.map((feature) => ({
           ...feature,
           selected: projectFeatures.some((pf) => pf.id === feature.id),

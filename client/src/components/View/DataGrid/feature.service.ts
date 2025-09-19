@@ -9,8 +9,9 @@ export const featureTypeMap: Record<'string' | 'number' | 'array' | 'integer', s
   integer: 'number',
 }
 
-export const fetchFeatures = async (): Promise<Feature[]> => {
-  const response = await api.get('/features')
+export const fetchFeatures = async (projectId?: string): Promise<Feature[]> => {
+  const url = projectId ? `/features?project_id=${projectId}` : '/features'
+  const response = await api.get(url)
   return response.data.features.map(
     (feature: {
       id: string
@@ -26,9 +27,7 @@ export const fetchFeatures = async (): Promise<Feature[]> => {
       if (trail.endsWith('.parent')) {
         trail = trail.replace('.parent', '')
       }
-      // reverse trail : trail.split('.').reverse().join(' ← ')
       trail = trail.replace(/\./g, ' → ')
-      // trail = trail.split('.').reverse().join(' ← ')
       return {
         id: feature.id,
         feature_name: feature.feature_name,
