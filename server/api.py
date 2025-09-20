@@ -333,7 +333,8 @@ async def login(request: Request):
     if request.method == "POST":
         data = request.json
         email = data.get("email")
-        return await login_user(email=email)
+        is_sdk = data.get("client_type") == "sdk"  # Check if it's from SDK
+        return await login_user(email=email, is_sdk=is_sdk)
 
 
 @app.route("/api/logout", methods=["POST"], name="logout")

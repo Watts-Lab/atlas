@@ -7,13 +7,17 @@ import jwt
 
 from sanic import Request, Sanic, json as json_response
 
-from controllers.utils.email_client import send_magic_link
+from controllers.utils.email_client import send_magic_link, send_sdk_login
 from database.models.users import User
 
 
-async def login_user(email: str):
+async def login_user(email: str, is_sdk: bool = False):
     """
     Handles the POST request for user login.
+
+    Args:
+        email: User's email address
+        is_sdk: Whether this is an SDK login request
     """
     try:
         if not email:
@@ -33,9 +37,13 @@ async def login_user(email: str):
             user.updated_at = datetime.now(UTC)
             user.save()  # Save the User asynchronously
 
-            # Send magic link via email
-            send_magic_link(email=email, token=magic_link)
-            response_data = {"message": "Magic link generated. Check your email."}
+            # Send appropriate email based on request type
+            if is_sdk:
+                send_sdk_login(email=email, token=magic_link)
+                response_data = {"message": "SDK token sent. Check your email."}
+            else:
+                send_magic_link(email=email, token=magic_link)
+                response_data = {"message": "Magic link generated. Check your email."}
             return json_response(body=response_data, status=200)
 
         # Create a new user and send magic link
@@ -50,11 +58,17 @@ async def login_user(email: str):
         )
         new_user.create()  # Create the User asynchronously
 
-        # Send magic link via email
-        send_magic_link(email=email, token=new_user.magic_link)
-        response_data = {
-            "message": "User created. Check your email for the magic link."
-        }
+        # Send appropriate email based on request type
+        if is_sdk:
+            send_sdk_login(email=email, token=new_user.magic_link)
+            response_data = {
+                "message": "User created. Check your email for the SDK token."
+            }
+        else:
+            send_magic_link(email=email, token=new_user.magic_link)
+            response_data = {
+                "message": "User created. Check your email for the magic link."
+            }
         return json_response(body=response_data, status=200)
 
     except JSONDecodeError:
