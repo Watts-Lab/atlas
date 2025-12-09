@@ -40,7 +40,7 @@ async def project(request: Request):
     """
 
     # Validate user from JWT
-    user = request.ctx.user
+    user: User = request.ctx.user
 
     if request.method == "POST":
         project_name = request.json.get("project_name")
@@ -92,6 +92,9 @@ async def project(request: Request):
                 for r in results
                 if str(r.project.id) == str(proj["id"])
             ]
+
+        if not user.recently_viewed_projects:
+            return json_response({"project": pr_response, "recently_viewed": []})
 
         recently_viewed_project_ids = [
             PydanticObjectId(view["project_id"])
@@ -193,7 +196,7 @@ async def project_results(request: Request, project_id: str):
     """
     A protected route for getting results of a project.
     """
-    user = request.ctx.user
+    user: User = request.ctx.user
     user_project: Project = Project.get(project_id, fetch_links=True).run()
     if not user_project:
         return json_response({"error": "Project not found."}, status=404)
@@ -308,7 +311,7 @@ async def score_csv_endpoint(request: Request, project_id: str):
     """
     A protected route for scoring CSV data.
     """
-    user = request.ctx.user  # Get user from JWT context
+    user: User = request.ctx.user  # Get user from JWT context
 
     if request.method == "POST":
         csv_file = request.files.get("file")
