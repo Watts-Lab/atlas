@@ -96,10 +96,15 @@ async def project(request: Request):
         if not user.recently_viewed_projects:
             return json_response({"project": pr_response, "recently_viewed": []})
 
-        recently_viewed_project_ids = [
-            PydanticObjectId(view["project_id"])
-            for view in user.recently_viewed_projects
-        ]
+        recently_viewed_project_ids = []
+        for view in user.recently_viewed_projects:
+            try:
+                recently_viewed_project_ids.append(PydanticObjectId(view["project_id"]))
+            except Exception:
+                logger.warning(
+                    f"Invalid project_id in recently_viewed: {view.get('project_id')}"
+                )
+                continue
 
         recently_viewed_projects = []
         if recently_viewed_project_ids:
@@ -116,7 +121,6 @@ async def project(request: Request):
                 "title": p.title,
                 "description": p.description,
                 "updated_at": p.updated_at.isoformat() if p.updated_at else None,
-                "owner_email": p.user.email,  # Show who owns the project
                 "is_owner": str(p.user.id) == str(user.id),  # Flag if user owns it
             }
 

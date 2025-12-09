@@ -66,14 +66,16 @@ export default function RecentlyViewedProjects({ recentlyViewed }: RecentlyViewe
                     view.project.is_owner ? (
                       <span className='text-gray-400'>You</span>
                     ) : (
-                      view.project.owner_email.split('@')[0]
+                      <span className='text-gray-600'>Collaborator</span>
                     )
                   ) : (
                     '-'
                   )}
                 </TableCell>
                 <TableCell className='py-2 text-xs text-gray-500'>
-                  {format(new Date(view.viewed_at), 'MMM dd yyyy, hh:mm a')}
+                  {view.viewed_at
+                    ? format(new Date(view.viewed_at), 'MMM dd, yyyy h:mm a')
+                    : 'Unknown'}
                 </TableCell>
                 <TableCell className='py-2 text-right'>
                   {view.exists && (

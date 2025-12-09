@@ -8,10 +8,11 @@ export type RecentlyViewedProject = {
   project_id: string
   viewed_at: string
   project: {
+    id: string
     title: string
     description: string
+    updated_at: string | null
     is_owner: boolean
-    owner_email: string
   } | null
   exists: boolean
 }

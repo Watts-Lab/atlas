@@ -166,7 +166,7 @@ async def track_project_view(user: User, project_id: str):
     """
     Track project view asynchronously.
     Args:
-        user_id (PydanticObjectId): the id of the user
+        user (User): the user viewing the project
         project_id (str): the id of the project
     Returns:
         None
@@ -192,8 +192,6 @@ async def track_project_view(user: User, project_id: str):
         user.recently_viewed_projects = user.recently_viewed_projects[:10]
 
         user.save()
-
-        print(f"Tracked project view for user {user.email} and project {project_id}")
 
     except Exception as e:
         # Log error but don't fail the request
