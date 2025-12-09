@@ -3,9 +3,10 @@ import ProjectsTable from '@/components/View/DataGrid/ProjectsTable'
 import PapersTable from '@/components/View/DataGrid/PapersTable'
 import useOverviewData from './useOverviewData'
 import { useUser } from '@/context/User/useUser'
+import RecentlyViewedProjects from '@/components/View/DataGrid/RecentlyViewedProjects'
 
 const Overview = () => {
-  const { projects, papers, isLoadingProjects, isLoadingPapers, refetchProjects } =
+  const { projects, papers, recentlyViewed, isLoadingProjects, isLoadingPapers, refetchProjects } =
     useOverviewData(50)
   const { user } = useUser()
 
@@ -39,6 +40,8 @@ const Overview = () => {
             <p className='text-sm text-gray-500'>{user.credits} tokens</p>
           </div>
         </div>
+        <RecentlyViewedProjects recentlyViewed={recentlyViewed} />
+
         <ProjectsTable
           projects={projects}
           isLoading={isLoadingProjects}

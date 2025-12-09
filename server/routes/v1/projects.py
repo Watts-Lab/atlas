@@ -11,12 +11,14 @@ from controllers.project import (
     create_project,
     delete_project,
     get_project_detail,
+    track_project_view,
     update_project,
 )
 
 from database.models.features_quality import FeaturesQuality
 from database.models.projects import Project
 from database.models.results import Result
+from database.models.users import User
 from workers.celery_config import score_csv_data
 from routes.auth import require_jwt
 from routes.error_handler import error_handler
@@ -91,7 +93,47 @@ async def project(request: Request):
                 if str(r.project.id) == str(proj["id"])
             ]
 
-        return json_response({"project": pr_response})
+        recently_viewed_project_ids = [
+            PydanticObjectId(view["project_id"])
+            for view in user.recently_viewed_projects
+        ]
+
+        recently_viewed_projects = []
+        if recently_viewed_project_ids:
+            recently_viewed_projects = Project.find(
+                In(Project.id, recently_viewed_project_ids),
+                fetch_links=True,
+                nesting_depth=1,
+            ).to_list()
+
+        project_map = {}
+        for p in recently_viewed_projects:
+            project_map[str(p.id)] = {
+                "id": str(p.id),
+                "title": p.title,
+                "description": p.description,
+                "updated_at": p.updated_at.isoformat() if p.updated_at else None,
+                "owner_email": p.user.email,  # Show who owns the project
+                "is_owner": str(p.user.id) == str(user.id),  # Flag if user owns it
+            }
+
+        recently_viewed_enriched = []
+        for view in user.recently_viewed_projects:
+            project_id = view["project_id"]
+            project_data = project_map.get(project_id)
+
+            recently_viewed_enriched.append(
+                {
+                    "project_id": project_id,
+                    "viewed_at": view["viewed_at"].isoformat(),
+                    "project": project_data,  # None if project was deleted
+                    "exists": project_data is not None,
+                }
+            )
+
+        return json_response(
+            {"project": pr_response, "recently_viewed": recently_viewed_enriched}
+        )
 
 
 @projects_bp.route(
@@ -104,13 +146,17 @@ async def project_detail(request: Request, project_id: str):
     A protected route for getting/updating a project.
     """
     # Validate user from JWT
-    user = request.ctx.user
+    user: User = request.ctx.user
 
     if request.method == "GET":
         # Get project details
         project_data, results = get_project_detail(project_id)
         if not project_data:
             return json_response({"error": "Project not found."}, status=404)
+
+        # Non blocking update of recently viewed projects
+        request.app.add_task(track_project_view(user, project_id))
+
         return json_response({"project": project_data, "results": results})
 
     if request.method == "PUT":

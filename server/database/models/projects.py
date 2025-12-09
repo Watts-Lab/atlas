@@ -1,5 +1,5 @@
 """
-Papers model.
+Projects model.
 """
 
 from datetime import datetime

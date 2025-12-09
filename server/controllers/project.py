@@ -160,3 +160,41 @@ def delete_project(project_id: str, user: User):
         raise PermissionError("You are not allowed to delete this project.")
     user_project.delete()
     return True
+
+
+async def track_project_view(user: User, project_id: str):
+    """
+    Track project view asynchronously.
+    Args:
+        user_id (PydanticObjectId): the id of the user
+        project_id (str): the id of the project
+    Returns:
+        None
+    Raises:
+        Exception: if the project view could not be tracked
+
+    """
+    try:
+
+        # Remove if already exists
+        user.recently_viewed_projects = [
+            view
+            for view in user.recently_viewed_projects
+            if view["project_id"] != project_id
+        ]
+
+        # Add to front
+        user.recently_viewed_projects.insert(
+            0, {"project_id": project_id, "viewed_at": datetime.now()}
+        )
+
+        # Keep only last 10
+        user.recently_viewed_projects = user.recently_viewed_projects[:10]
+
+        user.save()
+
+        print(f"Tracked project view for user {user.email} and project {project_id}")
+
+    except Exception as e:
+        # Log error but don't fail the request
+        print(f"Error tracking project view: {e}")
