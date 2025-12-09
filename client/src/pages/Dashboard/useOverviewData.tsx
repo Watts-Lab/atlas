@@ -4,6 +4,19 @@ import api from '@/service/api'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+export type RecentlyViewedProject = {
+  project_id: string
+  viewed_at: string
+  project: {
+    id: string
+    title: string
+    description: string
+    updated_at: string | null
+    is_owner: boolean
+  } | null
+  exists: boolean
+}
+
 /**
  * Custom hook to handle fetching of projects and papers data.
  * @param pageSize default number of items to fetch per page
@@ -12,6 +25,7 @@ import { useNavigate } from 'react-router-dom'
 export default function useOverviewData(pageSize: number = 50) {
   const [projects, setProjects] = useState<Projects[]>([])
   const [papers, setPapers] = useState<Papers[]>([])
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedProject[]>([])
   const [isLoadingProjects, setIsLoadingProjects] = useState<boolean>(false)
   const [isLoadingPapers, setIsLoadingPapers] = useState<boolean>(false)
 
@@ -25,28 +39,33 @@ export default function useOverviewData(pageSize: number = 50) {
         if (response.status !== 200) {
           throw new Error('Network response was not ok')
         }
-        setProjects(
-          response.data.project.map(
-            (project: {
-              id: string
-              title: string
-              description: string
-              papers: unknown[]
-              results: { id: string; finished: boolean; paper_id: string }[]
-            }) => {
-              const uniquePaperIds = Array.from(
-                new Set(project.results.map((result) => result.paper_id)),
-              )
-              return {
-                id: project.id,
-                name: project.title,
-                description: project.description,
-                paper_count: uniquePaperIds.length,
-                results: project.results,
-              } as Projects
-            },
-          ),
+
+        const projectsList = response.data.project.map(
+          (project: {
+            id: string
+            title: string
+            description: string
+            papers: unknown[]
+            results: { id: string; finished: boolean; paper_id: string }[]
+          }) => {
+            const uniquePaperIds = Array.from(
+              new Set(project.results.map((result) => result.paper_id)),
+            )
+            return {
+              id: project.id,
+              name: project.title,
+              description: project.description,
+              paper_count: uniquePaperIds.length,
+              results: project.results,
+            } as Projects
+          },
         )
+
+        setProjects(projectsList)
+
+        if (response.data.recently_viewed) {
+          setRecentlyViewed(response.data.recently_viewed)
+        }
       } catch (error) {
         console.error(error)
       } finally {
@@ -131,6 +150,7 @@ export default function useOverviewData(pageSize: number = 50) {
   return {
     projects,
     papers,
+    recentlyViewed,
     isLoadingProjects,
     isLoadingPapers,
     refetchProjects,

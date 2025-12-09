@@ -3,8 +3,9 @@ User model. This model is used to store user data in the database.
 """
 
 from datetime import datetime, UTC
-from typing import Optional
+from typing import List, Optional
 from bunnet import Document, Indexed
+from pydantic import Field
 
 
 class User(Document):
@@ -17,6 +18,11 @@ class User(Document):
     magic_link_expired: bool = True
     magic_link_expiration_date: datetime
     number_of_tokens: Optional[int]
+
+    # A list of recently viewed projects with their view timestamps
+    # format : [{"project_id": str, "viewed_at": datetime}]
+    recently_viewed_projects: List[dict] = Field(default_factory=list)
+
     created_at: datetime = datetime.now(UTC)
     updated_at: datetime = datetime.now(UTC)
 
