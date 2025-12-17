@@ -10,7 +10,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, Copy, Link, Loader2, MoreHorizontal, Trash2 } from 'lucide-react'
+import {
+  ChevronDown,
+  Copy,
+  Link,
+  Loader2,
+  MoreHorizontal,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+} from 'lucide-react'
+import { format } from 'date-fns'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -46,6 +56,9 @@ export type Projects = {
     finished: boolean
     paper_id?: string
   }[]
+  is_owner: boolean
+  last_viewed: string | null
+  exists: boolean
 }
 
 export type ProjectTableProps = {
@@ -54,8 +67,31 @@ export type ProjectTableProps = {
   refetchProjects: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SortableHeader = ({ column, title }: { column: any; title: string }) => {
+  const sortDirection = column.getIsSorted()
+
+  return (
+    <button
+      onClick={() => column.toggleSorting()}
+      className='flex items-center gap-2 cursor-pointer select-none hover:text-gray-600'
+    >
+      {title}
+      {sortDirection === 'asc' && <ArrowUp className='h-4 w-4' />}
+      {sortDirection === 'desc' && <ArrowDown className='h-4 w-4' />}
+      {!sortDirection && <ArrowDown className='h-4 w-4 opacity-30' />}
+    </button>
+  )
+}
+
 export default function ProjectsTable({ projects, isLoading, refetchProjects }: ProjectTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  // Set default sorting by last_viewed descending
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'last_viewed',
+      desc: true,
+    },
+  ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
@@ -84,36 +120,74 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
       ),
       enableSorting: false,
       enableHiding: false,
+      meta: {
+        displayName: 'Select',
+      },
     },
     {
       accessorKey: 'name',
-      header: 'Name',
+      header: ({ column }) => <SortableHeader column={column} title='Name' />,
       cell: ({ row }) => <div className='capitalize'>{row.getValue('name')}</div>,
+      meta: {
+        displayName: 'Name',
+      },
     },
     {
       accessorKey: 'description',
-      header: 'Description',
+      header: ({ column }) => <SortableHeader column={column} title='Description' />,
       cell: ({ row }) => <div className='lowercase'>{row.getValue('description')}</div>,
+      meta: {
+        displayName: 'Description',
+      },
     },
     {
-      accessorKey: 'paper_count',
-      header: 'Paper count',
-      cell: ({ row }) => <div className='lowercase'>{row.getValue('paper_count')}</div>,
+      accessorKey: 'is_owner',
+      header: ({ column }) => <SortableHeader column={column} title='Owner' />,
+      cell: ({ row }) => (
+        <div className='capitalize'>
+          {row.getValue('is_owner') ? (
+            <span className='text-gray-400'>You</span>
+          ) : (
+            <span className='text-gray-600'>Collaborator</span>
+          )}
+        </div>
+      ),
+      meta: {
+        displayName: 'Owner',
+      },
+    },
+    {
+      accessorKey: 'last_viewed',
+      header: ({ column }) => <SortableHeader column={column} title='Last Viewed' />,
+      cell: ({ row }) => {
+        const date = row.getValue('last_viewed')
+        return (
+          <div className='text-sm text-gray-500'>
+            {date ? format(new Date(date as string), 'MMM dd, yyyy') : '-'}
+          </div>
+        )
+      },
+      meta: {
+        displayName: 'Last Viewed',
+      },
     },
     {
       id: 'actions',
+      header: 'Actions',
       enableHiding: false,
+      enableSorting: false,
+      meta: {
+        displayName: 'Actions',
+      },
       cell: ({ row }) => {
         const project = row.original
 
-        // Single deletion handler for a project.
         const handleDelete = async (e: React.MouseEvent) => {
           e.stopPropagation()
           if (!confirm(`Are you sure you want to delete "${project.name}"?`)) return
           try {
             await api.delete(`/v1/projects/${project.id}`)
             toast.success('Project deleted successfully')
-            // Optionally, refresh your projects list or remove it from state.
             refetchProjects()
           } catch (error) {
             console.error(error)
@@ -143,17 +217,21 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
                   <Link /> Copy share URL
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                  data-no-row-click
-                >
-                  <Copy /> Duplicate
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDelete} data-no-row-click>
-                  <Trash2 /> Remove
-                </DropdownMenuItem>
+                {project.is_owner && (
+                  <>
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation()
+                      }}
+                      data-no-row-click
+                    >
+                      <Copy /> Duplicate
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDelete} data-no-row-click>
+                      <Trash2 /> Remove
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -211,7 +289,10 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
-                    {column.columnDef.header as string}
+                    {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (column.columnDef.meta as any)?.displayName || column.id
+                    }
                   </DropdownMenuCheckboxItem>
                 )
               })}

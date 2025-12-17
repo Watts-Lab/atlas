@@ -11,6 +11,7 @@ import { useSocket } from '@/context/Socket/useSocket'
 import api from '@/service/api'
 import ProjectHeader from './ProjectHeader'
 import SelectFeatures from './SelectFeatures'
+import ProjectFeatureMapDialog from './ProjectFeatureMapDialog'
 
 type ProjectDetails = {
   id: string
@@ -42,6 +43,7 @@ const Project: React.FC = () => {
     { paper: '...' },
   ])
   const [resultIds, setResultIds] = useState<string[]>([])
+  const [isFeaturesLoading, setIsFeaturesLoading] = useState<boolean>(false)
 
   const [project, setProject] = useState<ProjectDetails>({
     id: '',
@@ -70,6 +72,7 @@ const Project: React.FC = () => {
     open: false,
     initialTab: 'select',
   })
+  const [mapDialogOpen, setMapDialogOpen] = useState(false)
 
   // Refs
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -547,6 +550,7 @@ const Project: React.FC = () => {
       if (!params.project_id) return
 
       try {
+        setIsFeaturesLoading(true)
         // Fetch all features relevant to the project in one request
         const allFeatures = await fetchFeatures(params.project_id)
 
@@ -567,6 +571,8 @@ const Project: React.FC = () => {
         }))
       } catch (error) {
         console.error('Error fetching features:', error)
+      } finally {
+        setIsFeaturesLoading(false)
       }
     }
 
@@ -796,6 +802,14 @@ const Project: React.FC = () => {
         onAddFeature={handleAddNewFeature}
         onReprocessAll={reprocessAllPapers}
         bulkReprocessing={bulkReprocessing}
+        onViewMap={() => setMapDialogOpen(true)}
+      />
+
+      <ProjectFeatureMapDialog
+        open={mapDialogOpen}
+        onOpenChange={setMapDialogOpen}
+        features={availableFeatures}
+        isLoading={isFeaturesLoading}
       />
 
       <input

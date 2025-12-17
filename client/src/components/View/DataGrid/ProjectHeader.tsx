@@ -76,6 +76,7 @@ interface ProjectHeaderProps {
   onAddFeature: (nf: NewFeature) => Promise<void>
   onReprocessAll: () => Promise<void>
   bulkReprocessing: boolean
+  onViewMap: () => void
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -95,6 +96,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   setFeatureModal,
   onReprocessAll,
   bulkReprocessing,
+  onViewMap,
 }) => {
   // Dialog open states
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -262,6 +264,10 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 onClick={() => setFeatureModal({ open: true, initialTab: 'define' })}
               >
                 <Plus className='w-4 h-4 mr-2' /> Create New Feature
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onViewMap}>
+                <Layers className='w-4 h-4 mr-2 transform rotate-90' /> View Feature Map
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

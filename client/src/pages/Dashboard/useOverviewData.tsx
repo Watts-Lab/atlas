@@ -17,19 +17,70 @@ export type RecentlyViewedProject = {
   exists: boolean
 }
 
-/**
- * Custom hook to handle fetching of projects and papers data.
- * @param pageSize default number of items to fetch per page
- * @returns { projects, papers, isLoadingProjects, isLoadingPapers }
- */
 export default function useOverviewData(pageSize: number = 50) {
   const [projects, setProjects] = useState<Projects[]>([])
   const [papers, setPapers] = useState<Papers[]>([])
-  const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedProject[]>([])
   const [isLoadingProjects, setIsLoadingProjects] = useState<boolean>(false)
   const [isLoadingPapers, setIsLoadingPapers] = useState<boolean>(false)
 
   const navigate = useNavigate()
+
+  const mergeProjectsWithRecentlyViewed = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    projectsList: any[],
+    recentlyViewed: RecentlyViewedProject[],
+  ): Projects[] => {
+    // Create a map of recently viewed data by project_id
+    const recentlyViewedMap = new Map<string, RecentlyViewedProject>()
+    recentlyViewed.forEach((rv) => {
+      recentlyViewedMap.set(rv.project_id, rv)
+    })
+
+    // Map own projects and include last_viewed if it was recently viewed
+    const ownProjects = projectsList.map(
+      (project: {
+        id: string
+        title: string
+        description: string
+        papers: unknown[]
+        results: { id: string; finished: boolean; paper_id: string }[]
+      }) => {
+        const uniquePaperIds = Array.from(new Set(project.results.map((result) => result.paper_id)))
+        const recentView = recentlyViewedMap.get(project.id)
+
+        return {
+          id: project.id,
+          name: project.title,
+          description: project.description,
+          paper_count: uniquePaperIds.length,
+          results: project.results,
+          is_owner: true,
+          last_viewed: recentView?.viewed_at || null,
+          exists: true,
+        } as Projects
+      },
+    )
+
+    // Add recently viewed projects that are NOT owned by the user
+    const ownProjectIds = new Set(ownProjects.map((p) => p.id))
+    const collaboratorProjects = recentlyViewed
+      .filter((rv) => !ownProjectIds.has(rv.project_id) && rv.exists && rv.project)
+      .map(
+        (rv) =>
+          ({
+            id: rv.project_id,
+            name: rv.project?.title || 'Deleted Project',
+            description: rv.project?.description || '',
+            paper_count: 0,
+            results: [],
+            is_owner: false,
+            last_viewed: rv.viewed_at,
+            exists: rv.exists,
+          }) as Projects,
+      )
+
+    return [...ownProjects, ...collaboratorProjects]
+  }
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -40,32 +91,13 @@ export default function useOverviewData(pageSize: number = 50) {
           throw new Error('Network response was not ok')
         }
 
-        const projectsList = response.data.project.map(
-          (project: {
-            id: string
-            title: string
-            description: string
-            papers: unknown[]
-            results: { id: string; finished: boolean; paper_id: string }[]
-          }) => {
-            const uniquePaperIds = Array.from(
-              new Set(project.results.map((result) => result.paper_id)),
-            )
-            return {
-              id: project.id,
-              name: project.title,
-              description: project.description,
-              paper_count: uniquePaperIds.length,
-              results: project.results,
-            } as Projects
-          },
+        const recentlyViewed: RecentlyViewedProject[] = response.data.recently_viewed || []
+        const mergedProjects = mergeProjectsWithRecentlyViewed(
+          response.data.project,
+          recentlyViewed,
         )
 
-        setProjects(projectsList)
-
-        if (response.data.recently_viewed) {
-          setRecentlyViewed(response.data.recently_viewed)
-        }
+        setProjects(mergedProjects)
       } catch (error) {
         console.error(error)
       } finally {
@@ -84,28 +116,10 @@ export default function useOverviewData(pageSize: number = 50) {
         throw new Error('Network response was not ok')
       }
 
-      setProjects(
-        response.data.project.map(
-          (project: {
-            id: string
-            title: string
-            description: string
-            papers: unknown[]
-            results: { id: string; finished: boolean; paper_id: string }[]
-          }) => {
-            const uniquePaperIds = Array.from(
-              new Set(project.results.map((result) => result.paper_id)),
-            )
-            return {
-              id: project.id,
-              name: project.title,
-              description: project.description,
-              paper_count: uniquePaperIds.length,
-              results: project.results,
-            } as Projects
-          },
-        ),
-      )
+      const recentlyViewed: RecentlyViewedProject[] = response.data.recently_viewed || []
+      const mergedProjects = mergeProjectsWithRecentlyViewed(response.data.project, recentlyViewed)
+
+      setProjects(mergedProjects)
     } catch (error) {
       console.error(error)
     } finally {
@@ -132,7 +146,7 @@ export default function useOverviewData(pageSize: number = 50) {
                 id: String(index + 1),
                 title: paper.title,
                 file_hash: paper.file_hash,
-                uploaded_at: paper.updated_at, // If you prefer to rename it
+                uploaded_at: paper.updated_at,
               } as Papers
             },
           ),
@@ -150,7 +164,6 @@ export default function useOverviewData(pageSize: number = 50) {
   return {
     projects,
     papers,
-    recentlyViewed,
     isLoadingProjects,
     isLoadingPapers,
     refetchProjects,

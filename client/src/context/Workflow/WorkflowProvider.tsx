@@ -26,6 +26,8 @@ export interface WorkflowContextType {
     allFeatures: Feature[],
     createNodeData: (f: Feature) => Node['data'],
   ) => void
+  addNode: (node: Node) => void
+  setGraph: (nodes: Node[], edges: Edge[]) => void
   removeFeature: (featureId: string) => void
   saveWorkflow: () => void
   loadWorkflow: () => void
@@ -89,44 +91,58 @@ function getParentChain(identifier: string): string[] {
 
 const elk = new ELK()
 
-export const WorkflowProvider = ({ children }: { children: React.ReactNode }) => {
+export const WorkflowProvider = ({
+  children,
+  enablePersistence = true,
+}: {
+  children: React.ReactNode
+  enablePersistence?: boolean
+}) => {
   // State to manage nodes, edges, and selected feature IDs
-  const [nodes, setNodes] = useState<Node[]>(() => loadJsonFromLS('workflowNodes', defaultNodes))
-  const [edges, setEdges] = useState<Edge[]>(() => loadJsonFromLS('workflowEdges', defaultEdges))
+  const [nodes, setNodes] = useState<Node[]>(() =>
+    enablePersistence ? loadJsonFromLS('workflowNodes', defaultNodes) : defaultNodes,
+  )
+  const [edges, setEdges] = useState<Edge[]>(() =>
+    enablePersistence ? loadJsonFromLS('workflowEdges', defaultEdges) : defaultEdges,
+  )
   const [selectedFeatureIds, setSelectedFeatureIds] = useState<string[]>(() =>
-    loadJsonFromLS('selectedFeatureIds', []),
+    enablePersistence ? loadJsonFromLS('selectedFeatureIds', []) : [],
   )
 
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>()
 
   const saveWorkflow = useCallback(() => {
+    if (!enablePersistence) return
     localStorage.setItem('workflowNodes', JSON.stringify(nodes))
     localStorage.setItem('workflowEdges', JSON.stringify(edges))
     localStorage.setItem('selectedFeatureIds', JSON.stringify(selectedFeatureIds))
-  }, [nodes, edges, selectedFeatureIds])
+  }, [nodes, edges, selectedFeatureIds, enablePersistence])
 
   useEffect(() => {
     saveWorkflow()
   }, [nodes, edges, selectedFeatureIds, saveWorkflow])
 
   const loadWorkflow = useCallback(() => {
+    if (!enablePersistence) return
     const loadedNodes = loadJsonFromLS<Node[]>('workflowNodes', defaultNodes)
     const loadedEdges = loadJsonFromLS<Edge[]>('workflowEdges', defaultEdges)
     const loadedSelected = loadJsonFromLS<string[]>('selectedFeatureIds', [])
     setNodes(loadedNodes)
     setEdges(loadedEdges)
     setSelectedFeatureIds(loadedSelected)
-  }, [])
+  }, [enablePersistence])
 
   const resetWorkflow = useCallback(() => {
     setNodes(defaultNodes)
     setEdges(defaultEdges)
     setSelectedFeatureIds([])
-    // Remove from localStorage as well
-    localStorage.removeItem('workflowNodes')
-    localStorage.removeItem('workflowEdges')
-    localStorage.removeItem('selectedFeatureIds')
-  }, [])
+    // Remove from localStorage as well if persistence is on
+    if (enablePersistence) {
+      localStorage.removeItem('workflowNodes')
+      localStorage.removeItem('workflowEdges')
+      localStorage.removeItem('selectedFeatureIds')
+    }
+  }, [enablePersistence])
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -150,57 +166,61 @@ export const WorkflowProvider = ({ children }: { children: React.ReactNode }) =>
     [setEdges],
   )
 
-  const layoutGraph = useCallback(async () => {
-    if (!reactFlowInstance) return
-    const currentNodes = reactFlowInstance.getNodes()
-    const currentEdges = reactFlowInstance.getEdges()
-    if (!currentNodes || currentNodes.length === 0) return
+  const layoutGraph = useCallback(
+    async (nodesToLayout?: Node[], edgesToLayout?: Edge[]) => {
+      if (!reactFlowInstance) return
+      const currentNodes = nodesToLayout || reactFlowInstance.getNodes()
+      const currentEdges = edgesToLayout || reactFlowInstance.getEdges()
+      if (!currentNodes || currentNodes.length === 0) return
 
-    // Set the graph layout options
-    const graph = {
-      id: 'root',
-      layoutOptions: {
-        'elk.algorithm': 'layered',
-        'elk.direction': 'DOWN',
-        'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-        'elk.spacing.nodeNode': '80',
-      },
-      children: currentNodes.map((n: Node) => ({
-        id: n.id,
-        width: 160,
-        height: 60,
-      })),
-      edges: currentEdges.map((e: Edge) => ({
-        id: e.id,
-        sources: [e.source],
-        targets: [e.target],
-      })),
-    }
+      // Set the graph layout options
+      const graph = {
+        id: 'root',
+        layoutOptions: {
+          'elk.algorithm': 'layered',
+          'elk.direction': 'DOWN',
+          'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+          'elk.spacing.nodeNode': '80',
+        },
+        children: currentNodes.map((n: Node) => ({
+          id: n.id,
+          width: 160,
+          height: 60,
+        })),
+        edges: currentEdges.map((e: Edge) => ({
+          id: e.id,
+          sources: [e.source],
+          targets: [e.target],
+        })),
+      }
 
-    try {
-      const layouted = await elk.layout(graph)
-      const layoutedChildren = layouted.children || []
+      try {
+        const layouted = await elk.layout(graph)
+        const layoutedChildren = layouted.children || []
 
-      // Update node positions
-      const updatedNodes = currentNodes.map((n: Node) => {
-        const layoutInfo = layoutedChildren.find((c) => c.id === n.id)
-        if (!layoutInfo) return n
-        return {
-          ...n,
-          position: {
-            x: layoutInfo.x || 0,
-            y: layoutInfo.y || 0,
-          },
-          draggable: false,
-        }
-      })
-      setNodes(updatedNodes)
+        // Update node positions
+        const updatedNodes = currentNodes.map((n: Node) => {
+          const layoutInfo = layoutedChildren.find((c) => c.id === n.id)
+          if (!layoutInfo) return n
+          return {
+            ...n,
+            position: {
+              x: layoutInfo.x || 0,
+              y: layoutInfo.y || 0,
+            },
+            draggable: false,
+          }
+        })
+        setNodes(updatedNodes)
 
-      reactFlowInstance.fitView()
-    } catch (err) {
-      console.error('ELK layout error:', err)
-    }
-  }, [reactFlowInstance, setNodes])
+        // Fit view after a short delay to ensure nodes are rendered
+        requestAnimationFrame(() => reactFlowInstance.fitView())
+      } catch (err) {
+        console.error('ELK layout error:', err)
+      }
+    },
+    [reactFlowInstance, setNodes],
+  )
 
   // Add chain of features (child + parents)
   const addFeatureChain = useCallback(
@@ -261,6 +281,25 @@ export const WorkflowProvider = ({ children }: { children: React.ReactNode }) =>
     [nodes, edges, setNodes, setEdges, layoutGraph],
   )
 
+  const addNode = useCallback(
+    (node: Node) => {
+      setNodes((nds) => {
+        if (nds.some((n) => n.id === node.id)) return nds
+        return [...nds, node]
+      })
+    },
+    [setNodes],
+  )
+
+  const setGraph = useCallback(
+    (newNodes: Node[], newEdges: Edge[]) => {
+      setNodes(newNodes)
+      setEdges(newEdges)
+      setTimeout(() => layoutGraph(newNodes, newEdges), 0)
+    },
+    [setNodes, setEdges, layoutGraph],
+  )
+
   // Remove a feature node (parents remain)
   const removeFeature = useCallback(
     (featureId: string) => {
@@ -281,6 +320,8 @@ export const WorkflowProvider = ({ children }: { children: React.ReactNode }) =>
     onEdgesChange,
     onConnect,
     addFeatureChain,
+    addNode,
+    setGraph,
     removeFeature,
     saveWorkflow,
     loadWorkflow,
