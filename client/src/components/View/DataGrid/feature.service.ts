@@ -21,6 +21,8 @@ export const fetchFeatures = async (projectId?: string): Promise<Feature[]> => {
       feature_type: 'string' | 'number' | 'array' | 'integer'
       feature_prompt: string
       feature_enum_options: string[]
+      truth?: number
+      repeat?: number
       created_by: 'user' | 'provider'
     }) => {
       let trail = feature.feature_identifier
@@ -44,6 +46,9 @@ export const fetchFeatures = async (projectId?: string): Promise<Feature[]> => {
         trail,
         selected: false,
         created_by: feature.created_by,
+        ground_truth_accuracy: feature.truth || undefined,
+        repeatability_score: feature.repeat || undefined,
+        version: 'v1',
       }
     },
   )
@@ -72,5 +77,6 @@ export const addFeature = async (feature: NewFeature): Promise<Feature> => {
   return {
     ...addedFeature,
     trail: addedFeature.feature_identifier.replace(/\./g, ' → '),
+    version: 'v1',
   }
 }

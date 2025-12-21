@@ -839,6 +839,7 @@ const Project: React.FC = () => {
         setAvailableFeatures={setAvailableFeatures}
         updateProjectFeatures={updateProjectFeatures}
         addNewFeature={handleAddNewFeature}
+        isLoading={isFeaturesLoading}
       />
     </main>
   )

@@ -11,6 +11,9 @@ export type Feature = {
   trail: string
   selected?: boolean
   created_by: 'user' | 'provider'
+  ground_truth_accuracy?: number
+  repeatability_score?: number
+  version?: string
 }
 
 export type NewFeature = {
