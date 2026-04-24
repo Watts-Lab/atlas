@@ -1,4 +1,4 @@
-import { BookOpen, House, Settings2, SquareTerminal } from 'lucide-react'
+import { BookOpen, House, Layers, Settings2, SquareTerminal } from 'lucide-react'
 
 import {
   Sidebar,
@@ -41,6 +41,23 @@ const data = {
         //   title: 'Project Settings',
         //   url: '/projects/settings',
         // },
+      ],
+    },
+    {
+      title: 'Features',
+      url: '/features',
+      icon: Layers,
+      isActive: true,
+      isDefaultOpen: true,
+      items: [
+        {
+          title: 'Explorer',
+          url: '/features/explorer',
+        },
+        {
+          title: 'Create Feature',
+          url: '/features/create',
+        },
       ],
     },
     {

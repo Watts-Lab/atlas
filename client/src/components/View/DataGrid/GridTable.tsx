@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import {
   ColDef,
@@ -399,6 +399,14 @@ const GridTable = ({
     ;(window as any).exportCurrentTableData = exportCurrentTableData
   }, [rowData])
 
+  const defaultColDef: ColDef = useMemo(() => {
+    return {
+      resizable: true,
+      minWidth: 50,
+      maxWidth: 600,
+    }
+  }, [])
+
   return (
     <main className='h-screen w-screen flex flex-col'>
       {/* History toggle button */}
@@ -480,6 +488,9 @@ const GridTable = ({
           suppressGroupChangesColumnVisibility='suppressHideOnGroup'
           tooltipShowDelay={100}
           tooltipShowMode={'whenTruncated'}
+          defaultColDef={defaultColDef}
+          onFirstDataRendered={(params) => params.api.autoSizeAllColumns()}
+          onGridColumnsChanged={(params) => params.api.autoSizeAllColumns()}
         />
       </div>
     </main>

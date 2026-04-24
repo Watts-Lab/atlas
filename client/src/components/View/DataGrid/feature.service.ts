@@ -46,7 +46,7 @@ export const fetchFeatures = async (projectId?: string): Promise<Feature[]> => {
         trail,
         selected: false,
         created_by: feature.created_by,
-        ground_truth_accuracy: feature.truth || undefined,
+        ground_truth_accuracy: 0.1,
         repeatability_score: feature.repeat || undefined,
         version: 'v1',
       }
@@ -58,17 +58,18 @@ export function useFeatures() {
   const [features, setFeatures] = useState<Feature[]>([])
   const [loading, setLoading] = useState(false)
 
+  const loadFeatures = async () => {
+    setLoading(true)
+    const loadedFeatures = await fetchFeatures()
+    setFeatures(loadedFeatures)
+    setLoading(false)
+  }
+
   useEffect(() => {
-    const loadFeatures = async () => {
-      setLoading(true)
-      const loadedFeatures = await fetchFeatures()
-      setFeatures(loadedFeatures)
-      setLoading(false)
-    }
     loadFeatures()
   }, [])
 
-  return { features, loading }
+  return { features, loading, refetch: loadFeatures }
 }
 
 export const addFeature = async (feature: NewFeature): Promise<Feature> => {
@@ -79,4 +80,11 @@ export const addFeature = async (feature: NewFeature): Promise<Feature> => {
     trail: addedFeature.feature_identifier.replace(/\./g, ' → '),
     version: 'v1',
   }
+}
+
+export const getParentIdentifier = (identifier: string): string => {
+  const lastDot = identifier.lastIndexOf('.')
+  if (lastDot === -1) return ''
+  const p = identifier.substring(0, lastDot)
+  return p.endsWith('.parent') ? p : p + '.parent'
 }

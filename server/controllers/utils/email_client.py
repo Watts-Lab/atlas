@@ -105,7 +105,7 @@ def send_magic_link(email: str, token: str):
                     <!-- Header -->
                     <tr>
                         <td align="center" style="padding: 40px 20px 20px 20px;">
-                            <img src="https://atlas.seas.upenn.edu/logo.svg" alt="Atlas" width="60" style="display: block;">
+                            <img src="https://atlas.seas.upenn.edu/favicon.svg" alt="Atlas" width="60" style="display: block;">
                         </td>
                     </tr>
                     
