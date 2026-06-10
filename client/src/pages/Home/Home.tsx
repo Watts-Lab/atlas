@@ -120,13 +120,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
             {/* Header Section */}
             <div className='text-center space-y-4'>
               <div className='flex justify-center'>
-                <div className='w-12 flex items-center justify-center'>
-                  <img
-                    src='/web-app-manifest-512x512-bg-i.png'
-                    alt='Atlas Logo'
-                    className='w-full h-full'
-                  />
-                </div>
+                <img src='/logo.svg' alt='Atlas Logo' className='w-28 h-28 invert' />
               </div>
               <div>
                 <h1 className='text-2xl font-bold text-gray-50'>Welcome to Atlas</h1>
