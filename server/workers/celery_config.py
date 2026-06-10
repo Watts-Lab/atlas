@@ -12,7 +12,6 @@ from redis import Redis
 
 from database.database import init_db
 
-
 load_dotenv()
 
 sys.path.append(os.getcwd())
@@ -31,7 +30,7 @@ AWS_REGION = os.getenv("AWS_REGION")
 AWS_S3_KEY = os.getenv("AWS_S3_KEY")
 AWS_S3_SECRET = os.getenv("AWS_S3_SECRET")
 
-REDIS_URL = os.getenv("CELERY_BROKER_URL")
+REDIS_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 
 
 # Global variable to hold the initialized database

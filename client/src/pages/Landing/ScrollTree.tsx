@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react'
+import { motion, useScroll, useTransform, AnimatePresence, type MotionValue } from 'motion/react'
 import { useRef, useState } from 'react'
 import {
   FileText,
@@ -487,7 +487,7 @@ function Branch({
 }: {
   start: { x: number; y: number }
   end: { x: number; y: number }
-  pathLength: any
+  pathLength: MotionValue<number>
 }) {
   const sy = start.y + 50
   const ey = end.y - 50
@@ -525,8 +525,8 @@ function Node({
   description: string
   isArray?: boolean
   schemaKey: string
-  nodeOpacity: any
-  nodeScale: any
+  nodeOpacity: MotionValue<number> | number
+  nodeScale: MotionValue<number> | number
 }) {
   return (
     <foreignObject x={x - 160} y={y - 50} width='320' height='320'>

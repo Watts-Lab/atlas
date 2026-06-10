@@ -23,7 +23,15 @@ export function CosmicBackground() {
     resize()
 
     // Star properties
-    const stars: any[] = []
+    type Star = {
+      x: number
+      y: number
+      radius: number
+      alpha: number
+      velocity: number
+      flickerSpeed: number
+    }
+    const stars: Star[] = []
     const numStars = 600
     for (let i = 0; i < numStars; i++) {
       stars.push({
@@ -36,7 +44,14 @@ export function CosmicBackground() {
       })
     }
 
-    const shootingStars: any[] = []
+    const shootingStars: {
+      x: number
+      y: number
+      length: number
+      speed: number
+      angle: number
+      alpha: number
+    }[] = []
 
     const draw = () => {
       // Clear with deep cosmic black

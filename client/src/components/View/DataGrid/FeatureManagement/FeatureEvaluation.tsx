@@ -38,7 +38,15 @@ import { generateTrail } from './featureUtils'
 import api from '@/service/api'
 import { toast } from 'sonner'
 import { AgGridReact } from 'ag-grid-react'
-import { AllCommunityModule, ModuleRegistry, provideGlobalGridOptions } from 'ag-grid-community'
+import {
+  AllCommunityModule,
+  ModuleRegistry,
+  provideGlobalGridOptions,
+  type CellClassParams,
+  type CellValueChangedEvent,
+  type ColDef,
+  type ICellRendererParams,
+} from 'ag-grid-community'
 import { flattenObject } from '../../TableView/hooks/data-handler'
 import { useSocket } from '@/context/Socket/useSocket'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -144,7 +152,7 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
   useEffect(() => {
     if (!socket || !currentTaskId) return
 
-    const handleStatus = (data: any) => {
+    const handleStatus = (data: { task_id: string; progress: number; done: boolean }) => {
       if (data.task_id === currentTaskId) {
         if (isRepeatabilityRunning) {
           setRepeatabilityProgress(data.progress)
@@ -316,8 +324,9 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
     )
   }
 
-  const onCellValueChanged = useCallback((params: any) => {
-    const { colId, newValue, data } = params
+  const onCellValueChanged = useCallback((params: CellValueChangedEvent<EvaluationResult>) => {
+    const colId = params.column.getColId()
+    const { newValue, data } = params
     if (colId?.endsWith('_truth')) {
       const field = colId.replace('_truth', '')
       const actualValue = String(data[field] || '')
@@ -348,7 +357,7 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
     if (results.length === 0) return []
     const baseKeys = Object.keys(results[0]).filter((k) => k !== 'paper' && !k.endsWith('_truth'))
 
-    const paperCol: any = {
+    const paperCol: ColDef<EvaluationResult> = {
       field: 'paper',
       headerName: 'Paper',
       pinned: 'left',
@@ -356,12 +365,12 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
     }
 
     const featureCols = baseKeys.flatMap((k) => {
-      const cols: any[] = [
+      const cols: ColDef<EvaluationResult>[] = [
         {
           field: k,
           headerName: k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' '),
           flex: 1,
-          cellClass: (params: any) => {
+          cellClass: (params: CellClassParams<EvaluationResult>) => {
             const score = accuracyScores[k]
             if (score === 1) return 'bg-green-100/50'
             const rowData = params.data as EvaluationResult
@@ -370,7 +379,7 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
           },
           cellRenderer:
             k === feature.identifier
-              ? (params: any) => {
+              ? (params: ICellRendererParams<EvaluationResult>) => {
                   return (
                     <div className='flex items-center justify-between w-full h-full group'>
                       <span className='truncate'>{params.value}</span>
@@ -694,7 +703,7 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
                 </Badge>
               </div>
               <p className='text-[10px] text-muted-foreground max-w-[300px] leading-tight'>
-                Edit cells under 'Ground Truth' to calculate manual accuracy for this run.
+                Edit cells under &apos;Ground Truth&apos; to calculate manual accuracy for this run.
               </p>
             </div>
             <div className='text-xs text-muted-foreground'>

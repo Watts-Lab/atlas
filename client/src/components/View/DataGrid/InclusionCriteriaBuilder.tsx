@@ -481,7 +481,6 @@ export default function InclusionCriteriaBuilder({
       .filter((r): r is RuleNode => r !== null)
 
     onChange({ type: 'logic', logic, rules })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conditions, logic])
 
   const addCondition = () =>
