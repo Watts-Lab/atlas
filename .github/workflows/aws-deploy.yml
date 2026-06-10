@@ -82,13 +82,15 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME_BACKEND }}
           image: ${{ steps.build-backend-image.outputs.image }}
-      - name: Fill in the new image ID in the Amazon ECS task definition for backend
+
+      - name: Fill in the new image ID in the Amazon ECS task definition for celery worker
         id: render-celery-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ steps.render-backend-container.outputs.task-definition }}
           container-name: ${{ env.CONTAINER_NAME_CELERY }}
           image: ${{ steps.build-backend-image.outputs.image }}
+
       - name: Fill in the new image ID in the Amazon ECS task definition for frontend
         id: render-frontend-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -96,6 +98,7 @@ jobs:
           task-definition: ${{ steps.render-celery-container.outputs.task-definition }}
           container-name: ${{ env.CONTAINER_NAME_FRONTEND }}
           image: ${{ steps.build-front-image.outputs.image }}
+
       - name: Fill in the new image ID in the Amazon ECS task definition for mcp
         id: render-mcp-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1

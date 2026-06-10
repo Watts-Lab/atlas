@@ -277,6 +277,3 @@ paper/
 server/trial.ipynb
 Dockerfile.dev
 experiment/*
-
-!experiment/krippendorffs_alpha/
-!experiment/krippendorffs_alpha/krippendorffs_alpha.py

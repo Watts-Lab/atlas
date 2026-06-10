@@ -9,7 +9,7 @@ behind nginx at ``/mcp`` (e.g. https://atlas.seas.upenn.edu/mcp).
 """
 
 import asyncio
-from typing import Optional
+from typing import Literal, Optional
 
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
@@ -118,16 +118,46 @@ async def list_features(project_id: Optional[str] = None) -> dict:
 
 
 @mcp.tool
-async def create_feature(feature: dict) -> dict:
+async def create_feature(
+    feature_name: str,
+    feature_identifier: str,
+    feature_prompt: str,
+    feature_type: Literal["text", "number", "boolean", "enum", "parent"] = "text",
+    feature_description: str = "",
+    feature_parent: str = "",
+    enum_options: Optional[list[str]] = None,
+    is_shared: bool = False,
+) -> dict:
     """Create a new feature definition.
 
     Args:
-        feature: The feature payload, matching the Atlas feature schema (for
-            example its name, type, description, and any conditions). When in
-            doubt, inspect existing features with `list_features` first to match
-            the expected shape.
+        feature_name: Human-readable feature name (e.g. "Sample Size").
+        feature_identifier: Stable machine identifier, typically snake_case
+            (e.g. "sample_size"). Must be unique among the user's features.
+        feature_prompt: The instruction the LLM uses to extract this feature
+            from a paper.
+        feature_type: The data type of the feature. Must be one of "text",
+            "number", "boolean", "enum", or "parent" (NOT "string"). Use
+            "enum" when the answer is one of a fixed set of options, and
+            "parent" for a grouping node with no value of its own.
+        feature_description: Optional human-facing description of the feature.
+        feature_parent: Optional identifier of a parent feature to nest under.
+        enum_options: Required non-empty list of allowed values when
+            feature_type is "enum"; otherwise leave unset.
+        is_shared: Whether the feature is shared across the user's projects.
     """
-    return await atlas_request("POST", "/features/", json=feature)
+    payload: dict = {
+        "feature_name": feature_name,
+        "feature_identifier": feature_identifier,
+        "feature_prompt": feature_prompt,
+        "feature_type": feature_type,
+        "feature_description": feature_description,
+        "feature_parent": feature_parent,
+        "is_shared": is_shared,
+    }
+    if enum_options is not None:
+        payload["enum_options"] = enum_options
+    return await atlas_request("POST", "/features/", json=payload)
 
 
 # ---------------------------------------------------------------------------
