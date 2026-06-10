@@ -3,17 +3,20 @@ This file is responsible for initializing the database connection and the bunnet
 """
 
 import os
-from bunnet import init_bunnet
-from dotenv import load_dotenv
-from pymongo import MongoClient
 
+from bunnet import init_bunnet
+from database.models.api_keys import ApiKey
 from database.models.features import Features
 from database.models.features_quality import FeaturesQuality
+from database.models.inclusion_criteria import InclusionCriteria
 from database.models.papers import Paper
 from database.models.project_paper_result import ProjectPaperResult
 from database.models.projects import Project
-from database.models.users import User
+from database.models.repeatability import RepeatabilityResult
 from database.models.results import Result
+from database.models.users import User
+from dotenv import load_dotenv
+from pymongo import MongoClient
 
 
 # Call this from within your event loop to get bunnet setup.
@@ -33,11 +36,14 @@ def init_db():
         database=client.atlas_main,
         document_models=[
             User,
+            ApiKey,
             Paper,
             Result,
             Project,
             Features,
             ProjectPaperResult,
             FeaturesQuality,
+            RepeatabilityResult,
+            InclusionCriteria,
         ],
     )

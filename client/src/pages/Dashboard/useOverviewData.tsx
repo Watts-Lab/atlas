@@ -86,7 +86,7 @@ export default function useOverviewData(pageSize: number = 50) {
     const fetchProjects = async () => {
       setIsLoadingProjects(true)
       try {
-        const response = await api.get(`/v1/projects`)
+        const response = await api.get(`/projects`)
         if (response.status !== 200) {
           throw new Error('Network response was not ok')
         }
@@ -111,7 +111,7 @@ export default function useOverviewData(pageSize: number = 50) {
   const refetchProjects = useCallback(async () => {
     setIsLoadingProjects(true)
     try {
-      const response = await api.get(`/v1/projects`)
+      const response = await api.get(`/projects`)
       if (response.status !== 200) {
         throw new Error('Network response was not ok')
       }

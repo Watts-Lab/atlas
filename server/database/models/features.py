@@ -1,10 +1,7 @@
-"""
-Features model.
-"""
-
-from typing import Optional
+from datetime import datetime
+from typing import Optional, List
 from bunnet import Document, Link, PydanticObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from database.models.users import User
 from database.schemas.gpt_interface import GPTInterface
@@ -13,7 +10,6 @@ from database.schemas.gpt_interface import GPTInterface
 class Features(Document):
     """This class represents a feature stored in MongoDB."""
 
-    # TODO: Add a versioning
     feature_name: str
     feature_parent: str
     feature_identifier: str
@@ -21,11 +17,23 @@ class Features(Document):
     feature_gpt_interface: GPTInterface
     user: Optional[Link[User]] = None
     is_shared: Optional[bool] = False
+    
+    # Versioning fields
+    version: int = Field(default=1)
+    history: List[GPTInterface] = Field(default_factory=list)
+    
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
     class Settings:
         """Settings for the Features model."""
 
         name = "features"  # The name of the MongoDB collection
+
+    def save(self, *args, **kwargs):
+        """Override save to handle versioning."""
+        self.updated_at = datetime.now()
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"Feature {self.feature_name}"

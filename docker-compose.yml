@@ -89,3 +89,25 @@ services:
       - backend
       - redis
       - celery_worker
+
+  mcp_server:
+    container_name: mcp_server
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    env_file:
+      - .env
+    environment:
+      - PYTHON_ENV=development
+      - ATLAS_API_URL=http://backend:8000/api/v1
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=9000
+      - MCP_PATH=/mcp
+    volumes:
+      - ./atlas_mcp:/app/atlas_mcp
+    command: >
+      sh -c "watchmedo auto-restart --directory=/app/atlas_mcp --pattern=*.py --recursive -- python -m atlas_mcp.server"
+    expose:
+      - 9000
+    depends_on:
+      - backend

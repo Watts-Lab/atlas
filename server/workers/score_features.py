@@ -2,20 +2,21 @@
 This module contains functions to compute scores for CSV data based on features
 """
 
-from datetime import datetime
 import json
 import logging
 import os
+from datetime import datetime
+
+import polars as pl
+from bunnet.operators import In
+from celery import Task
+from database.models.features import Features
 from database.models.features_quality import FeaturesQuality
 from database.models.projects import Project
-from workers.celery_config import celery
-from celery import Task
-import polars as pl
-from sklearn.metrics import f1_score, r2_score
-from database.models.features import Features
 from database.models.users import User
 from openai import OpenAI
-from bunnet.operators import In
+from sklearn.metrics import f1_score, r2_score
+from workers.celery_config import celery
 
 logger = logging.getLogger(__name__)
 

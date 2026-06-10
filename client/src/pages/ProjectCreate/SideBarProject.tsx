@@ -113,7 +113,7 @@ export function SidebarRight(props: ComponentProps<typeof Sidebar>) {
         toast.error('Please enter a project name')
         return
       }
-      const response = await api.post('/v1/projects', {
+      const response = await api.post('/projects', {
         project_name: projectName,
         project_description: projectDescription,
         project_features: selectedFeatureIds,

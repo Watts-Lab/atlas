@@ -186,7 +186,7 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
           e.stopPropagation()
           if (!confirm(`Are you sure you want to delete "${project.name}"?`)) return
           try {
-            await api.delete(`/v1/projects/${project.id}`)
+            await api.delete(`/projects/${project.id}`)
             toast.success('Project deleted successfully')
             refetchProjects()
           } catch (error) {

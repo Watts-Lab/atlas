@@ -5,9 +5,12 @@ Strategy factory for creating extraction strategies.
 from openai import OpenAI
 
 from workers.services.socket_emitter import SocketEmmiter
+from workers.strategies.anthropic_json_schema_strategy import (
+    AnthropicJSONSchemaStrategy,
+)
 from workers.strategies.assistant_strategy import AssistantAPIStrategy
 from workers.strategies.extraction_strategy import ExtractionStrategy
-from workers.strategies.json_schema_strategy import JSONSchemaStrategy
+from workers.strategies.openai_json_schema_strategy import OpenAIJSONSchemaStrategy
 
 
 class ExtractionStrategyFactory:
@@ -15,7 +18,10 @@ class ExtractionStrategyFactory:
 
     _strategies = {
         "assistant_api": AssistantAPIStrategy,
-        "json_schema": JSONSchemaStrategy,
+        "openai_json_schema": OpenAIJSONSchemaStrategy,
+        "anthropic_json_schema": AnthropicJSONSchemaStrategy,
+        # Backwards-compatible alias for the original OpenAI JSON schema strategy.
+        "json_schema": OpenAIJSONSchemaStrategy,
     }
 
     @classmethod
@@ -26,7 +32,8 @@ class ExtractionStrategyFactory:
         Create an extraction strategy based on the specified type.
 
         Args:
-            strategy_type: Type of strategy ('assistant_api' or 'json_schema')
+            strategy_type: Type of strategy ('assistant_api', 'openai_json_schema',
+                or 'anthropic_json_schema')
             client: OpenAI client
             project_id: Project ID
             emitter: Socket emitter for progress updates

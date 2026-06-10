@@ -1,4 +1,4 @@
-import { BookOpen, House, Settings2, SquareTerminal } from 'lucide-react'
+import { BookOpen, House, Layers, Settings2, SquareTerminal } from 'lucide-react'
 
 import {
   Sidebar,
@@ -44,6 +44,23 @@ const data = {
       ],
     },
     {
+      title: 'Features',
+      url: '/features',
+      icon: Layers,
+      isActive: true,
+      isDefaultOpen: true,
+      items: [
+        {
+          title: 'Explorer',
+          url: '/features/explorer',
+        },
+        {
+          title: 'Create Feature',
+          url: '/features/create',
+        },
+      ],
+    },
+    {
       title: 'Documentation',
       url: '/docs',
       icon: BookOpen,
@@ -76,22 +93,12 @@ const data = {
       title: 'Settings',
       url: '#',
       icon: Settings2,
+      isActive: true,
+      isDefaultOpen: true,
       items: [
         {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
+          title: 'API Keys',
+          url: '/settings/api-keys',
         },
       ],
     },

@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/python:3.13-slim
+WORKDIR /app
+
+# Install only the MCP server's dependencies (not the full backend stack).
+COPY atlas_mcp/requirements.txt ./atlas_mcp/requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r ./atlas_mcp/requirements.txt \
+    && pip install -U 'watchdog[watchmedo]'
+
+# Copy the MCP source.
+COPY atlas_mcp ./atlas_mcp
+
+# Run as a non-root user.
+RUN adduser --disabled-password --gecos "" mcpuser \
+    && chown -R mcpuser:mcpuser /app
+USER mcpuser
+
+ENV PYTHON_ENV=production \
+    MCP_HOST=0.0.0.0 \
+    MCP_PORT=9000 \
+    MCP_PATH=/mcp \
+    ATLAS_API_URL=http://backend:8000/api/v1
+
+EXPOSE 9000
+
+CMD ["python", "-m", "atlas_mcp.server"]

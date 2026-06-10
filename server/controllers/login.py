@@ -92,6 +92,7 @@ async def logout_user():
             max_age=0,
             httponly=True,
             secure=app.config.SECURE_COOKIES,
+            samesite="Lax",
         )
 
         return response
@@ -148,6 +149,7 @@ async def validate_user(email: str, token: str):
                         max_age=60 * 60 * 24 * 2,  # 2 days
                         httponly=True,
                         secure=app.config.SECURE_COOKIES,
+                        samesite="Lax",
                     )
 
                     return response

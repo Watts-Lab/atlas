@@ -35,6 +35,7 @@ import {
   Loader2,
   Share2,
   Download,
+  Filter,
 } from 'lucide-react'
 import { Feature, NewFeature } from './feature.types'
 import PromptEditorModal from './PromptEditorModal'
@@ -77,6 +78,7 @@ interface ProjectHeaderProps {
   onReprocessAll: () => Promise<void>
   bulkReprocessing: boolean
   onViewMap: () => void
+  onOpenInclusionCriteria: () => void
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -97,6 +99,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   onReprocessAll,
   bulkReprocessing,
   onViewMap,
+  onOpenInclusionCriteria,
 }) => {
   // Dialog open states
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -320,6 +323,18 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Inclusion Criteria */}
+          <Button
+            variant='ghost'
+            size='sm'
+            className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+            onClick={onOpenInclusionCriteria}
+            disabled={isLoading}
+          >
+            <Filter className='w-3 h-3 mr-1' />
+            Inclusion Criteria
+          </Button>
         </div>
       </div>
 

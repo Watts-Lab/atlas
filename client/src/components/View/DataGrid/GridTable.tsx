@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import {
   ColDef,
@@ -23,6 +23,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { evaluateCriteria } from './criteriaEvaluator'
+import type { EvalResult, InclusionCriteria as ICriteria } from './inclusionCriteria.types'
 
 ModuleRegistry.registerModules([AllCommunityModule])
 provideGlobalGridOptions({ theme: 'legacy' })
@@ -35,6 +38,7 @@ export interface GridTableProps {
   showVersions: boolean
   onToggleVersions: () => void
   reprocessPaper: (paperId: string) => void
+  inclusionCriteria: ICriteria[]
 }
 
 function findArrayKeys(
@@ -57,6 +61,55 @@ function findArrayKeys(
   }
   return [...out]
 }
+
+// ─── Inclusion-criteria helpers ──────────────────────────────────────────────
+
+function formatBreakdown(result: EvalResult, depth: number): string {
+  const indent = '  '.repeat(depth)
+  const icon = result.passes === true ? '✅' : result.passes === false ? '❌' : '⚠️'
+  const label = result.label ?? result.reason ?? (result.field ? result.field : 'Rule')
+  const lines = [`${indent}${icon} ${label}`]
+  if (result.children?.length) {
+    for (const child of result.children) {
+      lines.push(formatBreakdown(child, depth + 1))
+    }
+  }
+  return lines.join('\n')
+}
+
+const ICCellRenderer = (props: ICellRendererParams) => {
+  const evalResult = props.value as EvalResult | undefined
+  if (evalResult === undefined || evalResult === null) {
+    return <span className='text-gray-400 text-xs flex items-center justify-center h-full'>—</span>
+  }
+  const icon = evalResult.passes === true ? '✅' : evalResult.passes === false ? '❌' : '⚠️'
+  const breakdown = formatBreakdown(evalResult, 0)
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className='flex items-center justify-center h-full cursor-default select-none'>
+          <span className='text-sm leading-none'>{icon}</span>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent
+        className='max-w-sm bg-white text-gray-800 border border-gray-200 shadow-xl p-3 z-[9999]'
+        side='left'
+      >
+        <div className='font-semibold text-xs mb-2'>
+          {evalResult.passes === true
+            ? 'Passes ✅'
+            : evalResult.passes === false
+              ? 'Fails ❌'
+              : 'Unknown ⚠️ (missing fields)'}
+        </div>
+        <pre className='whitespace-pre-wrap font-mono text-xs leading-relaxed'>{breakdown}</pre>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const UtilsButtons = (props: ICellRendererParams) => {
   const { _paper_id, id } = props.data
@@ -97,6 +150,7 @@ const GridTable = ({
   showVersions,
   onToggleVersions,
   reprocessPaper,
+  inclusionCriteria,
 }: GridTableProps) => {
   const [expanded, setExpanded] = useState<string[]>([])
   const [available, setAvailable] = useState<string[]>([])
@@ -216,14 +270,41 @@ const GridTable = ({
       }
     })
 
+    // ── Compute inclusion-criteria results and embed in each row ─────────────
+    if (inclusionCriteria.length > 0) {
+      const icMap = new Map<string, Record<string, EvalResult>>()
+      for (const rawResult of data) {
+        const rid = rawResult._result_id as string
+        if (!rid) continue
+        const evals: Record<string, EvalResult> = {}
+        for (const ic of inclusionCriteria) {
+          evals[ic.id] = evaluateCriteria(rawResult, ic.formula)
+        }
+        icMap.set(rid, evals)
+      }
+
+      rows = rows.map((row) => {
+        const rid = row._result_id as string
+        if (!rid || !icMap.has(rid)) return row
+        const icEvals = icMap.get(rid)!
+        const icFields: Record<string, unknown> = {}
+        for (const [icId, evalResult] of Object.entries(icEvals)) {
+          icFields[`_ic_${icId}`] = evalResult
+        }
+        return { ...row, ...icFields }
+      })
+    }
+
     setRowData(rows)
     if (!rows.length) return
 
     const keys = [...new Set(rows.flatMap(Object.keys))]
 
-    // Filter out version metadata fields from column display
+    // Filter out version metadata fields and IC fields from column display
     const filteredKeys = keys.filter(
-      (k) => !['_version', '_is_latest', '_result_id', '_paper_id', '_versionColor'].includes(k),
+      (k) =>
+        !['_version', '_is_latest', '_result_id', '_paper_id', '_versionColor'].includes(k) &&
+        !k.startsWith('_ic_'),
     )
 
     const tip: { [key: string]: string } = availableFeatures
@@ -315,6 +396,24 @@ const GridTable = ({
       spanRows: ({ valueA, valueB }) => valueA === valueB,
     }
 
+    // ── One column per inclusion criterion ────────────────────────────────────
+    const icCols: ColDef[] = inclusionCriteria.map((ic) => ({
+      headerName: ic.name,
+      colId: `ic_${ic.id}`,
+      field: `_ic_${ic.id}`,
+      width: 80,
+      sortable: true,
+      filter: false,
+      cellRenderer: ICCellRenderer,
+      headerTooltip: ic.description ? `${ic.name}: ${ic.description}` : ic.name,
+      // Sort: pass > unknown > fail
+      comparator: (valA: EvalResult | undefined, valB: EvalResult | undefined) => {
+        const rank = (v: EvalResult | undefined) =>
+          !v ? 1 : v.passes === true ? 2 : v.passes === null ? 1 : 0
+        return rank(valA) - rank(valB)
+      },
+    }))
+
     // Add version column when showing versions
     if (showVersions) {
       const versionCol: ColDef = {
@@ -325,11 +424,11 @@ const GridTable = ({
         valueFormatter: (params) => `v${params.value || 1}`,
         cellClass: (params) => params.data._versionColor || '',
       }
-      setColDefs([...dataCols, versionCol, utilsCol])
+      setColDefs([...dataCols, ...icCols, versionCol, utilsCol])
     } else {
-      setColDefs([...dataCols, utilsCol])
+      setColDefs([...dataCols, ...icCols, utilsCol])
     }
-  }, [data, expanded, availableFeatures, accuracyScores, deleted, showVersions])
+  }, [data, expanded, availableFeatures, accuracyScores, deleted, showVersions, inclusionCriteria])
 
   const toggle = (p: string) =>
     setExpanded((e) => (e.includes(p) ? e.filter((k) => k !== p) : [...e, p]))
@@ -398,6 +497,14 @@ const GridTable = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exportCurrentTableData = exportCurrentTableData
   }, [rowData])
+
+  const defaultColDef: ColDef = useMemo(() => {
+    return {
+      resizable: true,
+      minWidth: 50,
+      maxWidth: 600,
+    }
+  }, [])
 
   return (
     <main className='h-screen w-screen flex flex-col'>
@@ -480,6 +587,9 @@ const GridTable = ({
           suppressGroupChangesColumnVisibility='suppressHideOnGroup'
           tooltipShowDelay={100}
           tooltipShowMode={'whenTruncated'}
+          defaultColDef={defaultColDef}
+          onFirstDataRendered={(params) => params.api.autoSizeAllColumns()}
+          onGridColumnsChanged={(params) => params.api.autoSizeAllColumns()}
         />
       </div>
     </main>

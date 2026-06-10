@@ -46,11 +46,10 @@ class BaseTaskWithCleanup(Task):
         Update the result in the database.
         """
         try:
-            result_query = Result.find_one(Result.task_id == task_id)
-            if not result_query:
-                logger.error("No result found for task_id: %s", task_id)
+            result_obj = Result.find_one(Result.task_id == task_id).run()
+            if not result_obj:
+                logger.info("No result record to update for task_id: %s (likely project-less upload)", task_id)
                 return
-            result_obj = result_query.run()
             if extra_data:
                 result_obj.json_response = extra_data.get(
                     "json_response", result_obj.json_response
@@ -249,7 +248,18 @@ def add_paper(
 
         # Get user and project
         user = User.find_one(User.email == user_email).run()
-        current_project: Project = Project.get(project_id, fetch_links=True).run()
+        version = 1
+        
+        current_project = None
+        if project_id and project_id.strip():
+            try:
+                # Pydantic/Bunnet might raise ValueError if ID is not a valid PydanticObjectId
+                current_project = Project.get(project_id, fetch_links=True).run()
+                if not current_project:
+                    logger.warning("Project %s not found in add_paper task", project_id)
+            except Exception as e:
+                logger.warning("Failed to fetch project %s: %s", project_id, e)
+                current_project = None
 
         if not original_filename:
             original_filename = os.path.basename(file_path)
@@ -289,69 +299,82 @@ def add_paper(
                         progress=8,
                     )
 
-            # Create result record with versioning - ALWAYS create new version
-            result_obj, version = create_result_record(
-                task_id=task_id,
-                user=user,
-                paper=paper,
-                project=current_project,
+            # Create result record with versioning - ONLY if project exists
+            if current_project:
+                result_obj, version = create_result_record(
+                    task_id=task_id,
+                    user=user,
+                    paper=paper,
+                    project=current_project,
+                )
+            else:
+                result_obj = None
+                logger.info("Skipping result record creation - no project context")
+
+        # Process the paper ONLY if project exists
+        if current_project:
+            emitter.emit_status(message=f"Extracting features using {strategy_type}...", progress=15)
+            emitter.emit_status(message=f"Processing paper (v{version})...", progress=10)
+
+            logger.info(
+                "Executing API call for user %s with strategy %s", user_email, strategy_type
             )
 
-        # Process the paper
-        version = result_obj.version if result_obj else 1
-        emitter.emit_status(message=f"Processing paper (v{version})...", progress=10)
+            base_temperature = 0.7
+            current_temperature = base_temperature + (self.request.retries * 0.2)
 
-        logger.info(
-            "Executing API call for user %s with strategy %s", user_email, strategy_type
-        )
+            open_ai_res = run_assistant_api(
+                file_path=processing_file_path,
+                project_id=project_id,
+                emitter=emitter,
+                gpt_temperature=current_temperature,
+                strategy_type=strategy_type,
+            )
 
-        base_temperature = 0.7
-        current_temperature = base_temperature + (self.request.retries * 0.2)
+            emitter.emit_status(message="Saving results...", progress=90)
 
-        open_ai_res = run_assistant_api(
-            file_path=processing_file_path,
-            project_id=project_id,
-            emitter=emitter,
-            gpt_temperature=current_temperature,
-            strategy_type=strategy_type,
-        )
+            # Update result
+            if result_obj: # Only update if a result object was created
+                result_obj.json_response = open_ai_res["output"]["result"]
+                result_obj.prompt_token = open_ai_res["output"]["prompt_tokens"]
+                result_obj.completion_token = open_ai_res["output"]["completion_tokens"]
+                result_obj.finished = True
+                result_obj.updated_at = datetime.now()
+                result_obj.save()
 
-        emitter.emit_status(message="Saving results...", progress=90)
+            logger.info("Results saved for task %s", task_id)
 
-        # Update result
-        result_obj.json_response = open_ai_res["output"]["result"]
-        result_obj.prompt_token = open_ai_res["output"]["prompt_tokens"]
-        result_obj.completion_token = open_ai_res["output"]["completion_tokens"]
-        result_obj.finished = True
-        result_obj.updated_at = datetime.now()
-        result_obj.save()
+            # Update project mapping ONLY if project exists
+            if not existing_result: # Only update mapping if this wasn't a retry
+                update_project_paper_mapping(current_project, paper, result_obj)
 
-        # Update project-paper mapping only on success
-        if not existing_result:  # Only update mapping if this wasn't a retry
-            update_project_paper_mapping(current_project, paper, result_obj)
+                # Add paper to project if not already there
+                if paper not in current_project.papers:
+                    current_project.papers.append(paper)
+                    current_project.updated_at = datetime.now()
+                    current_project.save()
+            
+            emitter.emit_status(message="Paper processed successfully", progress=100, done=True)
 
-            # Add paper to project if not already there
-            if paper not in current_project.papers:
-                current_project.papers.append(paper)
-                current_project.updated_at = datetime.now()
-                current_project.save()
-
-        logger.info("Results saved for task %s", task_id)
-
-        # Emit completion status before returning
-        emitter.emit_status(
-            message="Processing complete!", progress=100, done=True, status="SUCCESS"
-        )
-
-        return {
-            "message": "Success",
-            "file_name": original_filename,
-            "experiments": open_ai_res["output"]["result"],
-            "paper_id": str(paper.id),
-            "result_id": str(result_obj.id),
-            "version": version,
-            "cached": False,  # Never cached, always processed
-        }
+            return {
+                "status": "success",
+                "file_name": original_filename,
+                "experiments": open_ai_res["output"]["result"],
+                "paper_id": str(paper.id),
+                "result_id": str(result_obj.id) if result_obj else None,
+                "version": version,
+                "cached": False,
+                "project_id": str(current_project.id),
+            }
+        else:
+            # Just library upload, no extraction
+            emitter.emit_status(message="Paper added to library", progress=100, done=True)
+            return {
+                "status": "success",
+                "file_name": original_filename,
+                "paper_id": str(paper.id),
+                "message": "Paper added to library (no extraction run)"
+            }
 
     except Exception as exc:
         logger.exception("Error in task %s: %s", task_id, exc)
@@ -364,8 +387,8 @@ def add_paper(
             status="FAILURE",
         )
 
-        # Only create a failed result if we haven't created one yet AND this is the last retry
-        if not result_obj and self.request.retries >= self.max_retries:
+        # Only create a failed result if we haven't created one yet AND this is the last retry AND we have a project
+        if not result_obj and current_project and self.request.retries >= self.max_retries:
             # Create a failed result record
             paper = Paper.find_one(Paper.original_filename == original_filename).run()
             if paper:

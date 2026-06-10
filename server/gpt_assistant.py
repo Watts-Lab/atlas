@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 import logging
 import time
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from openai import OpenAI
 from openai.types import VectorStore
 from dotenv import load_dotenv
@@ -34,7 +34,7 @@ class AssistantException(Exception):
         return f"AssistantException: {self.message}"
 
 
-def get_all_features(project_id: str) -> List[str]:
+def get_all_features(project_id: str) -> Tuple[List[str], Dict]:
     """
     Gets all the available features.
 
@@ -57,6 +57,29 @@ def get_all_features(project_id: str) -> List[str]:
 
     sorted_features = sorted(feature_list, key=lambda s: s.count("."))
 
+    return sorted_features, user_features
+
+
+def get_features_by_ids(feature_ids: List[str]) -> Tuple[List[str], Dict]:
+    """
+    Gets specified features by their IDs.
+    Returns sorted_features (list of identifiers) and user_features (dict of schemas)
+    """
+    feature_list = []
+    user_features = {}
+
+    for fid in feature_ids:
+        feature = Features.get(fid).run()
+        if not feature:
+            continue
+        if feature.feature_identifier.endswith("parent"):
+            continue
+        user_features[feature.feature_identifier] = (
+            feature.feature_gpt_interface.model_dump(exclude_none=True)
+        )
+        feature_list.append(feature.feature_identifier)
+
+    sorted_features = sorted(feature_list, key=lambda s: s.count("."))
     return sorted_features, user_features
 
 

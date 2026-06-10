@@ -2,9 +2,10 @@
 This module contains the routes for the projects API.
 """
 
-import os
 import logging
+import os
 import uuid
+
 from bunnet import PydanticObjectId
 from bunnet.operators import In
 from controllers.project import (
@@ -14,17 +15,17 @@ from controllers.project import (
     track_project_view,
     update_project,
 )
-
 from database.models.features_quality import FeaturesQuality
 from database.models.projects import Project
 from database.models.results import Result
 from database.models.users import User
-from workers.celery_config import score_csv_data
 from routes.auth import require_jwt
 from routes.error_handler import error_handler
+from routes.v1.docs import projects as docs
 from sanic import Blueprint
 from sanic import json as json_response
 from sanic.request import Request
+from workers.celery_config import score_csv_data
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ projects_bp = Blueprint("projects", url_prefix="/projects")
 
 
 @projects_bp.route("/", methods=["GET", "POST"], name="projects")
+@docs.project
 @require_jwt
 @error_handler
 async def project(request: Request):
@@ -146,6 +148,7 @@ async def project(request: Request):
 @projects_bp.route(
     "/<project_id>", methods=["GET", "PUT", "DELETE"], name="project_detail"
 )
+@docs.project_detail
 @require_jwt
 @error_handler
 async def project_detail(request: Request, project_id: str):
@@ -194,6 +197,7 @@ async def project_detail(request: Request, project_id: str):
 @projects_bp.route(
     "/<project_id>/results", methods=["GET", "DELETE"], name="project_results"
 )
+@docs.project_results
 @require_jwt
 @error_handler
 async def project_results(request: Request, project_id: str):
@@ -309,6 +313,7 @@ async def project_results(request: Request, project_id: str):
 @projects_bp.route(
     "/<project_id>/score_csv", methods=["POST", "GET"], name="project_analysis"
 )
+@docs.score_csv_endpoint
 @require_jwt
 @error_handler
 async def score_csv_endpoint(request: Request, project_id: str):
@@ -363,6 +368,7 @@ async def score_csv_endpoint(request: Request, project_id: str):
 
 
 @projects_bp.route("/<project_id>/ground_truth", methods=["GET"], name="project_scores")
+@docs.get_feature_scores
 @require_jwt
 @error_handler
 async def get_feature_scores(request: Request, project_id: str):
@@ -398,6 +404,42 @@ async def get_feature_scores(request: Request, project_id: str):
                 "feature_scores": result,
             }
         )
+
+
+@projects_bp.route(
+    "/<project_id>/features",
+    methods=["GET", "POST", "DELETE"],
+    name="project_features",
+)
+@docs.project_features
+@require_jwt
+@error_handler
+async def project_features(request: Request, project_id: str):
+    """
+    A protected route for adding or removing features to a project.
+    """
+    from controllers.features import (
+        add_project_features_controller,
+        get_project_features_controller,
+        remove_project_features_controller,
+    )
+
+    if request.method == "GET":
+        result = get_project_features_controller(project_id)
+        status = result.pop("status", 200)
+        return json_response(result, status=status)
+
+    if request.method == "POST":
+        feature_ids = request.json.get("feature_ids", [])
+        result = add_project_features_controller(project_id, feature_ids)
+        status = result.pop("status", 201)
+        return json_response(result, status=status)
+
+    if request.method == "DELETE":
+        feature_ids_to_remove = request.json.get("feature_ids", [])
+        result = remove_project_features_controller(project_id, feature_ids_to_remove)
+        status = result.pop("status", 200)
+        return json_response(result, status=status)
 
 
 # • /api/projects/:
