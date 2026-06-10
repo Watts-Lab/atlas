@@ -1,60 +1,169 @@
 """
-This module contains a decorator to require a valid JSON Web Token (JWT) for accessing a route.
+Authentication decorators for Sanic route handlers.
+
+Two decorators are provided:
+
+``require_jwt`` validates the caller's identity through one of two mechanisms,
+tried in order:
+
+1. **JWT cookie** (``jwt``) — the standard browser-based session token.
+2. **API key header** (``X-API-Key``) — a programmatic access token for
+   headless clients, SDKs, or CI pipelines.
+
+``require_session`` is stricter: it accepts **only** the JWT cookie and rejects
+API keys. It is used for sensitive, self-administration endpoints (such as
+creating or revoking API keys) so that a leaked API key cannot be used to mint
+or manage further keys.
+
+In all cases a validated :class:`~database.models.users.User` instance is
+attached to ``request.ctx.user`` and the mechanism used is recorded on
+``request.ctx.auth_method`` (``"jwt"`` or ``"api_key"``) before the wrapped
+handler is called.
 """
 
+import logging
+
 import jwt
+from controllers.api_keys import authenticate_api_key
+from database.models.users import User
 from sanic import Request
 from sanic.response import json as json_response
-from database.models.users import User
+
+logger = logging.getLogger(__name__)
 
 
-def require_jwt(handler):
+def _resolve_jwt_user(request: Request):
     """
-    Decorator to require a valid JSON Web Token (JWT) for accessing a route.
+    Decode the ``jwt`` cookie and return ``(user, error_response)``.
 
-    This decorator extracts the JWT from the request, decodes it using the
-    application's secret key, and attaches the corresponding user to the request
-    context. If the token is expired, invalid, or the user is not found, it returns
-    an appropriate JSON response with an error message and status code.
+    Exactly one element of the tuple is non-``None``. ``error_response`` is a
+    ready-to-return Sanic response on failure.
+    """
+    token = request.cookies.get("jwt")
+    if not token:
+        return None, None
 
-    Args:
-        func (Callable): The route handler function to be decorated.
+    secret = request.app.config.JWT_SECRET
 
-    Returns:
-        Callable: The decorated route handler function.
+    try:
+        user_jwt = jwt.decode(token, secret, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        return None, json_response(
+            {"error": True, "message": "Token has expired."}, status=401
+        )
+    except jwt.InvalidTokenError:
+        return None, json_response(
+            {"error": True, "message": "Invalid token."}, status=401
+        )
 
-    Raises:
-        jwt.ExpiredSignatureError: If the JWT has expired.
-        jwt.InvalidTokenError: If the JWT is invalid.
-        Exception: For any other exceptions that occur during token decoding or user retrieval.
+    user: User = User.find_one(User.email == user_jwt["email"]).run()  # type: ignore[assignment]
+
+    if not user:
+        return None, json_response(
+            {"error": True, "message": "User not found."}, status=404
+        )
+
+    return user, None
+
+
+def _make_auth_decorator(handler, *, allow_api_key: bool):
+    """
+    Build an authentication wrapper around *handler*.
+
+    Parameters
+    ----------
+    allow_api_key : bool
+        When ``True`` the ``X-API-Key`` header is accepted as a fallback to the
+        JWT cookie. When ``False`` only the JWT cookie is accepted.
     """
 
     async def wrapper(request: Request, *args, **kwargs):
         try:
-            secret = request.app.config.JWT_SECRET
-            token = request.cookies.get("jwt")
-            if not token:
-                return json_response(
-                    {"error": True, "message": "No authentication token provided."},
-                    status=401,
+            # --------------------------------------------------------------
+            # Path 1: JWT cookie
+            # --------------------------------------------------------------
+            user, error = _resolve_jwt_user(request)
+            if error is not None:
+                return error
+            if user is not None:
+                request.ctx.user = user
+                request.ctx.auth_method = "jwt"
+                return await handler(request, *args, **kwargs)
+
+            # --------------------------------------------------------------
+            # Path 2: X-API-Key header (only if permitted)
+            # --------------------------------------------------------------
+            if allow_api_key:
+                raw_api_key = request.headers.get("X-API-Key") or request.headers.get(
+                    "x-api-key"
                 )
-            user_jwt = jwt.decode(token, secret, algorithms=["HS256"])
-            user = User.find_one(User.email == user_jwt["email"]).run()
-            if not user:
+
+                if raw_api_key:
+                    user = authenticate_api_key(raw_api_key)  # type: ignore[assignment]
+
+                    if not user:
+                        return json_response(
+                            {"error": True, "message": "Invalid or inactive API key."},
+                            status=401,
+                        )
+
+                    request.ctx.user = user
+                    request.ctx.auth_method = "api_key"
+                    return await handler(request, *args, **kwargs)
+
+            # --------------------------------------------------------------
+            # Path 3: No (acceptable) credentials
+            # --------------------------------------------------------------
+            if not allow_api_key and (
+                request.headers.get("X-API-Key") or request.headers.get("x-api-key")
+            ):
                 return json_response(
-                    {"error": True, "message": "User not found."}, status=404
+                    {
+                        "error": True,
+                        "message": (
+                            "This endpoint requires a logged-in session and cannot "
+                            "be accessed with an API key."
+                        ),
+                    },
+                    status=403,
                 )
-            request.ctx.user = user
-        except jwt.ExpiredSignatureError:
+
             return json_response(
-                {"error": True, "message": "Token has expired."}, status=401
+                {"error": True, "message": "No authentication token provided."},
+                status=401,
             )
-        except jwt.InvalidTokenError:
+
+        except Exception as e:  # noqa: BLE001 - last-resort guard
+            logger.exception("Unhandled error during authentication: %s", e)
             return json_response(
-                {"error": True, "message": "Invalid token."}, status=401
+                {"error": True, "message": "Internal server error."},
+                status=500,
             )
-        except Exception as e:
-            return json_response({"error": True, "message": str(e)}, status=500)
-        return await handler(request, *args, **kwargs)
+
+    # Preserve the original handler's name so that Sanic's route registry
+    # doesn't raise "duplicate route name" errors when the decorator is applied
+    # to multiple handlers.
+    wrapper.__name__ = handler.__name__
 
     return wrapper
+
+
+def require_jwt(handler):
+    """
+    Authenticate via JWT cookie **or** ``X-API-Key`` header.
+
+    On success ``request.ctx.user`` and ``request.ctx.auth_method`` are set and
+    the wrapped *handler* is awaited.
+    """
+    return _make_auth_decorator(handler, allow_api_key=True)
+
+
+def require_session(handler):
+    """
+    Authenticate via the JWT cookie **only** — API keys are rejected.
+
+    Use this for sensitive self-administration endpoints (e.g. API key
+    management) so that a compromised API key cannot create or revoke keys.
+    A request that presents only an API key receives ``403``.
+    """
+    return _make_auth_decorator(handler, allow_api_key=False)

@@ -3,6 +3,7 @@ This file contains the controller for the project
 """
 
 from datetime import datetime
+
 from bunnet import PydanticObjectId
 from bunnet.operators import In
 from database.models.features import Features
@@ -32,7 +33,7 @@ def create_project(
     """
 
     available_features = Features.find(
-        In(Features.id, [PydanticObjectId(p) for p in project_features])
+        In(Features.id, [PydanticObjectId(p) for p in (project_features or [])])
     ).run()
 
     new_project = Project(
@@ -175,7 +176,6 @@ async def track_project_view(user: User, project_id: str):
 
     """
     try:
-
         # Remove if already exists
         user.recently_viewed_projects = [
             view

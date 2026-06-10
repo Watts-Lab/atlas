@@ -12,6 +12,9 @@ import api from '@/service/api'
 import ProjectHeader from './ProjectHeader'
 import SelectFeatures from './SelectFeatures'
 import ProjectFeatureMapDialog from './ProjectFeatureMapDialog'
+import InclusionCriteriaPanel from './InclusionCriteriaPanel'
+import { fetchCriteria } from './inclusionCriteria.service'
+import type { InclusionCriteria } from './inclusionCriteria.types'
 
 type ProjectDetails = {
   id: string
@@ -65,6 +68,9 @@ const Project: React.FC = () => {
   const [accuracyScores, setAccuracyScores] = useState<Record<string, number> | null>(null)
   const [showVersions, setShowVersions] = useState<boolean>(false)
 
+  const [inclusionCriteria, setInclusionCriteria] = useState<InclusionCriteria[]>([])
+  const [icPanelOpen, setIcPanelOpen] = useState(false)
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_tasksMapping, setTasksMapping] = useState<Record<string, string>>({})
   type FeatureModalState = { open: boolean; initialTab: 'select' | 'define' }
@@ -91,7 +97,7 @@ const Project: React.FC = () => {
 
       try {
         const response = await api.put(
-          `/v1/projects/${params.project_id}`,
+          `/projects/${params.project_id}`,
           {
             project_name: updatedProject.name,
             project_description: updatedProject.description,
@@ -121,7 +127,7 @@ const Project: React.FC = () => {
 
   const updateProjectPrompt = async (newPrompt: string) => {
     try {
-      const response = await api.put(`/v1/projects/${params.project_id}`, {
+      const response = await api.put(`/projects/${params.project_id}`, {
         project_name: project.name,
         project_prompt: newPrompt,
       })
@@ -185,11 +191,11 @@ const Project: React.FC = () => {
     }
     data.append('sid', socket?.id || '')
     data.append('project_id', params.project_id)
-    data.append('strategy_type', 'json_schema') // 'json_schema' or 'assistant_api' for backend processing
+    data.append('strategy_type', 'openai_json_schema') // 'openai_json_schema', 'anthropic_json_schema', or 'assistant_api' for backend processing
 
     try {
       toast.loading('Uploading files...')
-      const response = await api.post('/add_paper', data)
+      const response = await api.post('/assistant/add_paper', data)
 
       if (response.status === 200) {
         toast.dismiss()
@@ -282,7 +288,7 @@ const Project: React.FC = () => {
 
     try {
       // Start the task
-      const response = await api.post(`/v1/projects/${params.project_id}/score_csv`, formData)
+      const response = await api.post(`/projects/${params.project_id}/score_csv`, formData)
 
       if (response.status === 200) {
         const { task_id } = response.data
@@ -298,7 +304,7 @@ const Project: React.FC = () => {
 
           try {
             const resultResponse = await api.get(
-              `/v1/projects/${params.project_id}/score_csv?task_id=${task_id}`,
+              `/projects/${params.project_id}/score_csv?task_id=${task_id}`,
             )
 
             if (resultResponse.status === 200) {
@@ -419,7 +425,7 @@ const Project: React.FC = () => {
     try {
       const resultIdsToDelete = paperIds.map((id) => resultIds[parseInt(id)])
 
-      const response = await api.delete(`/v1/projects/${params.project_id}/results`, {
+      const response = await api.delete(`/projects/${params.project_id}/results`, {
         data: {
           result_ids: resultIdsToDelete,
         },
@@ -450,8 +456,8 @@ const Project: React.FC = () => {
       setLoading(true)
       try {
         const url = showVersions
-          ? `/v1/projects/${params.project_id}/results?include_versions=true`
-          : `/v1/projects/${params.project_id}/results`
+          ? `/projects/${params.project_id}/results?include_versions=true`
+          : `/projects/${params.project_id}/results`
 
         const response = await api.get(url)
         const responseData = response.data
@@ -497,7 +503,7 @@ const Project: React.FC = () => {
 
       setLoading(true)
       try {
-        const response = await api.get(`/v1/projects/${params.project_id}`)
+        const response = await api.get(`/projects/${params.project_id}`)
         const projectData = response.data.project
 
         setProject({
@@ -527,7 +533,7 @@ const Project: React.FC = () => {
     const fetchProjectScores = async () => {
       if (!params.project_id) return
       try {
-        const response = await api.get(`/v1/projects/${params.project_id}/ground_truth`)
+        const response = await api.get(`/projects/${params.project_id}/ground_truth`)
         const projectData = response.data.feature_scores
 
         const formattedScores: Record<string, number> = {}
@@ -543,6 +549,13 @@ const Project: React.FC = () => {
     }
 
     fetchProjectScores()
+  }, [params.project_id])
+
+  useEffect(() => {
+    if (!params.project_id) return
+    fetchCriteria(params.project_id)
+      .then(setInclusionCriteria)
+      .catch((err) => console.error('Error fetching inclusion criteria:', err))
   }, [params.project_id])
 
   useEffect(() => {
@@ -614,9 +627,9 @@ const Project: React.FC = () => {
     if (!params.project_id || !paperId) return
 
     try {
-      const response = await api.post(`/reprocess_paper/${paperId}`, {
+      const response = await api.post(`/assistant/reprocess_paper/${paperId}`, {
         project_id: params.project_id,
-        strategy_type: 'json_schema',
+        strategy_type: 'openai_json_schema',
         sid: socket?.id || '',
       })
 
@@ -660,8 +673,8 @@ const Project: React.FC = () => {
               const fetchResults = async () => {
                 try {
                   const url = showVersions
-                    ? `/v1/projects/${params.project_id}/results?include_versions=true`
-                    : `/v1/projects/${params.project_id}/results`
+                    ? `/projects/${params.project_id}/results?include_versions=true`
+                    : `/projects/${params.project_id}/results`
 
                   const response = await api.get(url)
                   const responseData = response.data
@@ -711,8 +724,8 @@ const Project: React.FC = () => {
     setBulkReprocessing(true)
 
     try {
-      const response = await api.post(`/reprocess_project/${params.project_id}`, {
-        strategy_type: 'json_schema',
+      const response = await api.post(`/assistant/reprocess_project/${params.project_id}`, {
+        strategy_type: 'openai_json_schema',
         sid: socket?.id || '',
       })
 
@@ -803,6 +816,7 @@ const Project: React.FC = () => {
         onReprocessAll={reprocessAllPapers}
         bulkReprocessing={bulkReprocessing}
         onViewMap={() => setMapDialogOpen(true)}
+        onOpenInclusionCriteria={() => setIcPanelOpen(true)}
       />
 
       <ProjectFeatureMapDialog
@@ -829,6 +843,7 @@ const Project: React.FC = () => {
         showVersions={showVersions}
         onToggleVersions={handleToggleVersions}
         reprocessPaper={reprocessPaper}
+        inclusionCriteria={inclusionCriteria}
       />
 
       <SelectFeatures
@@ -840,6 +855,14 @@ const Project: React.FC = () => {
         updateProjectFeatures={updateProjectFeatures}
         addNewFeature={handleAddNewFeature}
         isLoading={isFeaturesLoading}
+      />
+      <InclusionCriteriaPanel
+        open={icPanelOpen}
+        onOpenChange={setIcPanelOpen}
+        projectId={project.id}
+        criteria={inclusionCriteria}
+        availableFeatures={availableFeatures}
+        onCriteriaChange={setInclusionCriteria}
       />
     </main>
   )

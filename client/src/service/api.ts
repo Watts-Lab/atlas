@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-export const API_URL = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/api'
+export const API_URL =
+  process.env.NODE_ENV === 'production' ? '/api/v1' : 'http://localhost:3000/api/v1'
 
 export const WEB_URL =
   process.env.NODE_ENV === 'production' ? 'https://atlas.seas.upenn.edu' : 'http://localhost:5173'
@@ -16,7 +17,7 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response && error.response.status === 401) {
       try {
-        await api.post('/logout')
+        await api.post('/auth/logout')
       } catch (logoutErr) {
         console.warn('Logout failed:', logoutErr)
       }

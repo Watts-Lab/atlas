@@ -10,7 +10,11 @@ import {
   ChevronDown,
   Trophy,
   Activity,
+  History,
+  AlertCircle,
+  Timer,
 } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +32,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import { Progress } from '@/components/ui/progress'
 import { Feature } from '../feature.types'
 import { generateTrail } from './featureUtils'
 import api from '@/service/api'
@@ -35,6 +40,7 @@ import { toast } from 'sonner'
 import { AgGridReact } from 'ag-grid-react'
 import { AllCommunityModule, ModuleRegistry, provideGlobalGridOptions } from 'ag-grid-community'
 import { flattenObject } from '../../TableView/hooks/data-handler'
+import { useSocket } from '@/context/Socket/useSocket'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-balham.css'
 
@@ -45,6 +51,16 @@ interface Paper {
   id: string
   title: string
   file_hash?: string
+  uploaded_at?: string
+}
+
+interface Evaluation {
+  id: string
+  paper_id: string
+  version: number
+  alpha: number
+  status: string
+  created_at: string
 }
 
 interface FeatureEvaluationProps {
@@ -70,6 +86,8 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
   feature,
   availableFeatures,
 }) => {
+  const { socket } = useSocket()
+  const params = useParams<{ project_id: string }>()
   const [papers, setPapers] = useState<Paper[]>([])
   const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null)
   const [featureStack, setFeatureStack] = useState<Feature[]>([])
@@ -78,7 +96,13 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
   const [accuracyScores, setAccuracyScores] = useState<Record<string, number>>({})
   const [comparisonSearchOpen, setComparisonSearchOpen] = useState(false)
 
-  // Fetch papers on mount
+  // Repeatability state
+  const [evaluations, setEvaluations] = useState<Evaluation[]>([])
+  const [isRepeatabilityRunning, setIsRepeatabilityRunning] = useState(false)
+  const [repeatabilityProgress, setRepeatabilityProgress] = useState(0)
+  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null)
+
+  // Fetch papers and evaluations on mount
   useEffect(() => {
     const fetchPapers = async () => {
       try {
@@ -99,8 +123,82 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
         console.error('Failed to fetch papers:', error)
       }
     }
+
+    const fetchEvaluations = async () => {
+      if (!feature.id) return
+      try {
+        const response = await api.get(`/features/${feature.id}/evaluations`)
+        if (response.data && response.data.evaluations) {
+          setEvaluations(response.data.evaluations)
+        }
+      } catch (error) {
+        console.error('Failed to fetch evaluations:', error)
+      }
+    }
+
     fetchPapers()
-  }, [])
+    fetchEvaluations()
+  }, [feature.id, params.project_id])
+
+  // Socket listener for progress
+  useEffect(() => {
+    if (!socket || !currentTaskId) return
+
+    const handleStatus = (data: any) => {
+      if (data.task_id === currentTaskId) {
+        if (isRepeatabilityRunning) {
+          setRepeatabilityProgress(data.progress)
+        }
+
+        if (data.done) {
+          const isSingleRun = !isRepeatabilityRunning && isEvaluating
+
+          if (isRepeatabilityRunning) {
+            setIsRepeatabilityRunning(false)
+            toast.success('Repeatability evaluation complete!')
+          } else if (isEvaluating) {
+            setIsEvaluating(false)
+            toast.success('Extraction complete!')
+          }
+
+          setCurrentTaskId(null)
+
+          // Refresh evaluations history
+          api.get(`/features/${feature.id}/evaluations`).then((res) => {
+            if (res.data?.evaluations) {
+              setEvaluations(res.data.evaluations)
+            }
+
+            // If it was a single run, find the latest result and show it in the table
+            if (isSingleRun && res.data.evaluations.length > 0) {
+              const latestId = res.data.evaluations[0].id
+              api.get(`/repeatability_results/${latestId}`).then((res2) => {
+                if (res2.data && res2.data.extractions && res2.data.extractions.length > 0) {
+                  const rawRes = res2.data.extractions[0]
+
+                  const tableRes = [
+                    {
+                      id: latestId,
+                      _paper_id: selectedPaper?.id,
+                      paper: selectedPaper?.title || 'Unknown',
+                      ...flattenObject(rawRes),
+                    },
+                  ]
+
+                  setResults(tableRes as unknown as EvaluationResult[])
+                }
+              })
+            }
+          })
+        }
+      }
+    }
+
+    socket.on('status', handleStatus)
+    return () => {
+      socket.off('status', handleStatus)
+    }
+  }, [socket, currentTaskId, feature.id])
 
   const handlePaperUpload = () => {
     const input = document.createElement('input')
@@ -114,19 +212,38 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
       const formData = new FormData()
       formData.append('files[]', file)
       formData.append('strategy_type', 'json_schema')
+      formData.append('project_id', params.project_id || '')
+      formData.append('sid', socket?.id || '')
 
       try {
         const tId = toast.loading('Uploading and processing paper...')
-        const response = await api.post('/add_paper', formData)
+        const response = await api.post('/assistant/add_paper', formData)
         if (response.status === 200) {
           toast.dismiss(tId)
           toast.success('Paper uploaded!')
+
+          const newPaperId = response.data.paper_id
+
           // Fetch papers again to get the new one
-          const papersResp = await api.get('/papers')
-          setPapers(papersResp.data)
-          // Optionally select the last paper
-          if (papersResp.data.length > 0) {
-            setSelectedPaper(papersResp.data[papersResp.data.length - 1])
+          const papersResp = await api.get('/user/papers?page=1&page_size=50')
+          if (papersResp.data && papersResp.data.papers) {
+            const updatedPapers = papersResp.data.papers.map(
+              (p: { id: string; title: string; file_hash: string; updated_at: string }) => ({
+                id: p.id,
+                title: p.title,
+                file_hash: p.file_hash,
+                uploaded_at: p.updated_at,
+              }),
+            )
+            setPapers(updatedPapers)
+
+            // Auto-select the new paper
+            if (newPaperId) {
+              const newPaper = updatedPapers.find((p: Paper) => p.id === newPaperId)
+              if (newPaper) {
+                setSelectedPaper(newPaper)
+              }
+            }
           }
         }
       } catch {
@@ -137,8 +254,8 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
   }
 
   const handleRunEvaluation = async () => {
-    if (!selectedPaper) {
-      toast.error('Please select a paper first')
+    if (!selectedPaper || !feature.id) {
+      toast.error('Selected paper and saved feature required')
       return
     }
 
@@ -146,76 +263,48 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
     const tId = toast.loading('Running extraction...')
 
     try {
-      /**
-       * EXPECTED API RESPONSE (multi-dimensional):
-       * { results: [{ _paper_id: "...", paper: [{title}],
-       *   feature: [{nested}, {data}] }] }
-       * Arrays → multiple rows, nested keys → prefixed
-       */
-      const payload = {
+      const response = await api.post(`/features/${feature.id}/extract`, {
         paper_id: selectedPaper.id,
-        features: [feature, ...featureStack],
+        project_id: params.project_id || '',
+        sid: socket?.id,
+      })
+
+      if (response.data.task_id) {
+        setCurrentTaskId(response.data.task_id)
+        toast.dismiss(tId)
       }
-      console.log('Sending tuning request:', payload)
-
-      // Simulate API delay and result
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      //  Mock nested response (like user's JSON: paper[{title}], dataset[{...}])
-      // Use the actual identifier from the feature being defined
-      const rootIdent = feature.identifier || 'new_feature'
-      const mockResults = [
-        {
-          _paper_id: selectedPaper.id,
-          paper: selectedPaper.title,
-          [rootIdent]: 'Extracted Value A',
-          ...featureStack.reduce(
-            (acc, f, idx) => ({
-              ...acc,
-              [f.feature_identifier]:
-                idx % 2 === 0 ? `Comparison for ${f.feature_name}` : 'Another Value',
-            }),
-            {},
-          ),
-        },
-        {
-          _paper_id: selectedPaper.id,
-          paper: selectedPaper.title,
-          [rootIdent]: 'Extracted Value B',
-          ...featureStack.reduce(
-            (acc, f, idx) => ({
-              ...acc,
-              [f.feature_identifier]:
-                idx % 2 === 0 ? `Comparison for ${f.feature_name}` : 'Another Value',
-            }),
-            {},
-          ),
-        },
-        {
-          _paper_id: selectedPaper.id,
-          paper: selectedPaper.title,
-          [rootIdent]: 'Extracted Value C',
-          ...featureStack.reduce(
-            (acc, f, idx) => ({
-              ...acc,
-              [f.feature_identifier]:
-                idx % 2 === 0 ? `Comparison for ${f.feature_name}` : 'Another Value',
-            }),
-            {},
-          ),
-        },
-      ]
-
-      // We don't need to flatten if we already have an array of rows, 
-      // but we keep it for consistency if featureStack has nested stuff
-      const flattenedResults = flattenObject(mockResults, [])
-      setResults(flattenedResults as EvaluationResult[])
-      toast.success('Extraction complete!', { id: tId })
     } catch (error) {
       console.error(error)
       toast.error('Extraction failed', { id: tId })
-    } finally {
       setIsEvaluating(false)
+    }
+  }
+
+  const handleRunRepeatability = async () => {
+    if (!selectedPaper || !feature.id) {
+      toast.error('Selected paper and saved feature required')
+      return
+    }
+
+    setIsRepeatabilityRunning(true)
+    setRepeatabilityProgress(0)
+    const tId = toast.loading('Starting repeatability check (10 runs)...')
+
+    try {
+      const response = await api.post(`/features/${feature.id}/evaluate_repeatability`, {
+        paper_id: selectedPaper.id,
+        project_id: params.project_id || '',
+        sid: socket?.id,
+      })
+
+      if (response.data.task_id) {
+        setCurrentTaskId(response.data.task_id)
+        toast.dismiss(tId)
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to start repeatability check', { id: tId })
+      setIsRepeatabilityRunning(false)
     }
   }
 
@@ -279,24 +368,26 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
             if (score === 0 && rowData[k + '_truth']) return 'bg-red-100/50'
             return ''
           },
-          cellRenderer: k === feature.identifier ? (params: any) => {
-            return (
-              <div className="flex items-center justify-between w-full h-full group">
-                <span className="truncate">{params.value}</span>
-                <button
-                  onClick={() => params.node.setDataValue(`${k}_truth`, params.value)}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-primary/10 rounded transition-opacity"
-                  title="Copy to Ground Truth"
-                >
-                  <Check className="w-4 h-4 text-primary" />
-                </button>
-              </div>
-            )
-          } : undefined
+          cellRenderer:
+            k === feature.identifier
+              ? (params: any) => {
+                  return (
+                    <div className='flex items-center justify-between w-full h-full group'>
+                      <span className='truncate'>{params.value}</span>
+                      <button
+                        onClick={() => params.node.setDataValue(`${k}_truth`, params.value)}
+                        className='opacity-0 group-hover:opacity-100 p-1 hover:bg-primary/10 rounded transition-opacity'
+                        title='Copy to Ground Truth'
+                      >
+                        <Check className='w-4 h-4 text-primary' />
+                      </button>
+                    </div>
+                  )
+                }
+              : undefined,
         },
       ]
 
-      // Add corresponding truth column only for the current feature being defined
       if (k === feature.identifier) {
         cols.push({
           field: k + '_truth',
@@ -311,21 +402,36 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
     })
 
     return [paperCol, ...featureCols]
-  }, [results, accuracyScores])
+  }, [results, accuracyScores, feature.identifier])
 
   return (
     <div className='h-full bg-muted/30 overflow-hidden flex flex-col min-w-0'>
       <div className='p-4 border-b bg-background/50 flex items-center justify-between shrink-0'>
         <div>
-          <h4 className='font-semibold text-lg'>Tuning & Evaluation</h4>
+          <div className='flex items-center gap-2'>
+            <h4 className='font-semibold text-lg'>Tuning & Evaluation</h4>
+            <Badge variant='outline' className='text-[10px] h-4'>
+              v{evaluations?.[0]?.version || 1}
+            </Badge>
+          </div>
           <p className='text-xs text-muted-foreground'>
-            Test your feature against real papers and compare with others.
+            Test your feature against real papers and check repeatability.
           </p>
         </div>
         <div className='flex gap-2'>
           <Button size='sm' variant='outline' className='gap-2' onClick={handlePaperUpload}>
             <Upload className='w-4 h-4' />
             Upload PDF
+          </Button>
+          <Button
+            size='sm'
+            variant='outline'
+            className='gap-2 border-primary/30 hover:border-primary/60 text-primary'
+            disabled={isRepeatabilityRunning || !selectedPaper || !feature.id}
+            onClick={handleRunRepeatability}
+          >
+            <Activity className={`w-4 h-4 ${isRepeatabilityRunning ? 'animate-pulse' : ''}`} />
+            Repeatability Check
           </Button>
           <Button
             size='sm'
@@ -339,7 +445,7 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
             onClick={handleRunEvaluation}
           >
             <RefreshCw className={`w-4 h-4 ${isEvaluating ? 'animate-spin' : ''}`} />
-            Run / Refresh
+            Quick Run
           </Button>
         </div>
       </div>
@@ -386,13 +492,12 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
 
           <div className='h-4 w-[1px] bg-border mx-1' />
 
-          <div className='flex items-center gap-2'>
-            <span className='text-muted-foreground font-medium'>Existing feature to include:</span>
+          <div className='flex items-center gap-2 flex-1'>
+            <span className='text-muted-foreground font-medium'>Compare with:</span>
             <div className='flex items-center gap-1.5'>
               {featureStack.map((f) => (
                 <Badge key={f.id} variant='secondary' className='pl-2 pr-1 h-7 gap-1 group'>
                   <span className='truncate max-w-[100px]'>{f.feature_name}</span>
-                  {f.version && <span className='text-[10px] opacity-60'>({f.version})</span>}
                   <button
                     onClick={() => toggleFeatureInStack(f)}
                     className='p-0.5 hover:bg-muted rounded-full opacity-50 group-hover:opacity-100'
@@ -434,12 +539,9 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
                               className='flex flex-col items-start gap-1 py-2 cursor-pointer'
                             >
                               <div className='flex items-center gap-2 w-full'>
-                                <span className='font-medium truncate flex-1'>{f.feature_name}</span>
-                                {f.version && (
-                                  <Badge variant='secondary' className='text-[10px] h-4 px-1'>
-                                    {f.version}
-                                  </Badge>
-                                )}
+                                <span className='font-medium truncate flex-1'>
+                                  {f.feature_name}
+                                </span>
                               </div>
                               <div className='text-[10px] text-muted-foreground font-mono opacity-70'>
                                 {generateTrail(f.feature_identifier)}
@@ -455,39 +557,123 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
           </div>
         </div>
 
-        {/* Results Grid */}
-        <div className='flex-1 relative'>
-          {results.length > 0 ? (
-            <div className='ag-theme-balham h-full w-full'>
-              <AgGridReact
-                rowData={results}
-                columnDefs={colDefs}
-                defaultColDef={{
-                  resizable: true,
-                  sortable: true,
-                  filter: true,
-                  minWidth: 100,
-                }}
-                onCellValueChanged={onCellValueChanged}
-              />
+        {/* Progress Bar for Repeatability */}
+        {isRepeatabilityRunning && (
+          <div className='px-4 py-2 bg-primary/5 border-b flex items-center gap-4'>
+            <div className='flex-1'>
+              <div className='flex justify-between items-center mb-1'>
+                <span className='text-[10px] font-medium text-primary uppercase tracking-wider'>
+                  Repeatability Check Progress
+                </span>
+                <span className='text-[10px] text-primary font-bold'>{repeatabilityProgress}%</span>
+              </div>
+              <Progress value={repeatabilityProgress} className='h-1.5' />
             </div>
-          ) : (
-            <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-12 text-muted-foreground'>
-              <Activity className='w-16 h-16 mb-4 opacity-10' />
-              <h5 className='text-lg font-medium text-foreground mb-1'>No evaluation data yet</h5>
-              <p className='max-w-xs mb-6'>
-                {selectedPaper
-                  ? "Click 'Run / Refresh' to extract information from the selected paper."
-                  : 'Start by selecting a paper to evaluate your feature prompt.'}
-              </p>
-              {!selectedPaper && (
-                <Button onClick={handlePaperUpload} variant='outline' className='gap-2'>
-                  <Upload className='w-4 h-4' />
-                  Upload First PDF
-                </Button>
+          </div>
+        )}
+
+        {/* Main Content Area: Split Grid and History */}
+        <div className='flex-1 flex overflow-hidden'>
+          {/* Results Grid */}
+          <div className='flex-1 relative border-r'>
+            {results.length > 0 ? (
+              <div className='ag-theme-balham h-full w-full'>
+                <AgGridReact
+                  rowData={results}
+                  columnDefs={colDefs}
+                  defaultColDef={{
+                    resizable: true,
+                    sortable: true,
+                    filter: true,
+                    minWidth: 100,
+                  }}
+                  onCellValueChanged={onCellValueChanged}
+                />
+              </div>
+            ) : (
+              <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-12 text-muted-foreground'>
+                <Activity className='w-12 h-12 mb-4 opacity-10' />
+                <h5 className='text-sm font-medium text-foreground mb-1'>No extraction data yet</h5>
+                <p className='max-w-xs text-xs mb-6'>
+                  {selectedPaper
+                    ? "Click 'Quick Run' to see a single extraction result."
+                    : 'Start by selecting a paper to evaluate your feature prompt.'}
+                </p>
+                {!selectedPaper && (
+                  <Button onClick={handlePaperUpload} variant='outline' size='sm' className='gap-2'>
+                    <Upload className='w-4 h-4' />
+                    Upload PDF
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Repeatability History Sidebar */}
+          <div className='w-72 bg-muted/20 flex flex-col shrink-0'>
+            <div className='p-3 border-b bg-muted/40 flex items-center gap-2'>
+              <History className='w-4 h-4 text-muted-foreground' />
+              <span className='text-xs font-semibold'>Repeatability History</span>
+            </div>
+            <div className='flex-1 overflow-y-auto p-2 space-y-2'>
+              {evaluations?.length > 0 ? (
+                evaluations.map((ev) => (
+                  <div
+                    key={ev.id}
+                    className='p-2 bg-background border rounded-md shadow-sm space-y-2'
+                  >
+                    <div className='flex justify-between items-start'>
+                      <Badge variant='outline' className='text-[9px] px-1 h-4 bg-muted/50'>
+                        v{ev.version}
+                      </Badge>
+                      <span className='text-[9px] text-muted-foreground'>
+                        {new Date(ev.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-1.5'>
+                        <Timer className='w-3 h-3 text-muted-foreground' />
+                        <span className='text-xs font-medium'>Alpha Score</span>
+                      </div>
+                      <span
+                        className={`text-sm font-bold ${ev.alpha !== null && ev.alpha > 0.8 ? 'text-green-600' : ev.alpha !== null && ev.alpha > 0.6 ? 'text-amber-600' : 'text-red-500'}`}
+                      >
+                        {ev.alpha !== null && ev.alpha >= 0 ? ev.alpha.toFixed(3) : 'N/A'}
+                      </span>
+                    </div>
+                    {ev.alpha !== null && ev.alpha >= 0 && (
+                      <div className='space-y-1'>
+                        <Progress
+                          value={ev.alpha * 100}
+                          className={`h-1 ${ev.alpha > 0.8 ? 'bg-green-100' : 'bg-red-100'}`}
+                        />
+                        <p className='text-[9px] text-muted-foreground italic'>
+                          {ev.alpha > 0.8
+                            ? 'Excellent repeatability'
+                            : ev.alpha > 0.6
+                              ? 'Substantial repeatability'
+                              : 'Needs prompt refinement'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className='h-full flex flex-col items-center justify-center text-center p-4 opacity-40'>
+                  <AlertCircle className='w-8 h-8 mb-2' />
+                  <p className='text-[10px]'>
+                    No repeatability checks performed for this feature yet.
+                  </p>
+                </div>
               )}
             </div>
-          )}
+            {feature.id &&
+              !evaluations?.some((e) => e.version === (evaluations?.[0]?.version || 1)) && (
+                <div className='p-3 bg-amber-50 border-t border-amber-100 text-[10px] text-amber-700'>
+                  Current version has no repeatability score yet.
+                </div>
+              )}
+          </div>
         </div>
 
         {/* Accuracy Dashboard (Footer) */}
@@ -496,7 +682,7 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
             <div className='flex items-center gap-6'>
               <div className='flex items-center gap-2'>
                 <Trophy className='w-4 h-4 text-yellow-500' />
-                <span className='text-sm font-medium'>Accuracy Score:</span>
+                <span className='text-sm font-medium'>Quick Accuracy:</span>
                 <Badge variant='outline' className='bg-green-50 text-green-700 border-green-200'>
                   {Object.keys(accuracyScores).length > 0
                     ? Math.round(
@@ -508,11 +694,11 @@ export const FeatureEvaluation: React.FC<FeatureEvaluationProps> = ({
                 </Badge>
               </div>
               <p className='text-[10px] text-muted-foreground max-w-[300px] leading-tight'>
-                Edit cells in the grid to provide ground truth and see live accuracy updates.
+                Edit cells under 'Ground Truth' to calculate manual accuracy for this run.
               </p>
             </div>
             <div className='text-xs text-muted-foreground'>
-              Evaluating <b>{featureStack.length + 1}</b> features on <b>1</b> paper
+              Visualizing <b>{featureStack.length + 1}</b> features on <b>1</b> paper
             </div>
           </div>
         )}

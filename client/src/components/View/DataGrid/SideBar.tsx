@@ -93,22 +93,12 @@ const data = {
       title: 'Settings',
       url: '#',
       icon: Settings2,
+      isActive: true,
+      isDefaultOpen: true,
       items: [
         {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
+          title: 'API Keys',
+          url: '/settings/api-keys',
         },
       ],
     },

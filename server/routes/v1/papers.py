@@ -4,21 +4,25 @@ It allows users to upload, update, and manage papers within projects.
 """
 
 import logging
-from sanic import Blueprint, Request
-from sanic.response import json as json_response
+
 from database.models.papers import Paper
 from database.models.projects import Project
 from routes.auth import require_jwt
+from routes.error_handler import error_handler
+from routes.v1.docs import papers as docs
+from sanic import Blueprint, Request
+from sanic.response import json as json_response
 from workers.celery_config import reprocess_paper
-
 
 logger = logging.getLogger(__name__)
 
-paper_bp = Blueprint("papers", url_prefix="/api/papers")
+paper_bp = Blueprint("papers", url_prefix="/papers")
 
 
 @paper_bp.route("/update/<paper_id>", methods=["POST"], name="update_paper_results")
+@docs.update_paper_results
 @require_jwt
+@error_handler
 async def update_paper_results(request: Request, paper_id: str):
     """
     Update results for an existing paper when features have changed.
@@ -73,7 +77,9 @@ async def update_paper_results(request: Request, paper_id: str):
 
 
 @paper_bp.route("/batch-update", methods=["POST"], name="batch_update_papers")
+@docs.batch_update_papers
 @require_jwt
+@error_handler
 async def batch_update_papers(request: Request):
     """
     Update multiple papers in a project when features have changed.

@@ -34,7 +34,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshUser = useCallback(async () => {
     try {
-      const { data } = await api.get('/check')
+      const { data } = await api.get('/auth/check')
       if (data.loggedIn) {
         setUser({
           loggedIn: true,
@@ -55,7 +55,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(
     async (credentials: { email: string }) => {
       try {
-        const response = await api.post('/login', credentials)
+        const response = await api.post('/auth/login', credentials)
         if (response.status === 200) {
           await refreshUser()
         }
@@ -69,7 +69,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = useCallback(async () => {
     try {
-      await api.post('/logout')
+      await api.post('/auth/logout')
       setUser(initialUser)
     } catch (error) {
       console.error('Logout error', error)

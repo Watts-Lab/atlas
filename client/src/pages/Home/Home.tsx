@@ -54,7 +54,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
       setLoggingInMessage('Authenticating... Please wait.')
 
       api
-        .post(`/validate`, { email: params.email, magic_link: params.magicLink })
+        .post(`/auth/validate`, { email: params.email, magic_link: params.magicLink })
         .then((response) => {
           if (response.status === 200) {
             updateUser({

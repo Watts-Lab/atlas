@@ -72,7 +72,9 @@ redis_client = Redis.from_url(REDIS_URL)
 from workers.add_paper_task import add_paper
 from workers.add_paper_task import reprocess_paper
 from workers.score_features import score_csv_data
+from workers.evaluate_repeatability_task import evaluate_feature_repeatability
 
 celery.register_task(add_paper)
 celery.register_task(reprocess_paper)
 celery.register_task(score_csv_data)
+celery.register_task(evaluate_feature_repeatability)

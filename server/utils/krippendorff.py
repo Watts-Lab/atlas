@@ -6,9 +6,24 @@ coefficient with additional utilities for practical use.
 """
 
 import numpy as np
-import pandas as pd
-from typing import Union, Literal, Optional, Tuple
+from typing import Union, Literal, Optional, Tuple, Any
 from dataclasses import dataclass
+
+# Optional dependencies handled at runtime
+pd_DataFrame = Any
+pl_DataFrame = Any
+try:
+    import pandas as pd
+
+    pd_DataFrame = pd.DataFrame
+except ImportError:
+    pass
+try:
+    import polars as pl
+
+    pl_DataFrame = pl.DataFrame
+except ImportError:
+    pass
 
 
 @dataclass
@@ -50,7 +65,7 @@ class AlphaResult:
 
 
 def krippendorff_alpha(
-    data: Union[np.ndarray, pd.DataFrame],
+    data: Any,
     metric: Literal[
         "nominal", "ordinal", "interval", "ratio", "circular", "bipolar"
     ] = "interval",
@@ -135,19 +150,17 @@ def krippendorff_alpha(
     """
 
     # Convert DataFrame to numpy array if needed
-    if isinstance(data, pd.DataFrame):
+    if pd_DataFrame is not Any and isinstance(data, pd_DataFrame):
         data = data.values
+    elif pl_DataFrame is not Any and isinstance(data, pl_DataFrame):
+        data = data.to_numpy()
 
-    print(
-        "version 1.0.0 - Initial implementation of Krippendorff's alpha with enhanced features"
-    )
+    print("version 1.0.1 - Polars support added")
     # Handle categorical/string data by converting to numeric codes
-    is_categorical = False
     value_map = None
 
     # Check if data contains non-numeric values
     if data.dtype == object or data.dtype.kind in ["U", "S", "O"]:
-        is_categorical = True
         # Get unique non-NaN values, handling mixed types carefully
         unique_vals = set()
         for val in data.flatten():
@@ -394,7 +407,7 @@ def visualize_agreement_matrix(
     data: np.ndarray,
     observer_names: Optional[list] = None,
     unit_names: Optional[list] = None,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """
     Create a visualization-ready agreement matrix.
 
@@ -420,7 +433,9 @@ def visualize_agreement_matrix(
     if unit_names is None:
         unit_names = [f"Unit_{i+1}" for i in range(n_units)]
 
-    df = pd.DataFrame(data, index=observer_names, columns=unit_names)
+    df = pl.DataFrame(
+        data, schema={name: pl.Float64 for name in unit_names}
+    ).with_columns(pl.Series("observer", observer_names))
     return df
 
 

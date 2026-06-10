@@ -10,6 +10,7 @@ import DocPage from './pages/Documentation/DocPage'
 import ProjectCreate from './pages/ProjectCreate/ProjectCreate'
 import FeaturesPage from './pages/Features/Features'
 import Landing from './pages/Landing/Landing'
+import ApiKeysPage from './pages/Settings/ApiKeysPage'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
 
         <Route path='/project-old/:project_id' element={<ProjectView />} />
         <Route path='/ic2s2' element={<IC2S2 />} />
+        <Route path='/settings/api-keys' element={<ApiKeysPage />} />
 
         <Route path='/docs' element={<DocumentationLayout />}>
           <Route index element={<DocPage fileName='overview.md' />} />
