@@ -43,7 +43,7 @@ const ProjectView = () => {
 
       try {
         const response = await api.put(
-          `/projects?project_id=${params.project_id}`,
+          `/projects/${params.project_id}`,
           { project_name: updatedName },
           {
             signal: controller.signal,
@@ -68,7 +68,7 @@ const ProjectView = () => {
       setLoading(true)
 
       try {
-        const response = await api.get(`/projects?project_id=${params.project_id}`)
+        const response = await api.get(`/projects/${params.project_id}`)
 
         if (response.status !== 200) {
           throw new Error('Network response was not ok')

@@ -43,20 +43,6 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
     )
   }, [searchQuery])
 
-  // const fetchAvailableFeatures = async () => {
-  //   try {
-  //     const response = await fetch(`/available_features`, {
-  //       headers: { Authorization: `Bearer ` },
-  //     })
-  //     if (response.ok) {
-  //       const features = await response.json()
-  //       setAvailableFeatures(features)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching features:', error)
-  //   }
-  // }
-
   const [rows, setRows] = useState<TableData>(
     flattenData(result, expandedExperiment, expandedCondition, expandedBehavior),
   )

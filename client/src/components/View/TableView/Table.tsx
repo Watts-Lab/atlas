@@ -75,7 +75,7 @@ const Table = () => {
   }, [socket])
 
   const getResults = async (task_id: string) => {
-    const response = await api.get(`/run_assistant?task_id=${task_id}`)
+    const response = await api.get(`/assistant/add_paper?task_id=${task_id}`)
     if (response.status === 200) {
       try {
         flattenData([response.data], true, true, true)
@@ -114,7 +114,7 @@ const Table = () => {
     data.append('model', 'gpt')
 
     try {
-      const response = await api.post(`/run_assistant`, data)
+      const response = await api.post(`/assistant/add_paper`, data)
       if (response.status === 200) {
         const new_data: { [key: string]: string } = response.data
         Object.entries(new_data).forEach(([key, value]) => {

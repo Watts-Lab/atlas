@@ -99,7 +99,7 @@ const TableView = ({ project_id, project_results }: TableViewProps) => {
   }, [socket, onMessage])
 
   const getResults = async (task_id: string) => {
-    const response = await api.get(`/run_assistant?task_id=${task_id}`)
+    const response = await api.get(`/assistant/add_paper?task_id=${task_id}`)
     if (response.status === 200) {
       try {
         flattenData([response.data], true, true, true)
@@ -150,7 +150,7 @@ const TableView = ({ project_id, project_results }: TableViewProps) => {
     )
 
     try {
-      const response = await api.post(`/add_paper`)
+      const response = await api.post(`/assistant/add_paper`, data)
       if (response.status === 200) {
         const new_data: { [key: string]: string } = response.data
         Object.entries(new_data).forEach(([key, value]) => {
