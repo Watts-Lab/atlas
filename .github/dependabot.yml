@@ -11,7 +11,12 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      all:
+      npm-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      npm-security-updates:
+        applies-to: security-updates
         patterns:
           - "*"
 
@@ -21,7 +26,12 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      all:
+      pip-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      pip-security-updates:
+        applies-to: security-updates
         patterns:
           - "*"
 
@@ -31,6 +41,11 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      all:
+      docker-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      docker-security-updates:
+        applies-to: security-updates
         patterns:
           - "*"
