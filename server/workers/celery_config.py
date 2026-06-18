@@ -64,12 +64,11 @@ def shutdown_celery_worker(**kwargs):
         DB_INITIALIZED = False
 
 
-redis_client = Redis.from_url(REDIS_URL)
+redis_client = Redis.from_url(REDIS_URL) if REDIS_URL else None
 
 
 # Import the tasks to register them with Celery
-from workers.add_paper_task import add_paper
-from workers.add_paper_task import reprocess_paper
+from workers.add_paper_task import add_paper, reprocess_paper
 from workers.score_features import score_csv_data
 from workers.evaluate_repeatability_task import evaluate_feature_repeatability
 

@@ -44,5 +44,8 @@
   },
   "[dockercompose]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "python.testing.pytestArgs": ["server"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

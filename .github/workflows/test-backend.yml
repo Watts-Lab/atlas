@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11]
+        python-version: [3.13]
     env:
       PYTHONPATH: ${{ github.workspace }}/server
 
@@ -37,4 +37,4 @@ jobs:
       - name: Run pytest
         working-directory: .
         run: |
-          pytest server/tests --maxfail=1 --disable-warnings -q
+          pytest server -m "not integration" --maxfail=1 --disable-warnings -q

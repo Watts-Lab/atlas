@@ -21,11 +21,15 @@ from routes.error_handler import error_handler
 from sanic import Blueprint
 from sanic import json as json_response
 from sanic.request import Request
+from sanic_ext import openapi
 
 api_keys_bp = Blueprint("api_keys", url_prefix="/api-keys")
 
 
+# API key management is session-only (require_session rejects API keys), so these
+# endpoints can't be driven by the public API. Hide them from the OpenAPI spec.
 @api_keys_bp.route("/", methods=["GET", "POST"], name="api_keys")
+@openapi.exclude()
 @require_session
 @error_handler
 async def api_keys(request: Request):
@@ -71,6 +75,7 @@ async def api_keys(request: Request):
 
 
 @api_keys_bp.route("/<key_id>", methods=["DELETE"], name="api_key_detail")
+@openapi.exclude()
 @require_session
 @error_handler
 async def api_key_detail(request: Request, key_id: str):

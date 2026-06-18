@@ -160,9 +160,10 @@ async def project_detail(request: Request, project_id: str):
 
     if request.method == "GET":
         # Get project details
-        project_data, results = get_project_detail(project_id)
-        if not project_data:
+        detail = get_project_detail(project_id)
+        if not detail:
             return json_response({"error": "Project not found."}, status=404)
+        project_data, results = detail
 
         # Non blocking update of recently viewed projects
         request.app.add_task(track_project_view(user, project_id))

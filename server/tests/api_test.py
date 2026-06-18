@@ -5,7 +5,6 @@ test_api.py
 Test cases for the API endpoints and argument parsing.
 """
 
-
 import sys
 import pytest
 import pytest_asyncio
@@ -33,6 +32,7 @@ def client(app):
 
 
 @pytest.mark.asyncio
+@pytest.mark.route
 async def test_health_ok(client):
     """
     Test the health check endpoint.
@@ -44,6 +44,7 @@ async def test_health_ok(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.route
 async def test_404_unknown(client):
     """
     Test a 404 error for an unknown route.
@@ -52,6 +53,7 @@ async def test_404_unknown(client):
     assert resp.status == 404
 
 
+@pytest.mark.unit
 def test_parse_args_defaults(monkeypatch):
     """
     Test the default argument parsing.
@@ -62,6 +64,7 @@ def test_parse_args_defaults(monkeypatch):
     assert args.dev is False
 
 
+@pytest.mark.unit
 def test_parse_args_override(monkeypatch):
     """
     Test the argument parsing with overridden values.
