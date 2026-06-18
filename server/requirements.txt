@@ -55,7 +55,7 @@ prometheus_client==0.21.1
 prompt_toolkit==3.0.51
 pydantic==2.11.4
 pydantic_core==2.33.2
-PyJWT==2.10.1
+PyJWT==2.13.0
 pylint==3.3.6
 pymongo==4.12.1
 pytest==8.3.5
