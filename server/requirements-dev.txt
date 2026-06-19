@@ -1,0 +1,27 @@
+# Development & CI dependencies.
+#
+# These are NOT installed in the production image (see Dockerfile.server) — they
+# only run tests and linting in CI / locally. Install with:
+#
+#     pip install -r requirements-dev.txt
+#
+# This includes the production requirements so a single command sets up a full
+# dev environment.
+-r requirements.txt
+
+# Testing
+pytest==9.1.0
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0
+coverage==7.14.1
+sanic-testing==24.6.0
+
+# Linting
+pylint==4.0.6
+astroid==4.0.4
+isort==8.0.1
+mccabe==0.7.0
+dill==0.4.1
+tomlkit==0.15.0
+pluggy==1.6.0
+iniconfig==2.3.0

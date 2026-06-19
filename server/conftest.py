@@ -1,5 +1,6 @@
 """Shared pytest fixtures for backend tests."""
 
+import os
 from dataclasses import dataclass
 from types import SimpleNamespace
 
@@ -7,8 +8,14 @@ import jwt
 import pytest
 import pytest_asyncio
 
-import api
-from api import app as sanic_app
+# AppConfig reads JWT_SECRET from the environment as a *class attribute* at import
+# time, and Sanic's config object shadows later assignments to it. So the secret
+# must exist in the environment BEFORE `api` is imported. Locally a .env supplies
+# it; in CI there is none, so provide a deterministic test default here.
+os.environ.setdefault("JWT_SECRET", "test-jwt-secret")
+
+import api  # noqa: E402  (must follow the JWT_SECRET default above)
+from api import app as sanic_app  # noqa: E402
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -20,8 +27,11 @@ def disable_db_bootstrap():
 
 @pytest.fixture
 def app():
-    """Reusable Sanic app fixture."""
-    sanic_app.config.JWT_SECRET = "test-jwt-secret"
+    """Reusable Sanic app fixture.
+
+    JWT_SECRET is established via the environment before ``api`` is imported (see
+    top of this module), so it is already set on the config here.
+    """
     return sanic_app
 
 
