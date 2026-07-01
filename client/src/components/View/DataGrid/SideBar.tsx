@@ -77,6 +77,10 @@ const data = {
       isDefaultOpen: true,
       items: [
         {
+          title: 'Usage & Keys',
+          url: '/settings/usage',
+        },
+        {
           title: 'API Keys',
           url: '/settings/api-keys',
         },
@@ -89,11 +93,10 @@ export function AppSidebar({
   sidebarOpen,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { sidebarOpen: boolean }) {
-  const { user } = useUser()
+  const { user, refreshUser } = useUser()
 
   const parsedUser = {
-    name: user.email?.split('@')[0] || '',
-    email: user.email || '',
+    email: user.email ?? '',
   }
 
   const { toggleSidebar } = useSidebar()
@@ -102,15 +105,21 @@ export function AppSidebar({
     if (!sidebarOpen) toggleSidebar()
   }, [sidebarOpen])
 
+  useEffect(() => {
+    if (!user.email) {
+      refreshUser()
+    }
+  }, [refreshUser, user.email])
+
   return (
-    <Sidebar collapsible='icon' {...props}>
-      <SidebarContent>
+    <Sidebar collapsible='icon' className='border-[#d6dee8]' {...props}>
+      <SidebarContent className='px-1 py-2'>
         <NavMain label='Atlas v0.1.4 [Alpha Release]' items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={parsedUser} />
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail className='hover:after:bg-[#8aa3bf]' />
     </Sidebar>
   )
 }

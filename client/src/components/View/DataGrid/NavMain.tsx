@@ -12,7 +12,18 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+
+const isCurrentSection = (pathname: string, url: string) => {
+  if (url === '#' || url.startsWith('/docs')) return false
+  if (url === '/dashboard') return pathname === url
+  return pathname === url || pathname.startsWith(`${url}/`)
+}
+
+const isCurrentPage = (pathname: string, url: string) => {
+  if (url === '#' || url.startsWith('/docs')) return false
+  return pathname === url
+}
 
 export function NavMain({
   label,
@@ -34,12 +45,19 @@ export function NavMain({
   }[]
 }) {
   const { toggleSidebar, open } = useSidebar()
+  const { pathname } = useLocation()
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      <SidebarGroupLabel className='px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#64748b]'>
+        {label}
+      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
+          const itemIsActive =
+            isCurrentSection(pathname, item.url) ||
+            Boolean(item.items?.some((subItem) => isCurrentPage(pathname, subItem.url)))
+
           return item.items?.length !== 0 ? (
             <Collapsible
               key={item.title}
@@ -56,7 +74,11 @@ export function NavMain({
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={itemIsActive}
+                    className='rounded-sm text-[#334155] hover:bg-[#eef4fa] hover:text-[#0b1f3a] data-[active=true]:bg-[#0b1f3a] data-[active=true]:text-white'
+                  >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
@@ -64,28 +86,41 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          {subItem.external ? (
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          ) : (
-                            <Link to={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </Link>
-                          )}
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {item.items?.map((subItem) => {
+                      const subItemIsActive = isCurrentPage(pathname, subItem.url)
+
+                      return (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={subItemIsActive}
+                            className='rounded-sm text-[#475569] hover:bg-[#eef4fa] hover:text-[#0b1f3a] data-[active=true]:bg-[#eef4fa] data-[active=true]:font-medium data-[active=true]:text-[#0b1f3a]'
+                          >
+                            {subItem.external ? (
+                              <a href={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </a>
+                            ) : (
+                              <Link to={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </Link>
+                            )}
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )
+                    })}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
           ) : (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title} asChild>
+              <SidebarMenuButton
+                tooltip={item.title}
+                asChild
+                isActive={itemIsActive}
+                className='rounded-sm text-[#334155] hover:bg-[#eef4fa] hover:text-[#0b1f3a] data-[active=true]:bg-[#0b1f3a] data-[active=true]:text-white'
+              >
                 {item.external ? (
                   <a href={item.url}>
                     {item.icon && <item.icon />}

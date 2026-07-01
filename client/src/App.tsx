@@ -9,13 +9,15 @@ import ProjectCreate from './pages/ProjectCreate/ProjectCreate'
 import FeaturesPage from './pages/Features/Features'
 import Landing from './pages/Landing/Landing'
 import ApiKeysPage from './pages/Settings/ApiKeysPage'
+import UsagePage from './pages/Settings/UsagePage'
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path='/home' element={<Landing />} />
-        <Route path='/' element={<Home />} />
+        <Route path='/' element={<Landing />} />
+        <Route path='/home' element={<Navigate to='/' replace />} />
+        <Route path='/login' element={<Home />} />
         <Route path='/login/:email/:magicLink' element={<Home loggingIn={true} />} />
         <Route path='/table' element={<Table />} />
         <Route path='/dashboard' element={<Overview />} />
@@ -32,6 +34,7 @@ function App() {
         <Route path='/project-old/:project_id' element={<ProjectView />} />
         <Route path='/ic2s2' element={<IC2S2 />} />
         <Route path='/settings/api-keys' element={<ApiKeysPage />} />
+        <Route path='/settings/usage' element={<UsagePage />} />
       </Routes>
     </>
   )

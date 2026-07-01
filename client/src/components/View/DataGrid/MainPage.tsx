@@ -27,21 +27,26 @@ export default function MainPage({
   rightSidebar,
 }: PageProps) {
   return (
-    <SidebarProvider className='h-svh overflow-hidden'>
+    <SidebarProvider className='h-svh overflow-hidden bg-[#f8fafc] text-[#0b1f3a]'>
       <AppSidebar sidebarOpen={sidebarOpen} />
-      <SidebarInset className='min-w-0'>
-        <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
+      <SidebarInset className='min-w-0 bg-[#f8fafc] bg-[linear-gradient(rgba(51,65,85,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(51,65,85,0.035)_1px,transparent_1px)] bg-[size:48px_48px]'>
+        <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 bg-[#f8fafc]/90 backdrop-blur-md transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
           <div className='flex items-center gap-2 px-4'>
-            <SidebarTrigger className='-ml-1' />
+            <SidebarTrigger className='-ml-1 rounded-sm text-[#334155] hover:bg-[#eef4fa] hover:text-[#0b1f3a]' />
             {breadcrumbs.length > 0 && (
               <>
-                <Separator orientation='vertical' className='mr-2 h-4' />
+                <Separator orientation='vertical' className='mr-2 h-4 bg-[#d6dee8]' />
                 <Breadcrumb>
-                  <BreadcrumbList>
+                  <BreadcrumbList className='text-[#64748b]'>
                     {breadcrumbs.map((breadcrumb, index) => (
                       <Fragment key={index}>
                         <BreadcrumbItem>
-                          <BreadcrumbLink href={breadcrumb.url}>{breadcrumb.title}</BreadcrumbLink>
+                          <BreadcrumbLink
+                            href={breadcrumb.url}
+                            className='font-medium hover:text-[#0b1f3a]'
+                          >
+                            {breadcrumb.title}
+                          </BreadcrumbLink>
                         </BreadcrumbItem>
                         {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
                       </Fragment>

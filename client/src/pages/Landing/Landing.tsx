@@ -3,6 +3,7 @@ import { CartographicBackground } from './CelestialBackground'
 import { ScrollTree } from './ScrollTree'
 import { motion, useScroll, useMotionValueEvent } from 'motion/react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Landing: React.FC = () => {
   const { scrollY } = useScroll()
@@ -69,8 +70,8 @@ const Landing: React.FC = () => {
               Documentation
             </a>
 
-            <button
-              onClick={() => scrollTo('home')}
+            <Link
+              to='/login'
               className='
       text-sm font-semibold px-4 py-1.5 rounded-sm
       bg-[#0b1f3a] text-white border border-[#0b1f3a]
@@ -79,7 +80,7 @@ const Landing: React.FC = () => {
     '
             >
               Login
-            </button>
+            </Link>
           </nav>
         </div>
       </motion.header>
@@ -131,9 +132,12 @@ const Landing: React.FC = () => {
             Upload your PDFs and let Atlas automatically structure the experiments, conditions, and
             results into a clean, queryable format.
           </p>
-          <button className='px-8 py-4 bg-[#0b1f3a] text-white rounded-sm font-semibold border border-[#0b1f3a] hover:bg-[#16375f] hover:border-[#16375f] transition-colors'>
+          <Link
+            to='/login'
+            className='inline-block px-8 py-4 bg-[#0b1f3a] text-white rounded-sm font-semibold border border-[#0b1f3a] hover:bg-[#16375f] hover:border-[#16375f] transition-colors'
+          >
             Get Started with Atlas
-          </button>
+          </Link>
         </motion.div>
       </section>
 
