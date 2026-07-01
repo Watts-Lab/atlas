@@ -6,14 +6,19 @@ All values are environment-driven so the same image runs in dev and prod.
 import os
 
 # Base URL of the Atlas REST API (versioned). Inside docker-compose the MCP
-# container reaches the backend over the internal network.
+# container reaches the backend over the internal network. For a local (stdio)
+# install this should point at the public API, e.g.
+# https://atlas.seas.upenn.edu/api/v1.
 ATLAS_API_URL: str = os.getenv("ATLAS_API_URL", "http://backend:8000/api/v1").rstrip(
     "/"
 )
 
-# Transport the server speaks. "http" (default) runs the hosted Streamable
-# HTTP server behind nginx. "stdio" runs the server locally on a user's own
-# machine (spawned by their MCP client), which enables local-file uploads.
+# Transport the server speaks:
+#   "http"  (default) — the hosted Streamable HTTP server behind nginx at /mcp.
+#                       The caller's API key arrives per-request in headers.
+#   "stdio"           — a local install spawned by the user's MCP client. This
+#                       enables uploading PDFs by local file path (the hosted
+#                       server cannot read the user's disk).
 MCP_TRANSPORT: str = os.getenv("MCP_TRANSPORT", "http").strip().lower()
 
 # Local (stdio) mode only: the user's Atlas API key, supplied via env by their
@@ -22,8 +27,8 @@ MCP_TRANSPORT: str = os.getenv("MCP_TRANSPORT", "http").strip().lower()
 ATLAS_API_KEY: str = os.getenv("ATLAS_API_KEY", "").strip()
 
 # Reading PDFs from the local filesystem is only safe when the server runs on
-# the user's own machine. Never enable it for the hosted HTTP deployment, or
-# tool calls could read arbitrary files off the server.
+# the user's own machine. Never enable it for the hosted HTTP deployment, or a
+# tool call could read arbitrary files off the server.
 ALLOW_LOCAL_FILES: bool = MCP_TRANSPORT == "stdio"
 
 # Where the MCP HTTP server binds.

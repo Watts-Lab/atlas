@@ -188,7 +188,9 @@ async def test_validate_success_sets_cookie_and_marks_link_used(client, monkeypa
         magic_link="valid-token",
         magic_link_expired=False,
         magic_link_expiration_date=datetime.now(UTC) + timedelta(hours=1),
-        number_of_tokens=5000,
+        monthly_usd_limit_micros=5_000_000,
+        monthly_usd_used_micros=0,
+        usage_period_start=None,
         updated_at=None,
     )
     saved = {}
@@ -202,7 +204,7 @@ async def test_validate_success_sets_cookie_and_marks_link_used(client, monkeypa
 
     assert response.status_code == 200
     assert response.json["message"] == "Magic link validated."
-    assert response.json["credits"] == 5000
+    assert response.json["usage"]["limit_usd"] == 5.0
     # Magic link is consumed (one-time use) and persisted.
     assert user.magic_link_expired is True
     assert saved.get("called") is True
@@ -215,7 +217,6 @@ async def test_validate_rejects_wrong_token(client, monkeypatch):
         magic_link="real-token",
         magic_link_expired=False,
         magic_link_expiration_date=datetime.now(UTC) + timedelta(hours=1),
-        number_of_tokens=1,
         updated_at=None,
     )
     user.save = lambda: None
@@ -242,7 +243,12 @@ async def test_check_valid_token(client, monkeypatch):
         "controllers.login.jwt.decode",
         lambda *args, **kwargs: {"email": "test@example.com"},
     )
-    user = SimpleNamespace(email="test@example.com", number_of_tokens=42)
+    user = SimpleNamespace(
+        email="test@example.com",
+        monthly_usd_limit_micros=3_000_000,
+        monthly_usd_used_micros=1_000_000,
+        usage_period_start=None,
+    )
     _install_user_model(monkeypatch, existing_user=user)
 
     _, response = await client.get(
@@ -251,7 +257,7 @@ async def test_check_valid_token(client, monkeypatch):
 
     assert response.status_code == 200
     assert response.json["loggedIn"] is True
-    assert response.json["credits"] == 42
+    assert response.json["usage"]["remaining_usd"] == 2.0
 
 
 async def test_check_invalid_token(client, monkeypatch):

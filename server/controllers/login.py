@@ -1,14 +1,14 @@
 """User login module that handles login via magic links."""
 
-from datetime import datetime, timedelta, timezone, UTC
-from json import JSONDecodeError
 import secrets
+from datetime import UTC, datetime, timedelta, timezone
+from json import JSONDecodeError
+
 import jwt
-
-from sanic import Request, Sanic, json as json_response
-
 from controllers.utils.email_client import send_magic_link, send_sdk_login
 from database.models.users import User
+from sanic import Request, Sanic
+from sanic import json as json_response
 
 
 async def login_user(email: str, is_sdk: bool = False):
@@ -52,7 +52,6 @@ async def login_user(email: str, is_sdk: bool = False):
             magic_link=secrets.token_urlsafe(64),
             magic_link_expired=False,
             magic_link_expiration_date=expiration_time,
-            number_of_tokens=5000,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
         )
@@ -126,10 +125,12 @@ async def validate_user(email: str, token: str):
                     user.magic_link_expired = True
                     user.save()  # Save the User asynchronously
 
+                    from services.llm_credentials import get_usage
+
                     response_data = {
                         "message": "Magic link validated.",
                         "email": email,
-                        "credits": user.number_of_tokens,
+                        "usage": get_usage(user),
                     }
 
                     jwt_token = jwt.encode(
@@ -185,11 +186,13 @@ async def validate_token(request: Request):
 
         if user:
             # Users local storage token is valid
+            from services.llm_credentials import get_usage
+
             response_data = {
                 "message": "Token is valid.",
                 "email": user.email,
                 "loggedIn": True,
-                "credits": user.number_of_tokens,
+                "usage": get_usage(user),
             }
             return json_response(body=response_data, status=200)
 

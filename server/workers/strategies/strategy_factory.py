@@ -2,8 +2,9 @@
 Strategy factory for creating extraction strategies.
 """
 
-from openai import OpenAI
+from typing import Optional
 
+from openai import OpenAI
 from workers.services.socket_emitter import SocketEmmiter
 from workers.strategies.anthropic_json_schema_strategy import (
     AnthropicJSONSchemaStrategy,
@@ -26,7 +27,12 @@ class ExtractionStrategyFactory:
 
     @classmethod
     def create_strategy(
-        cls, strategy_type: str, client: OpenAI, project_id: str, emitter: SocketEmmiter
+        cls,
+        strategy_type: str,
+        client: OpenAI,
+        project_id: str,
+        emitter: SocketEmmiter,
+        api_key: Optional[str] = None,
     ) -> ExtractionStrategy:
         """
         Create an extraction strategy based on the specified type.
@@ -34,9 +40,12 @@ class ExtractionStrategyFactory:
         Args:
             strategy_type: Type of strategy ('assistant_api', 'openai_json_schema',
                 or 'anthropic_json_schema')
-            client: OpenAI client
+            client: OpenAI client (already built from the resolved key)
             project_id: Project ID
             emitter: Socket emitter for progress updates
+            api_key: The resolved provider key. Passed to strategies (e.g. the
+                Anthropic strategy) that build their own provider client so they
+                use the same credential the caller resolved, never an env default.
 
         Returns:
             ExtractionStrategy instance
@@ -51,7 +60,7 @@ class ExtractionStrategyFactory:
                 f"Available strategies: {list(cls._strategies.keys())}"
             )
 
-        return strategy_class(client, project_id, emitter)
+        return strategy_class(client, project_id, emitter, api_key=api_key)
 
     @classmethod
     def get_available_strategies(cls) -> list[str]:

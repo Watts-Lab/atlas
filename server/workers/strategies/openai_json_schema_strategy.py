@@ -6,7 +6,7 @@ Uses the OpenAI Responses API with a strict JSON schema output format.
 
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from workers.strategies.extraction_strategy import ExtractionStrategy
 
@@ -87,6 +87,7 @@ class OpenAIJSONSchemaStrategy(ExtractionStrategy):
 
             return {
                 "result": result,
+                "model": self.MODEL,
                 "prompt_tokens": response.usage.input_tokens,
                 "completion_tokens": response.usage.output_tokens,
             }

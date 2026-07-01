@@ -13,14 +13,11 @@ from typing import Literal, Optional
 
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from . import config
-from .atlas_client import (
-    atlas_request,
-    atlas_upload,
-    decode_pdf_base64,
-    read_local_pdf,
-)
+from .atlas_client import atlas_request, atlas_upload, read_local_pdf
 
 # ---------------------------------------------------------------------------
 # Server instructions — the "mental model" handed to any connecting LLM.
@@ -53,10 +50,14 @@ Typical workflow:
 2. Curate the feature schema: `list_features` to browse, `add_project_features`
    / `remove_project_features` to choose what gets extracted, and
    `create_feature` for anything missing.
-3. `add_paper` to upload one of the user's PDFs into the project (by local
-   file path when the server runs on the user's machine, or base64 for small
-   files). This kicks off asynchronous extraction and returns a task id per
-   file.
+3. Add a PDF to the project. The available upload tool depends on how this
+   server is running (use whichever tool is present in your tool list):
+   - Local install: `add_paper` takes the PDF's path on the user's machine and
+     uploads it directly. Call it once per file to add several papers.
+   - Hosted server: `create_paper_upload` returns a presigned upload the client
+     completes itself (the server can't read the user's disk), then
+     `finalize_paper_upload` starts extraction.
+   Either way you get back a task id per paper.
 4. `wait_for_papers` to follow processing to completion with live progress, or
    `get_paper_status` to poll a single task yourself.
 5. `get_project_results` to read the extracted feature values, and
@@ -69,6 +70,18 @@ IDs — always obtain them from a list call.
 """
 
 mcp = FastMCP(name="Atlas", instructions=INSTRUCTIONS)
+
+
+# ---------------------------------------------------------------------------
+# Health check — a plain HTTP endpoint outside the MCP protocol so that load
+# balancers / ECS target-group health checks can probe the container without
+# speaking MCP. Served at the app root (a sibling of the mounted MCP path), so
+# it is reachable at e.g. http://<host>:9000/health.
+# ---------------------------------------------------------------------------
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(_request: Request) -> JSONResponse:
+    """Liveness probe: 200 OK when the MCP server process is up."""
+    return JSONResponse({"status": "ok"})
 
 
 # ---------------------------------------------------------------------------
@@ -259,58 +272,138 @@ async def remove_project_features(project_id: str, feature_ids: list[str]) -> di
 
 # ---------------------------------------------------------------------------
 # Papers: upload, processing, and progress
+#
+# The upload surface depends on the transport, and only the viable tool(s) are
+# registered so the model cannot pick a method that can't work in the current
+# mode:
+#
+#   * Local (stdio) install  -> `add_paper(file_path=...)`. The server runs on
+#     the user's machine and reads the PDF off disk directly. No shell/curl.
+#   * Hosted (http) server   -> `create_paper_upload` + `finalize_paper_upload`.
+#     The server can't see the user's disk, so the client uploads the bytes to
+#     a presigned URL itself (e.g. via curl).
 # ---------------------------------------------------------------------------
-@mcp.tool
-async def add_paper(
-    project_id: str,
-    file_path: Optional[str] = None,
-    file_base64: Optional[str] = None,
-    filename: Optional[str] = None,
-    strategy_type: str = "openai_json_schema",
-) -> dict:
-    """Upload one of the user's PDFs into a project and start asynchronous
-    feature extraction.
+if config.ALLOW_LOCAL_FILES:
 
-    This is the same upload the Atlas web app performs: the PDF is sent to Atlas
-    as a multipart/form-data upload and extraction runs in the background.
+    @mcp.tool
+    async def add_paper(
+        project_id: str,
+        file_path: str,
+        strategy_type: str = "openai_json_schema",
+    ) -> dict:
+        """Upload a local PDF into a project and start feature extraction.
 
-    Provide the PDF in exactly one of two ways:
-      * `file_path` (preferred): the path of a PDF on the user's machine, e.g.
-        "~/Downloads/smith2021.pdf". Available when the Atlas MCP server runs
-        locally (stdio transport). The file is read from disk and uploaded; it
-        never passes through the conversation.
-      * `file_base64`: the raw PDF bytes, base64-encoded. Only practical for
-        very small files, since tool arguments are JSON text.
+        This local server reads the PDF straight from the user's machine, so you
+        only need its path — no upload URLs or shell commands. To process
+        several papers, call this once per file.
 
-    Returns a mapping of filename to processing task id. Track progress with
-    `wait_for_papers` or `get_paper_status`, then read values with
-    `get_project_results`.
+        Args:
+            project_id: The id of the project to add the paper to.
+            file_path: Path to a PDF on the user's machine, e.g.
+                "/Users/me/papers/smith2020.pdf". Must be a real PDF within the
+                size limit.
+            strategy_type: Extraction strategy. One of "assistant_api",
+                "openai_json_schema", or "anthropic_json_schema". Defaults to
+                "openai_json_schema".
 
-    Args:
-        project_id: The id of the project to add the paper to.
-        file_path: Path to a PDF on the user's machine (local server only).
-        file_base64: The PDF file content, base64-encoded (small files only).
-        filename: Name to store the PDF under (should end in .pdf). Defaults to
-            the basename of `file_path`; required with `file_base64`.
-        strategy_type: Extraction strategy. One of "assistant_api",
-            "openai_json_schema", or "anthropic_json_schema". Defaults to
-            "openai_json_schema".
-    """
-    if bool(file_path) == bool(file_base64):
-        raise ToolError("Provide exactly one of 'file_path' or 'file_base64'.")
+        Returns a mapping of filename to processing task id. Track progress with
+        `wait_for_papers` or `get_paper_status`, then read values with
+        `get_project_results`.
+        """
+        filename, content = read_local_pdf(file_path)
+        return await atlas_upload(
+            "/assistant/add_paper",
+            files=[("files[]", (filename, content, "application/pdf"))],
+            data={"project_id": project_id, "strategy_type": strategy_type},
+        )
 
-    if file_path:
-        default_name, content = read_local_pdf(file_path)
-        filename = filename or default_name
-    else:
-        assert file_base64 is not None
-        if not filename:
-            raise ToolError("'filename' is required when using 'file_base64'.")
-        content = decode_pdf_base64(file_base64)
+else:
 
-    files = [("files[]", (filename, content, "application/pdf"))]
-    data = {"sid": "", "project_id": project_id, "strategy_type": strategy_type}
-    return await atlas_upload("/assistant/add_paper", files=files, data=data)
+    @mcp.tool
+    async def create_paper_upload(
+        project_id: str,
+        filename: str,
+        strategy_type: str = "openai_json_schema",
+    ) -> dict:
+        """Begin uploading a PDF: get a one-time URL to send the file to.
+
+        This hosted server cannot read the user's disk, so uploading a paper is
+        a three-step dance:
+
+          1. Call this tool to get a presigned `upload_url` and `upload_fields`
+             (plus an `upload_token`).
+          2. Upload the user's local PDF straight to `upload_url` with the shell,
+             using a multipart form POST. Send every key/value in `upload_fields`
+             as a form field, then the PDF as the `file` field (which MUST come
+             last), e.g.::
+
+                 curl -X POST "<upload_url>" \
+                      -F key=<upload_fields.key> \
+                      -F "Content-Type=application/pdf" \
+                      -F policy=<upload_fields.policy> \
+                      ... (one -F per entry in upload_fields) ... \
+                      -F "file=@/path/to/paper.pdf"
+
+             The file goes directly from the user's machine to storage; it never
+             passes through this conversation or the MCP server. Do not base64-
+             encode it. The upload must be a PDF and is size-limited (see
+             `max_bytes`); the server rejects non-PDF or oversized files.
+          3. Call `finalize_paper_upload` with the `upload_token` to start
+             extraction.
+
+        Args:
+            project_id: The id of the project the paper will be added to.
+            filename: Name to store the PDF under (should end in .pdf).
+            strategy_type: Extraction strategy. One of "assistant_api",
+                "openai_json_schema", or "anthropic_json_schema". Defaults to
+                "openai_json_schema".
+
+        Returns `upload_url`, `upload_fields` (form fields to include), the HTTP
+        `method` (POST), `upload_token`, `max_bytes`, and how long the URL is
+        valid (`expires_in` seconds).
+        """
+        return await atlas_request(
+            "POST",
+            "/assistant/upload_link",
+            json={
+                "filename": filename,
+                "project_id": project_id,
+                "strategy_type": strategy_type,
+            },
+        )
+
+    @mcp.tool
+    async def finalize_paper_upload(
+        upload_token: str,
+        project_id: str,
+        strategy_type: str = "openai_json_schema",
+    ) -> dict:
+        """Finish a PDF upload and start asynchronous feature extraction.
+
+        Call this only after `create_paper_upload` and after the file has been
+        successfully uploaded (POST) to the presigned URL. It verifies the file
+        arrived in storage (correct size, real PDF) and kicks off extraction.
+
+        Returns a mapping of filename to processing task id. Track progress with
+        `wait_for_papers` or `get_paper_status`, then read values with
+        `get_project_results`.
+
+        Args:
+            upload_token: The `upload_token` returned by `create_paper_upload`.
+            project_id: The id of the project to add the paper to.
+            strategy_type: Extraction strategy. Should match what you passed to
+                `create_paper_upload`. Defaults to "openai_json_schema".
+        """
+        return await atlas_request(
+            "POST",
+            "/assistant/upload_complete",
+            json={
+                "upload_token": upload_token,
+                "project_id": project_id,
+                "strategy_type": strategy_type,
+                "sid": "",
+            },
+        )
 
 
 @mcp.tool
@@ -428,11 +521,11 @@ async def reprocess_project(
 def main() -> None:
     """Start the MCP server on the configured transport.
 
-    * ``MCP_TRANSPORT=http`` (default): hosted Streamable HTTP server behind
-      nginx; the caller's API key arrives in request headers.
-    * ``MCP_TRANSPORT=stdio``: local install spawned by the user's MCP client;
-      the API key comes from the ``ATLAS_API_KEY`` env var and local PDF
-      uploads via ``file_path`` are enabled.
+    * ``MCP_TRANSPORT=http`` (default): the hosted Streamable HTTP server behind
+      nginx; the caller's API key arrives per-request in headers.
+    * ``MCP_TRANSPORT=stdio``: a local install spawned by the user's MCP client;
+      the API key comes from the ``ATLAS_API_KEY`` env var and local PDF uploads
+      via ``add_paper(file_path=...)`` are enabled.
     """
     if config.MCP_TRANSPORT == "stdio":
         mcp.run(transport="stdio")

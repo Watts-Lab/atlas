@@ -6,21 +6,28 @@ import hashlib
 import logging
 import os
 import tempfile
-from typing import Optional, Tuple
-from datetime import datetime
 import time
+from datetime import datetime
+from typing import Optional, Tuple
 
 import boto3
-from botocore.exceptions import ClientError
 import redis
-from pymongo.errors import DuplicateKeyError
-
+from botocore.exceptions import ClientError
 from database.models.papers import Paper
 from database.models.users import User
-from workers.celery_config import AWS_S3_BUCKET, AWS_REGION, AWS_S3_KEY, AWS_S3_SECRET
-
+from pymongo.errors import DuplicateKeyError
+from workers.celery_config import AWS_REGION, AWS_S3_BUCKET, AWS_S3_KEY, AWS_S3_SECRET
 
 logger = logging.getLogger(__name__)
+
+# Maximum size (bytes) accepted for a directly-uploaded paper PDF. Mirrors the
+# nginx `client_max_body_size` used for uploads that pass through the API, since
+# presigned uploads go straight to S3 and never touch nginx. Override with the
+# MAX_UPLOAD_BYTES env var if needed.
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
+
+# PDF magic number: every valid PDF begins with these bytes ("%PDF-").
+_PDF_MAGIC = b"%PDF-"
 
 
 class FileService:
@@ -178,6 +185,87 @@ class FileService:
             # Always release the lock if we acquired it
             if lock_acquired:
                 self.release_upload_lock(file_hash)
+
+    def generate_presigned_put(self, s3_key: str, expires_in: int = 3600) -> str:
+        """Return a presigned URL the client can PUT a file to directly.
+
+        Note: a presigned PUT cannot enforce a size limit or content type — use
+        :meth:`generate_presigned_post` for uploads that must be bounded.
+        """
+        try:
+            return self.s3_client.generate_presigned_url(
+                "put_object",
+                Params={"Bucket": self.bucket_name, "Key": s3_key},
+                ExpiresIn=expires_in,
+            )
+        except ClientError as e:
+            logger.error("Failed to presign upload URL: %s", e)
+            raise
+
+    def generate_presigned_post(
+        self,
+        s3_key: str,
+        expires_in: int = 3600,
+        max_bytes: int = MAX_UPLOAD_BYTES,
+        content_type: str = "application/pdf",
+    ) -> dict:
+        """Return a presigned POST (url + form fields) for a bounded direct upload.
+
+        Unlike a presigned PUT, a presigned POST supports policy *conditions*
+        that S3 enforces at upload time. We use:
+
+        * ``content-length-range`` — S3 rejects uploads larger than ``max_bytes``
+          (and empty ones), so a client cannot push a 50GB file straight to S3.
+        * a fixed ``Content-Type`` — declared type must match (this is a weak
+          check since it can be spoofed; the actual PDF magic bytes are verified
+          server-side at finalize).
+
+        The returned dict has ``url`` and ``fields``; the client must send every
+        field plus the file (as the ``file`` part) in a multipart/form-data POST.
+        """
+        try:
+            return self.s3_client.generate_presigned_post(
+                Bucket=self.bucket_name,
+                Key=s3_key,
+                Fields={"Content-Type": content_type},
+                Conditions=[
+                    {"Content-Type": content_type},
+                    ["content-length-range", 1, max_bytes],
+                ],
+                ExpiresIn=expires_in,
+            )
+        except ClientError as e:
+            logger.error("Failed to presign upload POST: %s", e)
+            raise
+
+    def head_object_size(self, s3_key: str) -> Optional[int]:
+        """Return the size in bytes of an S3 object, or None if it is missing."""
+        try:
+            resp = self.s3_client.head_object(Bucket=self.bucket_name, Key=s3_key)
+            return int(resp["ContentLength"])
+        except ClientError as e:
+            if e.response["Error"]["Code"] in ("404", "NoSuchKey", "NotFound"):
+                return None
+            raise
+
+    def looks_like_pdf(self, s3_key: str) -> bool:
+        """Return True if the S3 object starts with the PDF magic bytes.
+
+        Reads only the first few bytes (HTTP Range request) so it is cheap even
+        for large objects. Content-Type headers can be spoofed; the leading
+        ``%PDF-`` signature is the reliable check that the bytes are really a PDF.
+        """
+        try:
+            resp = self.s3_client.get_object(
+                Bucket=self.bucket_name,
+                Key=s3_key,
+                Range=f"bytes=0-{len(_PDF_MAGIC) - 1}",
+            )
+            head = resp["Body"].read(len(_PDF_MAGIC))
+            return head.startswith(_PDF_MAGIC)
+        except ClientError as e:
+            logger.error("Failed to read object header for %s: %s", s3_key, e)
+            return False
 
     def check_s3_exists(self, s3_key: str) -> bool:
         """Check if an object exists in S3."""

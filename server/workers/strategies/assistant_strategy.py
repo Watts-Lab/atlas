@@ -3,22 +3,21 @@ Assistant API Strategy for Feature Extraction
 """
 
 import json
-import time
 import logging
-from typing import Dict, Any, Optional
+import time
+from typing import Any, Dict, Optional
 
 from gpt_assistant import (
-    build_parent_objects,
-    enforce_additional_properties,
-    get_all_features,
     build_openai_feature_functions,
-    upload_file_to_vector_store,
-    update_assistant,
+    build_parent_objects,
     check_output_format,
     create_temporary_assistant,
+    enforce_additional_properties,
+    get_all_features,
+    update_assistant,
+    upload_file_to_vector_store,
 )
 from workers.strategies.extraction_strategy import ExtractionStrategy
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,13 +25,17 @@ logger = logging.getLogger(__name__)
 class AssistantAPIStrategy(ExtractionStrategy):
     """Strategy for extracting features using OpenAI Assistant API."""
 
+    # The temporary assistant is created with this model (see
+    # gpt_assistant.create_temporary_assistant). Kept here so metering can price
+    # the call; keep the two in sync.
+    MODEL = "gpt-4.1"
+
     def get_strategy_name(self) -> str:
         return "assistant_api"
 
     def extract(
         self,
         file_path: str,
-        temperature: float = 0.7,
         custom_prompt: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Extract features using Assistant API with function calling."""
@@ -59,9 +62,7 @@ class AssistantAPIStrategy(ExtractionStrategy):
 
             self.emitter.emit_status(message="Creating assistant...", progress=15)
 
-            assistant = create_temporary_assistant(
-                self.client, temperature, custom_prompt
-            )
+            assistant = create_temporary_assistant(self.client, custom_prompt)
 
             schema = self._build_json_schema(feature_list, feature_obj)
 
@@ -124,6 +125,7 @@ class AssistantAPIStrategy(ExtractionStrategy):
 
             return {
                 "result": tool_outputs,
+                "model": self.MODEL,
                 "prompt_tokens": run.usage.prompt_tokens if run.usage else 0,
                 "completion_tokens": run.usage.completion_tokens if run.usage else 0,
             }

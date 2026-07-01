@@ -15,9 +15,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Usage = {
-  limit: number
-  used: number
-  remaining: number
+  currency: string
+  limit_usd: number
+  used_usd: number
+  remaining_usd: number
   period_start: string
   has_openai_key: boolean
   has_anthropic_key: boolean
@@ -45,7 +46,10 @@ const BREADCRUMBS = [
   { title: 'Usage & Keys', url: '/settings/usage' },
 ]
 
-const PROVIDER_META: Record<Provider, { label: string; icon: typeof Sparkles; placeholder: string }> = {
+const PROVIDER_META: Record<
+  Provider,
+  { label: string; icon: typeof Sparkles; placeholder: string }
+> = {
   openai: { label: 'OpenAI', icon: Sparkles, placeholder: 'sk-...' },
   anthropic: { label: 'Anthropic', icon: Bot, placeholder: 'sk-ant-...' },
 }
@@ -138,7 +142,10 @@ export default function UsagePage() {
 
   const usage = settings?.usage
   const usedPct =
-    usage && usage.limit > 0 ? Math.min(100, Math.round((usage.used / usage.limit) * 100)) : 0
+    usage && usage.limit_usd > 0
+      ? Math.min(100, Math.round((usage.used_usd / usage.limit_usd) * 100))
+      : 0
+  const fmtUsd = (n: number) => n.toLocaleString(undefined, { style: 'currency', currency: 'USD' })
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
@@ -149,8 +156,8 @@ export default function UsagePage() {
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>Usage & API Keys</h1>
           <p className='text-sm text-muted-foreground mt-1'>
-            Track your monthly token usage, or bring your own OpenAI / Anthropic key to run
-            extractions without consuming your Atlas budget.
+            Track your monthly usage, or bring your own OpenAI / Anthropic key to run extractions
+            without consuming your Atlas budget.
           </p>
         </div>
 
@@ -169,11 +176,9 @@ export default function UsagePage() {
             <div className='mt-4 space-y-3'>
               <div className='flex items-baseline justify-between'>
                 <span className='text-sm text-muted-foreground'>
-                  {usage.used.toLocaleString()} / {usage.limit.toLocaleString()} tokens used
+                  {fmtUsd(usage.used_usd)} / {fmtUsd(usage.limit_usd)} used
                 </span>
-                <span className='text-sm font-medium'>
-                  {usage.remaining.toLocaleString()} remaining
-                </span>
+                <span className='text-sm font-medium'>{fmtUsd(usage.remaining_usd)} remaining</span>
               </div>
               <div className='h-2.5 w-full rounded-full bg-muted overflow-hidden'>
                 <div
@@ -182,8 +187,8 @@ export default function UsagePage() {
                 />
               </div>
               <p className='text-xs text-muted-foreground'>
-                Resets on {resetDateLabel(usage.period_start)}. Extractions using your own
-                provider key do not count toward this limit.
+                Resets on {resetDateLabel(usage.period_start)}. Extractions using your own provider
+                key do not count toward this limit.
               </p>
             </div>
           )}
@@ -193,8 +198,8 @@ export default function UsagePage() {
         <section className='rounded-lg border p-5'>
           <h2 className='text-lg font-semibold'>Your provider keys</h2>
           <p className='text-sm text-muted-foreground mt-1'>
-            When a key is set, your extractions use it directly and are billed by the provider —
-            not against your Atlas budget. Keys are encrypted and never shown again after saving.
+            When a key is set, your extractions use it directly and are billed by the provider — not
+            against your Atlas budget. Keys are encrypted and never shown again after saving.
           </p>
 
           <div className='mt-5 space-y-6'>
@@ -257,7 +262,8 @@ export default function UsagePage() {
             })}
           </div>
 
-          {!isLoading && !settings?.provider_keys?.openai.configured &&
+          {!isLoading &&
+            !settings?.provider_keys?.openai.configured &&
             !settings?.provider_keys?.anthropic.configured && (
               <div className='mt-6 flex items-center gap-2 text-xs text-muted-foreground'>
                 <KeyRound className='h-3.5 w-3.5' />

@@ -109,6 +109,9 @@ services:
       - .env
     environment:
       - PYTHON_ENV=development
+      # Pin http so a stray MCP_TRANSPORT in .env can't switch the hosted
+      # container into local stdio mode (which enables local file access).
+      - MCP_TRANSPORT=http
       - ATLAS_API_URL=http://backend:8000/api/v1
       - MCP_HOST=0.0.0.0
       - MCP_PORT=9000

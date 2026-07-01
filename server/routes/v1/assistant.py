@@ -4,6 +4,8 @@ This module contains the routes for the assistant API.
 
 from controllers.assisstant import (
     add_paper_to_project_controller,
+    create_paper_upload_controller,
+    finalize_paper_upload_controller,
     get_paper_task_status_controller,
     reprocess_paper_controller,
     reprocess_project_controller,
@@ -44,6 +46,45 @@ async def add_paper(request: Request):
         task_id = request.args.get("task_id")
         result = get_paper_task_status_controller(task_id)
         return json_response(result)
+
+
+@assistant_bp.route("/upload_link", methods=["POST"], name="create_paper_upload")
+@docs.create_paper_upload
+@require_jwt
+@error_handler
+async def create_paper_upload(request: Request):
+    """Issue a presigned URL for uploading a PDF directly to storage."""
+    user = request.ctx.user
+    data = request.json or {}
+    filename = data.get("filename")
+    project_id = data.get("project_id")
+    strategy_type = data.get("strategy_type", "assistant_api")
+
+    result = create_paper_upload_controller(user, filename, project_id, strategy_type)
+    if "error" in result:
+        return json_response(result, status=result.pop("status", 400))
+    return json_response(result)
+
+
+@assistant_bp.route("/upload_complete", methods=["POST"], name="finalize_paper_upload")
+@docs.finalize_paper_upload
+@require_jwt
+@error_handler
+async def finalize_paper_upload(request: Request):
+    """Start extraction for a paper uploaded via a presigned URL."""
+    user = request.ctx.user
+    data = request.json or {}
+    upload_token = data.get("upload_token")
+    project_id = data.get("project_id")
+    strategy_type = data.get("strategy_type", "assistant_api")
+    socket_id = data.get("sid")
+
+    result = finalize_paper_upload_controller(
+        user, upload_token, project_id, strategy_type, socket_id
+    )
+    if "error" in result:
+        return json_response(result, status=result.pop("status", 400))
+    return json_response(result)
 
 
 @assistant_bp.route(

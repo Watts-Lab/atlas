@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import MainPage from '@/components/View/DataGrid/MainPage'
 import ProjectsTable from '@/components/View/DataGrid/ProjectsTable'
 import PapersTable from '@/components/View/DataGrid/PapersTable'
@@ -9,10 +10,23 @@ import { Activity, Coins, Layers } from 'lucide-react'
 const Overview = () => {
   const { projects, papers, isLoadingProjects, isLoadingPapers, refetchProjects } =
     useOverviewData(50)
-  const { user } = useUser()
+  const { user, refreshUser } = useUser()
+
+  // Refresh usage figures on mount so the dashboard reflects tokens consumed
+  // since login (the numbers otherwise only update at login time).
+  useEffect(() => {
+    refreshUser()
+  }, [refreshUser])
   const runningJobs = projects
     .map((project) => project.results.filter((result) => !result.finished).length)
     .reduce((a, b) => a + b, 0)
+
+  // Live monthly-usage figures (USD) from the metering system; fall back to a
+  // dash while it loads.
+  const usage = user.usage
+  const fmtUsd = (n: number) => n.toLocaleString(undefined, { style: 'currency', currency: 'USD' })
+  const creditValue = usage ? fmtUsd(usage.remaining_usd) : '—'
+  const creditDetail = usage ? `of ${fmtUsd(usage.limit_usd)} left` : 'remaining'
 
   const stats = [
     {
@@ -28,9 +42,9 @@ const Overview = () => {
       icon: Layers,
     },
     {
-      title: 'Available credit',
-      value: user.credits,
-      detail: 'tokens',
+      title: 'Monthly usage',
+      value: creditValue,
+      detail: creditDetail,
       icon: Coins,
     },
   ]

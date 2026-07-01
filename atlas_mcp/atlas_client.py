@@ -5,8 +5,6 @@ and forwarded to the Atlas API as ``X-API-Key``. We never store the key; it
 lives only for the duration of a single forwarded request.
 """
 
-import base64
-import binascii
 from pathlib import Path
 from typing import Any, Optional
 
@@ -24,8 +22,8 @@ def _extract_api_key() -> str:
       * ``Authorization: Bearer atlas_...``  (MCP-idiomatic), or
       * ``X-API-Key: atlas_...``             (direct).
 
-    Stdio transport (local install): there are no HTTP headers, so fall back
-    to the ``ATLAS_API_KEY`` environment variable set in the MCP client config.
+    Stdio transport (local install): there are no HTTP headers, so fall back to
+    the ``ATLAS_API_KEY`` environment variable set in the MCP client config.
     """
     # include_all=True so the Authorization header is not filtered out.
     headers = get_http_headers(include_all=True)
@@ -118,6 +116,9 @@ async def atlas_upload(
 ) -> Any:
     """Forward a multipart/form-data POST (file upload) to the Atlas API.
 
+    Used only by the local (stdio) server, where a tool can read a PDF off the
+    user's disk and stream it to the API directly — no presigned URL or curl.
+
     Args:
         path: API path beneath the versioned base URL (e.g. ``/assistant/add_paper``).
         files: httpx-style file tuples, ``(field_name, (filename, content, mime))``.
@@ -141,17 +142,18 @@ async def atlas_upload(
 
 
 def read_local_pdf(file_path: str) -> tuple[str, bytes]:
-    """Read a PDF from the user's local filesystem (stdio transport only).
+    """Read and validate a PDF from the user's local filesystem (stdio only).
 
     Returns ``(filename, content)``. Refuses to run on the hosted HTTP server,
-    where "local" would mean the server's own filesystem.
+    where "local" would mean the server's own filesystem — a security boundary.
+    Enforces the same size cap and PDF magic-byte check the API applies.
     """
     if not config.ALLOW_LOCAL_FILES:
         raise ToolError(
             "Local file uploads are only available when the Atlas MCP server "
-            "runs on your own machine (stdio transport). Install it locally "
-            "and configure your MCP client to launch it with "
-            "MCP_TRANSPORT=stdio and your ATLAS_API_KEY."
+            "runs on your own machine (stdio transport). Install it locally and "
+            "configure your MCP client to launch it with MCP_TRANSPORT=stdio and "
+            "your ATLAS_API_KEY. On the hosted server, use create_paper_upload."
         )
 
     path = Path(file_path).expanduser()
@@ -162,7 +164,8 @@ def read_local_pdf(file_path: str) -> tuple[str, bytes]:
     if size == 0:
         raise ToolError(f"The file at '{file_path}' is empty.")
     if size > config.ATLAS_MAX_UPLOAD_BYTES:
-        raise ToolError(f"File exceeds the {config.ATLAS_MAX_UPLOAD_BYTES}-byte limit.")
+        limit_mb = config.ATLAS_MAX_UPLOAD_BYTES // (1024 * 1024)
+        raise ToolError(f"File exceeds the {limit_mb}MB limit.")
 
     content = path.read_bytes()
     if not content.startswith(b"%PDF"):
@@ -170,22 +173,3 @@ def read_local_pdf(file_path: str) -> tuple[str, bytes]:
             f"The file at '{file_path}' does not look like a PDF (missing %PDF header)."
         )
     return path.name, content
-
-
-def decode_pdf_base64(file_base64: str) -> bytes:
-    """Decode base64 PDF content sent through a tool call into raw bytes.
-
-    MCP tool arguments are JSON, so binary files arrive base64-encoded. This
-    decodes them and enforces the ``ATLAS_MAX_UPLOAD_BYTES`` size cap before the
-    bytes are forwarded to Atlas as a multipart upload.
-    """
-    try:
-        content = base64.b64decode(file_base64, validate=True)
-    except (binascii.Error, ValueError) as exc:
-        raise ToolError(f"Could not decode 'file_base64': {exc}") from exc
-
-    if not content:
-        raise ToolError("'file_base64' decoded to an empty file.")
-    if len(content) > config.ATLAS_MAX_UPLOAD_BYTES:
-        raise ToolError(f"File exceeds the {config.ATLAS_MAX_UPLOAD_BYTES}-byte limit.")
-    return content

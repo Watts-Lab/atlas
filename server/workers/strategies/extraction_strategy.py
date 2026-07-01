@@ -4,9 +4,7 @@ Extraction strategy abstract base class.
 
 import base64
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, List
-
-from openai import OpenAI
+from typing import Any, Dict, List, Optional
 
 from database.models.projects import Project
 from gpt_assistant import (
@@ -15,6 +13,7 @@ from gpt_assistant import (
     get_all_features,
     get_features_by_ids,
 )
+from openai import OpenAI
 from workers.services.socket_emitter import SocketEmmiter
 
 
@@ -22,17 +21,24 @@ class ExtractionStrategy(ABC):
     """Abstract base class for different extraction strategies."""
 
     def __init__(
-        self, client: OpenAI, project_id: Optional[str], emitter: SocketEmmiter
+        self,
+        client: OpenAI,
+        project_id: Optional[str],
+        emitter: SocketEmmiter,
+        api_key: Optional[str] = None,
     ):
         self.client = client
         self.project_id = project_id
         self.emitter = emitter
+        # The resolved provider key. Strategies that build their own provider
+        # client (e.g. Anthropic) must use this rather than an env default so
+        # bring-your-own keys and metering stay consistent.
+        self.api_key = api_key
 
     @abstractmethod
     def extract(
         self,
         file_path: str,
-        temperature: float = 0.7,
         custom_prompt: Optional[str] = None,
         feature_ids: Optional[List[str]] = None,
     ) -> Dict[str, Any]:

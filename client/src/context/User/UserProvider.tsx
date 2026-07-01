@@ -1,10 +1,20 @@
 import React, { createContext, useCallback, useState } from 'react'
 import api from '@/service/api'
 
+export type Usage = {
+  currency: string
+  limit_usd: number
+  used_usd: number
+  remaining_usd: number
+  period_start: string
+  has_openai_key: boolean
+  has_anthropic_key: boolean
+}
+
 export type UserDetails = {
   loggedIn: boolean
   email: string | null
-  credits: number
+  usage: Usage | null
 }
 
 export interface UserContextType {
@@ -18,7 +28,7 @@ export interface UserContextType {
 const initialUser: UserDetails = {
   loggedIn: false,
   email: null,
-  credits: 0,
+  usage: null,
 }
 
 export const UserContext = createContext<UserContextType>({
@@ -39,7 +49,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser({
           loggedIn: true,
           email: data.email,
-          credits: data.credits,
+          usage: data.usage ?? null,
         })
         return data
       } else {

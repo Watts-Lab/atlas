@@ -16,12 +16,21 @@ RUN adduser --disabled-password --gecos "" mcpuser \
     && chown -R mcpuser:mcpuser /app
 USER mcpuser
 
+# MCP_TRANSPORT is pinned to http: this image is the hosted deployment. stdio
+# mode is for local installs only and enables reading the local filesystem, so
+# it must never be the default for the server container.
 ENV PYTHON_ENV=production \
+    MCP_TRANSPORT=http \
     MCP_HOST=0.0.0.0 \
     MCP_PORT=9000 \
     MCP_PATH=/mcp \
     ATLAS_API_URL=http://backend:8000/api/v1
 
 EXPOSE 9000
+
+# Container-level health check. Uses Python (no curl in the slim image) to hit
+# the plain-HTTP /health route the server exposes alongside the MCP endpoint.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD python -c "import urllib.request,os,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:'+os.getenv('MCP_PORT','9000')+'/health', timeout=4).status==200 else 1)" || exit 1
 
 CMD ["python", "-m", "atlas_mcp.server"]

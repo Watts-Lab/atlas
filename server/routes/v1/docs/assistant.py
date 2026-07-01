@@ -80,15 +80,19 @@ __getattr__ = make_getattr(
             ],
         ),
         "create_paper_upload": Endpoint(
-            summary="Get a presigned URL to upload a PDF",
+            summary="Get a presigned upload for a PDF",
             description=(
                 "Step 1 of the presigned upload flow. Returns a one-time presigned "
-                "URL and an `upload_token`. Upload the PDF bytes directly to the "
-                "URL with an HTTP `PUT` (e.g. `curl -X PUT -H 'Content-Type: "
-                "application/pdf' --data-binary @paper.pdf '<upload_url>'`), then "
-                "call `upload_complete` with the `upload_token` to start "
-                "extraction. The bytes go straight to storage and never pass "
-                "through this API."
+                "**POST** (`upload_url` + `upload_fields`) and an `upload_token`. "
+                "Upload the PDF directly to storage with a multipart form POST: "
+                "send every entry in `upload_fields` as a form field, then the PDF "
+                "as the `file` field last (e.g. `curl -X POST <upload_url> -F "
+                "key=... -F policy=... -F file=@paper.pdf`), then call "
+                "`upload_complete` with the `upload_token`.\n\n"
+                "The upload is size-limited by S3 to `max_bytes` (the same cap as "
+                "API uploads) and must be a real PDF — `upload_complete` verifies "
+                "the PDF signature and rejects non-PDF or oversized files. The "
+                "bytes go straight to storage and never pass through this API."
             ),
             body=json_body(
                 {
@@ -112,7 +116,10 @@ __getattr__ = make_getattr(
                         obj(
                             {
                                 "upload_url": {"type": "string"},
+                                "upload_fields": {"type": "object"},
                                 "upload_token": {"type": "string"},
+                                "method": {"type": "string"},
+                                "max_bytes": {"type": "integer"},
                             }
                         )
                     ),
@@ -123,9 +130,12 @@ __getattr__ = make_getattr(
         "finalize_paper_upload": Endpoint(
             summary="Start extraction for a presigned-uploaded PDF",
             description=(
-                "Step 3 of the presigned upload flow. After `PUT`-ing the PDF to "
-                "the presigned URL, call this with the `upload_token` from "
-                "`upload_link` to begin feature extraction. Returns a `task_id`."
+                "Step 3 of the presigned upload flow. After POSTing the PDF to the "
+                "presigned upload, call this with the `upload_token` from "
+                "`upload_link` to begin feature extraction. Verifies the uploaded "
+                "object exists, is within the size limit, and is a real PDF (by "
+                "its magic bytes) before enqueuing — rejecting and deleting it "
+                "otherwise. Returns a `task_id`."
             ),
             body=json_body(
                 {
@@ -148,7 +158,11 @@ __getattr__ = make_getattr(
                     "Extraction started.",
                     json_content(obj({"task_id": {"type": "string"}})),
                 ),
-                response("400", "Missing or invalid upload token."),
+                response(
+                    "400",
+                    "Missing/invalid token, file not uploaded, oversized, or not a PDF.",
+                ),
+                response("403", "Token is outside the caller's upload area."),
             ],
         ),
         "reprocess_paper": Endpoint(

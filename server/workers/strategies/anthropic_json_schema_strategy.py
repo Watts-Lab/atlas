@@ -6,10 +6,9 @@ Uses the Anthropic Messages API with a strict JSON schema output format.
 
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 import anthropic
-
 from workers.strategies.extraction_strategy import ExtractionStrategy
 
 logger = logging.getLogger(__name__)
@@ -21,10 +20,14 @@ class AnthropicJSONSchemaStrategy(ExtractionStrategy):
     MODEL = "claude-opus-4-8"
     MAX_TOKENS = 16000
 
-    def __init__(self, client, project_id, emitter):
-        super().__init__(client, project_id, emitter)
-        # This strategy talks to Anthropic, not OpenAI; use a dedicated client.
-        self.anthropic_client = anthropic.Anthropic()
+    def __init__(self, client, project_id, emitter, api_key=None):
+        super().__init__(client, project_id, emitter, api_key=api_key)
+        # This strategy talks to Anthropic, not OpenAI; use a dedicated client
+        # built from the resolved key (the user's BYO key or the platform key).
+        # Falls back to the SDK's env default only if no key was resolved.
+        self.anthropic_client = (
+            anthropic.Anthropic(api_key=api_key) if api_key else anthropic.Anthropic()
+        )
 
     def get_strategy_name(self) -> str:
         return "anthropic_json_schema"
@@ -32,7 +35,6 @@ class AnthropicJSONSchemaStrategy(ExtractionStrategy):
     def extract(
         self,
         file_path: str,
-        temperature: float = 0.7,
         custom_prompt: Optional[str] = None,
         feature_ids: Optional[list[str]] = None,
         silent: bool = False,
@@ -94,6 +96,7 @@ class AnthropicJSONSchemaStrategy(ExtractionStrategy):
 
             return {
                 "result": result,
+                "model": self.MODEL,
                 "prompt_tokens": response.usage.input_tokens,
                 "completion_tokens": response.usage.output_tokens,
             }

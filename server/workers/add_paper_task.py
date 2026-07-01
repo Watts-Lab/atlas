@@ -4,23 +4,22 @@ This module processes uploaded papers, triggering the assistant API.
 It uses Celery for asynchronous execution and emits socket updates.
 """
 
-from datetime import datetime
 import logging
 import os
+from datetime import datetime
 from typing import Optional, Tuple
-from celery import Task
 
+from celery import Task
 from controllers.assisstant import run_assistant_api
 from database.models.papers import Paper
-
 from database.models.project_paper_result import ProjectPaperResult
 from database.models.projects import Project
 from database.models.results import Result
 from database.models.users import User
+from services.llm_credentials import BudgetExceededError, MissingPlatformKeyError
 from workers.celery_config import celery
 from workers.services.file_s3_service import FileService
 from workers.services.socket_emitter import SocketEmmiter
-
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,10 @@ class BaseTaskWithCleanup(Task):
         try:
             result_obj = Result.find_one(Result.task_id == task_id).run()
             if not result_obj:
-                logger.info("No result record to update for task_id: %s (likely project-less upload)", task_id)
+                logger.info(
+                    "No result record to update for task_id: %s (likely project-less upload)",
+                    task_id,
+                )
                 return
             if extra_data:
                 result_obj.json_response = extra_data.get(
@@ -125,6 +127,24 @@ class BaseTaskWithCleanup(Task):
             logger.info("Removed temp file: %s", temp_file_path)
 
         super().after_return(status, retval, task_id, args, kwargs, einfo)
+
+
+def _is_successful_result(result: Result) -> bool:
+    """Return True if *result* holds a completed, non-error extraction.
+
+    Used as an idempotency guard on retries: a result that already finished with
+    a real ``json_response`` (not a failure marker) means the paid LLM call
+    already happened and must not be repeated/re-metered.
+    """
+    if not result or not getattr(result, "finished", False):
+        return False
+    response = getattr(result, "json_response", None)
+    if not response or not isinstance(response, dict):
+        return False
+    # Failure records are stored as finished results with an "error" marker.
+    if response.get("paper") == "failed" or "error" in response:
+        return False
+    return True
 
 
 def create_result_record(
@@ -231,6 +251,7 @@ def add_paper(
     strategy_type: str = "assistant_api",
     original_filename: Optional[str] = None,
     paper_id: Optional[str] = None,  # For reprocessing existing papers
+    staged_s3_key: Optional[str] = None,  # For curl/presigned uploads
 ):
     """
     Process the uploaded paper with S3 integration and run the assistant API.
@@ -249,7 +270,7 @@ def add_paper(
         # Get user and project
         user = User.find_one(User.email == user_email).run()
         version = 1
-        
+
         current_project = None
         if project_id and project_id.strip():
             try:
@@ -265,11 +286,39 @@ def add_paper(
             original_filename = os.path.basename(file_path)
 
         # Check if this is a retry by looking for existing result with this task_id
-        existing_result = Result.find_one(Result.task_id == task_id).run()
+        existing_result = Result.find_one(
+            Result.task_id == task_id, fetch_links=True
+        ).run()
         if existing_result:
             # This is a retry, use the existing result object
             result_obj = existing_result
             logger.info("Using existing result for retry of task %s", task_id)
+
+            # Idempotency guard: if a previous attempt already completed the
+            # (paid) extraction successfully, do NOT call the LLM again. This
+            # prevents charging the user twice when a retry is triggered by a
+            # failure that happened *after* extraction (e.g. a save error).
+            if _is_successful_result(existing_result):
+                logger.info(
+                    "Task %s already has a completed extraction; skipping re-run.",
+                    task_id,
+                )
+                emitter.emit_status(
+                    message="Paper already processed", progress=100, done=True
+                )
+                completed_paper = existing_result.paper
+                return {
+                    "status": "success",
+                    "file_name": original_filename,
+                    "experiments": existing_result.json_response,
+                    "paper_id": (str(completed_paper.id) if completed_paper else None),
+                    "result_id": str(existing_result.id),
+                    "version": getattr(existing_result, "version", 1),
+                    "cached": True,
+                    "project_id": (
+                        str(current_project.id) if current_project else None
+                    ),
+                }
         else:
             # New task, proceed with normal flow
             # Handle paper - either existing or new
@@ -287,11 +336,37 @@ def add_paper(
                 processing_file_path = temp_file_path
                 is_new_paper = False
             else:
-                # New paper upload - get or create with concurrency handling
+                # New paper upload. The bytes may already be staged in S3 (the
+                # presigned "upload by curl" flow) — if so, pull them down to a
+                # temp file first so the normal hash/dedup path can run.
+                if staged_s3_key:
+                    emitter.emit_status(
+                        message="Retrieving uploaded paper...", progress=5
+                    )
+                    temp_file_path = self.file_service.download_from_s3(staged_s3_key)
+                    processing_file_path = temp_file_path
+                    file_path = temp_file_path
+                    if not original_filename:
+                        original_filename = os.path.basename(staged_s3_key)
+
                 emitter.emit_status(message="Processing uploaded paper...", progress=5)
                 paper, is_new_paper = self.file_service.get_or_create_paper(
-                    file_path=file_path, user=user, original_filename=original_filename
+                    file_path=processing_file_path,
+                    user=user,
+                    original_filename=original_filename,
                 )
+
+                # The staged object was a temporary holding spot; the canonical
+                # copy now lives under the hashed key from get_or_create_paper.
+                if staged_s3_key:
+                    try:
+                        self.file_service.s3_client.delete_object(
+                            Bucket=self.file_service.bucket_name, Key=staged_s3_key
+                        )
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to remove staged upload %s: %s", staged_s3_key, e
+                        )
 
                 if not is_new_paper:
                     emitter.emit_status(
@@ -313,28 +388,31 @@ def add_paper(
 
         # Process the paper ONLY if project exists
         if current_project:
-            emitter.emit_status(message=f"Extracting features using {strategy_type}...", progress=15)
-            emitter.emit_status(message=f"Processing paper (v{version})...", progress=10)
-
-            logger.info(
-                "Executing API call for user %s with strategy %s", user_email, strategy_type
+            emitter.emit_status(
+                message=f"Extracting features using {strategy_type}...", progress=15
+            )
+            emitter.emit_status(
+                message=f"Processing paper (v{version})...", progress=10
             )
 
-            base_temperature = 0.7
-            current_temperature = base_temperature + (self.request.retries * 0.2)
+            logger.info(
+                "Executing API call for user %s with strategy %s",
+                user_email,
+                strategy_type,
+            )
 
             open_ai_res = run_assistant_api(
                 file_path=processing_file_path,
                 project_id=project_id,
                 emitter=emitter,
-                gpt_temperature=current_temperature,
+                user=user,
                 strategy_type=strategy_type,
             )
 
             emitter.emit_status(message="Saving results...", progress=90)
 
             # Update result
-            if result_obj: # Only update if a result object was created
+            if result_obj:  # Only update if a result object was created
                 result_obj.json_response = open_ai_res["output"]["result"]
                 result_obj.prompt_token = open_ai_res["output"]["prompt_tokens"]
                 result_obj.completion_token = open_ai_res["output"]["completion_tokens"]
@@ -345,7 +423,7 @@ def add_paper(
             logger.info("Results saved for task %s", task_id)
 
             # Update project mapping ONLY if project exists
-            if not existing_result: # Only update mapping if this wasn't a retry
+            if not existing_result:  # Only update mapping if this wasn't a retry
                 update_project_paper_mapping(current_project, paper, result_obj)
 
                 # Add paper to project if not already there
@@ -353,8 +431,10 @@ def add_paper(
                     current_project.papers.append(paper)
                     current_project.updated_at = datetime.now()
                     current_project.save()
-            
-            emitter.emit_status(message="Paper processed successfully", progress=100, done=True)
+
+            emitter.emit_status(
+                message="Paper processed successfully", progress=100, done=True
+            )
 
             return {
                 "status": "success",
@@ -368,14 +448,32 @@ def add_paper(
             }
         else:
             # Just library upload, no extraction
-            emitter.emit_status(message="Paper added to library", progress=100, done=True)
+            emitter.emit_status(
+                message="Paper added to library", progress=100, done=True
+            )
             return {
                 "status": "success",
                 "file_name": original_filename,
                 "paper_id": str(paper.id),
-                "message": "Paper added to library (no extraction run)"
+                "message": "Paper added to library (no extraction run)",
             }
 
+    except (BudgetExceededError, MissingPlatformKeyError) as exc:
+        # Credential/budget problems are deterministic — retrying wastes work and
+        # (for a genuine over-limit user) money once a key is added. Fail fast.
+        logger.warning("Extraction blocked for task %s: %s", task_id, exc)
+        emitter.emit_status(
+            message=str(exc),
+            progress=100,
+            done=True,
+            status="FAILURE",
+        )
+        return {
+            "status": "error",
+            "error": str(exc),
+            "file_name": original_filename,
+            "paper_id": str(paper.id) if "paper" in locals() and paper else None,
+        }
     except Exception as exc:
         logger.exception("Error in task %s: %s", task_id, exc)
 
@@ -388,7 +486,11 @@ def add_paper(
         )
 
         # Only create a failed result if we haven't created one yet AND this is the last retry AND we have a project
-        if not result_obj and current_project and self.request.retries >= self.max_retries:
+        if (
+            not result_obj
+            and current_project
+            and self.request.retries >= self.max_retries
+        ):
             # Create a failed result record
             paper = Paper.find_one(Paper.original_filename == original_filename).run()
             if paper:

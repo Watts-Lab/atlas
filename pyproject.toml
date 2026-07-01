@@ -6,9 +6,9 @@
 ##   uvx --from git+https://github.com/Watts-Lab/atlas.git atlas-mcp
 ##
 ## Local (stdio) mode is what enables the `add_paper` tool to upload PDFs from
-## the user's own disk — the hosted /mcp endpoint cannot receive files because
-## MCP tool arguments are JSON only. The server/ and client/ apps are not part
-## of this package; they ship via their own Dockerfiles.
+## the user's own disk by file path — the hosted /mcp endpoint cannot receive
+## files because MCP tool arguments are JSON only. The server/ and client/ apps
+## are not part of this package; they ship via their own Dockerfiles.
 
 [build-system]
 requires = ["hatchling"]

@@ -1,34 +1,27 @@
 ---
 title: LLM-Readable Docs
-description: How Atlas publishes llms.txt and markdown copies for LLM clients.
+description: Machine-readable copies of the Atlas documentation for LLM clients.
 ---
 
 # LLM-Readable Docs
 
-Atlas docs use `vitepress-plugin-llms` to publish LLM-readable documentation alongside the human documentation site.
+Atlas publishes machine-readable copies of this documentation for use with LLM clients and tools. They contain the same content as the human documentation, formatted for direct consumption by a language model.
 
-During the docs build, the plugin generates files such as:
+## Available Files
 
 ```txt
-/docs/llms.txt
-/docs/llms-full.txt
+https://atlas.seas.upenn.edu/docs/llms.txt
+https://atlas.seas.upenn.edu/docs/llms-full.txt
 ```
 
-These files give LLM clients a compact map of the documentation and a fuller Markdown representation of the site.
+- `llms.txt` is an index of the documentation: a list of pages with a short description of each.
+- `llms-full.txt` is the full documentation combined into a single Markdown file.
 
-## Page Descriptions
+## Using Them
 
-Each documentation page should include frontmatter like:
+Point an LLM client at one of these URLs to give it context about Atlas:
 
-```md
----
-title: MCP Integration
-description: Connect LLM clients to Atlas through the Model Context Protocol server.
----
-```
+- Use `llms.txt` when you want a compact map of the documentation and links to individual pages.
+- Use `llms-full.txt` when you want the complete documentation in one request, for example to load into a model's context.
 
-Descriptions make `llms.txt` more useful because the generated link list can explain what each page is for.
-
-## Human Docs First
-
-LLM-readable docs work best when the human docs are already clear. Write the guide pages for researchers and developers first; let the plugin convert that structure for LLM clients.
+Both files are regenerated whenever the documentation is published, so they stay in sync with the pages on this site.

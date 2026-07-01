@@ -100,7 +100,6 @@ def gpt_function_string_comparison(user_refrence, gpt_answer):
             ],
             response_format={"type": "text"},
             reasoning_effort="high",
-            # temperature=0,
             tools=[gpt_function],
             tool_choice={"type": "function", "function": {"name": "compare_strings"}},
         )

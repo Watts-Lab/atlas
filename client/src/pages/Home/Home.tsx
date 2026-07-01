@@ -36,7 +36,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
             updateUser({
               loggedIn: true,
               email: response.data.email,
-              credits: response.data.credits,
+              usage: response.data.usage ?? null,
             })
             navigate('/dashboard')
           } else {

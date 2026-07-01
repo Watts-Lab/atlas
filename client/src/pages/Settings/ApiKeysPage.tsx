@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
@@ -162,12 +161,13 @@ export default function ApiKeysPage() {
 
   // ── MCP config ──────────────────────────────────────────────────────────────
 
-  // Both configs are built client-side from the already-revealed key — the raw
-  // key is never sent back to the server.
-  //
-  // Remote: the hosted MCP server under /mcp, authenticated via Bearer header.
-  // Covers every tool except uploading local PDFs (MCP tool calls are JSON
-  // only, so a remote server can never receive file bytes).
+  // Two ways to connect an MCP client. Both configs are built client-side from
+  // the already-revealed key — the raw key is never sent back to the server.
+
+  // 1) Hosted: the MCP server runs under /mcp on this origin and authenticates
+  //    via a Bearer header. Zero install, works in most clients — but uploading
+  //    PDFs requires the client to run a `curl` command (the hosted server
+  //    can't read your local files).
   const mcpUrl = `${WEB_URL}/mcp`
   const mcpConfig = createdKey
     ? JSON.stringify(
@@ -184,9 +184,8 @@ export default function ApiKeysPage() {
       )
     : ''
 
-  // Local: the same MCP server run on the user's machine over stdio (via uvx).
-  // Because it runs locally, the `add_paper` tool can read PDFs straight from
-  // the user's disk and upload them to the Atlas API with this key.
+  // 2) Local: the client launches the MCP server on your machine via uv. It can
+  //    read PDFs by path, so uploads work without curl. Requires `uv` installed.
   const mcpLocalConfig = createdKey
     ? JSON.stringify(
         {
@@ -195,8 +194,8 @@ export default function ApiKeysPage() {
             args: ['--from', 'git+https://github.com/Watts-Lab/atlas.git', 'atlas-mcp'],
             env: {
               MCP_TRANSPORT: 'stdio',
-              ATLAS_API_URL: `${WEB_URL}/api/v1`,
               ATLAS_API_KEY: createdKey.key,
+              ATLAS_API_URL: `${WEB_URL}/api/v1`,
             },
           },
         },
@@ -222,7 +221,7 @@ export default function ApiKeysPage() {
     try {
       await navigator.clipboard.writeText(mcpLocalConfig)
       setMcpLocalCopied(true)
-      toast.success('MCP configuration copied to clipboard')
+      toast.success('Local MCP configuration copied to clipboard')
       setTimeout(() => setMcpLocalCopied(false), 2500)
     } catch {
       toast.error('Failed to copy — please select and copy manually')
@@ -534,81 +533,73 @@ export default function ApiKeysPage() {
 
               <Separator />
 
-              {/* MCP configuration — remote vs local, as tabs */}
-              <Tabs defaultValue='remote' className='gap-3'>
-                <TabsList className='w-full'>
-                  <TabsTrigger value='remote'>Remote server</TabsTrigger>
-                  <TabsTrigger value='local'>Local server (PDF uploads)</TabsTrigger>
-                </TabsList>
+              {/* MCP configuration — hosted */}
+              <div className='flex flex-col gap-2'>
+                <div className='flex items-center justify-between gap-2'>
+                  <Label className='text-sm font-medium'>
+                    Connect an MCP client — Hosted (no install)
+                  </Label>
+                  <Button variant='outline' size='sm' onClick={handleCopyMcp}>
+                    {mcpCopied ? (
+                      <>
+                        <Check className='h-3.5 w-3.5 mr-1.5 text-green-600' />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className='h-3.5 w-3.5 mr-1.5' />
+                        Copy config
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <p className='text-xs text-muted-foreground'>
+                  Zero install, works in most clients. Paste into your editor&apos;s remote MCP
+                  server settings. To upload PDFs, the assistant runs a `curl` command you approve
+                  in your editor.
+                </p>
+                <pre className='rounded-md border bg-muted px-3 py-2.5 text-[12px] font-mono overflow-x-auto leading-relaxed select-all'>
+                  {mcpConfig}
+                </pre>
+              </div>
 
-                {/* Remote */}
-                <TabsContent value='remote' className='flex flex-col gap-2'>
-                  <div className='flex items-center justify-between gap-2'>
-                    <Label className='text-sm font-medium'>
-                      Connect an MCP client (e.g. Zed) — remote server
-                    </Label>
-                    <Button variant='outline' size='sm' onClick={handleCopyMcp}>
-                      {mcpCopied ? (
-                        <>
-                          <Check className='h-3.5 w-3.5 mr-1.5 text-green-600' />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className='h-3.5 w-3.5 mr-1.5' />
-                          Copy config
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  <p className='text-xs text-muted-foreground'>
-                    Paste this into your editor&apos;s remote MCP server settings. Nothing to
-                    install. Supports everything except uploading PDFs from your computer.
-                  </p>
-                  <pre className='rounded-md border bg-muted px-3 py-2.5 text-[12px] font-mono overflow-x-auto leading-relaxed select-all'>
-                    {mcpConfig}
-                  </pre>
-                </TabsContent>
-
-                {/* Local (stdio) */}
-                <TabsContent value='local' className='flex flex-col gap-2'>
-                  <div className='flex items-center justify-between gap-2'>
-                    <Label className='text-sm font-medium'>
-                      Local MCP server — enables PDF uploads
-                    </Label>
-                    <Button variant='outline' size='sm' onClick={handleCopyMcpLocal}>
-                      {mcpLocalCopied ? (
-                        <>
-                          <Check className='h-3.5 w-3.5 mr-1.5 text-green-600' />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className='h-3.5 w-3.5 mr-1.5' />
-                          Copy config
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  <p className='text-xs text-muted-foreground'>
-                    Paste this into your editor&apos;s local (command-based) MCP server settings.
-                    Runs the Atlas connector on your machine via{' '}
-                    <code className='font-mono'>uvx</code> (requires{' '}
-                    <a
-                      href='https://docs.astral.sh/uv/'
-                      target='_blank'
-                      rel='noreferrer'
-                      className='underline'
-                    >
-                      uv
-                    </a>
-                    ), so the assistant can also upload PDF files directly from your computer.
-                  </p>
-                  <pre className='rounded-md border bg-muted px-3 py-2.5 text-[12px] font-mono overflow-x-auto leading-relaxed select-all'>
-                    {mcpLocalConfig}
-                  </pre>
-                </TabsContent>
-              </Tabs>
+              {/* MCP configuration — local (uv) */}
+              <div className='flex flex-col gap-2'>
+                <div className='flex items-center justify-between gap-2'>
+                  <Label className='text-sm font-medium'>
+                    Connect an MCP client — Local (uploads by file path)
+                  </Label>
+                  <Button variant='outline' size='sm' onClick={handleCopyMcpLocal}>
+                    {mcpLocalCopied ? (
+                      <>
+                        <Check className='h-3.5 w-3.5 mr-1.5 text-green-600' />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className='h-3.5 w-3.5 mr-1.5' />
+                        Copy config
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <p className='text-xs text-muted-foreground'>
+                  Runs the Atlas MCP server on your machine via{' '}
+                  <a
+                    href='https://docs.astral.sh/uv/'
+                    target='_blank'
+                    rel='noreferrer'
+                    className='underline'
+                  >
+                    uv
+                  </a>{' '}
+                  (required). The assistant can then upload PDFs directly by their file path — no
+                  `curl` needed. Best if you upload papers often.
+                </p>
+                <pre className='rounded-md border bg-muted px-3 py-2.5 text-[12px] font-mono overflow-x-auto leading-relaxed select-all'>
+                  {mcpLocalConfig}
+                </pre>
+              </div>
             </div>
           )}
 
