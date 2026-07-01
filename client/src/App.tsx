@@ -5,8 +5,6 @@ import ProjectView from './pages/ProjectView/ProjectView'
 import Project from './components/View/DataGrid/Project'
 import Overview from './pages/Dashboard/Overview'
 import IC2S2 from './pages/IC2S2/IC2S2'
-import DocumentationLayout from './pages/Documentation/DocumentationLayout'
-import DocPage from './pages/Documentation/DocPage'
 import ProjectCreate from './pages/ProjectCreate/ProjectCreate'
 import FeaturesPage from './pages/Features/Features'
 import Landing from './pages/Landing/Landing'
@@ -34,15 +32,6 @@ function App() {
         <Route path='/project-old/:project_id' element={<ProjectView />} />
         <Route path='/ic2s2' element={<IC2S2 />} />
         <Route path='/settings/api-keys' element={<ApiKeysPage />} />
-
-        <Route path='/docs' element={<DocumentationLayout />}>
-          <Route index element={<DocPage fileName='overview.md' />} />
-          <Route path='introduction' element={<DocPage fileName='introduction.md' />} />
-          {/* <Route path='get-started' element={<DocPage fileName='get-started.md' />} /> */}
-          <Route path='tutorials' element={<DocPage fileName='tutorials.md' />} />
-          <Route path='changelog' element={<DocPage fileName='changelog.md' />} />
-          <Route path='api-reference' element={<DocPage fileName='api_reference.md' />} />
-        </Route>
       </Routes>
     </>
   )

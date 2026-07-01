@@ -16,6 +16,9 @@ services:
       - ./server/papers:/app/api/papers
     command: >
       sh -c "python3 -m sanic api.app --host 0.0.0.0 --port 8000 --workers 1 --dev"
+    depends_on:
+      redis:
+        condition: service_healthy
 
   client:
     container_name: client
@@ -37,9 +40,11 @@ services:
     image: public.ecr.aws/docker/library/redis:latest
     ports:
       - 6379:6379
-    depends_on:
-      - backend
-      - client
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   celery_worker:
     container_name: celery_worker
@@ -60,8 +65,10 @@ services:
     # command: bash -c "celery -A workers.celery_config.celery worker --loglevel=INFO"
     command: bash -c "watchmedo auto-restart --directory=/app/api --pattern=*.py --recursive -- celery -A workers.celery_config.celery worker --loglevel=INFO --concurrency=1"
     depends_on:
-      - backend
-      - redis
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
 
   celery_flower:
     container_name: celery_flower
@@ -86,9 +93,12 @@ services:
     ports:
       - 5556:5555
     depends_on:
-      - backend
-      - redis
-      - celery_worker
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
 
   mcp_server:
     container_name: mcp_server

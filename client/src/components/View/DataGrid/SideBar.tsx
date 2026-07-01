@@ -62,32 +62,12 @@ const data = {
     },
     {
       title: 'Documentation',
-      url: '/docs',
+      url: '/docs/',
       icon: BookOpen,
       isActive: true,
       isDefaultOpen: true,
-      items: [
-        {
-          title: 'Introduction',
-          url: '/docs/introduction',
-        },
-        // {
-        //   title: 'Get Started',
-        //   url: '/docs/get-started',
-        // },
-        {
-          title: 'Tutorials',
-          url: '/docs/tutorials',
-        },
-        {
-          title: 'Changelog',
-          url: '/docs/changelog',
-        },
-        {
-          title: 'API Reference',
-          url: '/docs/api-reference',
-        },
-      ],
+      external: true,
+      items: [],
     },
     {
       title: 'Settings',

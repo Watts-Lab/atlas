@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
-import { createUniverse } from './stars-render'
+import { useEffect, useState } from 'react'
+import { CartographicBackground } from '../Landing/CelestialBackground'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '@/service/api'
 import { useUser } from '@/context/User/useUser'
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Fingerprint, Loader2 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 
@@ -18,34 +18,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   const params: Params = useParams()
   const navigate = useNavigate()
 
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [email, setEmail] = useState<string>('')
   const [submitting, setSubmitting] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(loggingIn)
   const [loggingInMessage, setLoggingInMessage] = useState('Authenticating... Please wait.')
-
-  useEffect(() => {
-    const starDensity = 0.216
-    const speedCoeff = 0.03
-    const giantColor = '180,184,240'
-    const starColor = '226,225,142'
-    const cometColor = '226,225,224'
-    const cometDisabled = false
-
-    const canva = canvasRef.current!
-    const cleanup = createUniverse(
-      canva,
-      starDensity,
-      speedCoeff,
-      giantColor,
-      starColor,
-      cometColor,
-      cometDisabled,
-    )
-    return () => {
-      cleanup()
-    }
-  }, [])
 
   // Handle immediate magic-link login when "loggingIn" is true
   useEffect(() => {
@@ -111,86 +87,103 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   }
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center contrast-120'>
-      <div className='w-full h-full container-gradient'>
-        <canvas ref={canvasRef} id='universe' className='w-full h-full' />
+    <div className='fixed inset-0 overflow-auto bg-[#f8fafc] text-[#0b1f3a] selection:bg-[#6f95bd]/25 selection:text-[#06162b]'>
+      <CartographicBackground />
 
-        <div className='absolute inset-0 flex items-center justify-center pt-20'>
-          <div className='w-full max-w-sm space-y-6'>
-            {/* Header Section */}
-            <div className='text-center space-y-4'>
-              <div className='flex justify-center'>
-                <img src='/logo.svg' alt='Atlas Logo' className='w-28 h-28 invert' />
-              </div>
-              <div>
-                <h1 className='text-2xl font-bold text-gray-50'>Welcome to Atlas</h1>
-                <p className='text-gray-50 mt-2'>
-                  Atlas is a platform for research cartography and data visualization.
-                </p>
-              </div>
+      <main className='relative z-10 flex min-h-screen items-center justify-center px-6 py-12'>
+        <div className='w-full max-w-md  p-8 '>
+          {/* Header Section */}
+          <div className='text-center space-y-5'>
+            <div className='flex justify-center'>
+              <img src='/logo.svg' alt='Atlas Logo' className='h-32 w-32' />
             </div>
-
-            {/* Login Form */}
-            <div className='space-y-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='email' className='text-gray-50'>
-                  Email
-                </Label>
-                {!submitting ? (
-                  <Input
-                    data-testid='email-input'
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                    id='email'
-                    type='email'
-                    placeholder='example@scaledhumanity.org'
-                    required
-                    className='w-full text-white'
-                  />
-                ) : (
-                  <p className='text-slate-200 py-4 fade-in'>
-                    Please check your email for a login link
-                  </p>
-                )}
-              </div>
-
-              <Button
-                disabled={submitting}
-                type='button'
-                onClick={handleLogin}
-                className='w-full bg-gray-700 hover:bg-gray-600'
-              >
-                {submitting && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
-                Login
-              </Button>
+            <div>
+              <h1 className='text-3xl font-semibold tracking-tight text-[#071a33]'>
+                Welcome to Atlas
+              </h1>
             </div>
-
-            {/* Footer */}
-            <div className='text-center text-xs text-gray-100 space-x-1'>
-              <span>By clicking continue, you agree to our</span>
-              <a
-                href='https://github.com/Watts-Lab/atlas?tab=coc-ov-file'
-                className='underline hover:text-white'
-              >
-                Code of Conduct
-              </a>
-              <span>and</span>
-              <a
-                href='https://github.com/Watts-Lab/atlas?tab=AGPL-3.0-1-ov-file'
-                className='underline hover:text-white'
-              >
-                License
-              </a>
-              <span>.</span>
-            </div>
-
-            {/* Status Messages */}
-            {isLoggingIn && (
-              <p className='text-slate-200 text-center fade-in'>{loggingInMessage}</p>
-            )}
           </div>
+
+          {/* Login Form */}
+          <div className='mt-8 space-y-5'>
+            <div className='space-y-2'>
+              <Label htmlFor='email' className='text-sm font-semibold text-[#0b1f3a]'>
+                Email
+              </Label>
+              {!submitting ? (
+                <Input
+                  data-testid='email-input'
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  id='email'
+                  type='email'
+                  placeholder='example@scaledhumanity.org'
+                  required
+                  className='h-11 rounded-sm border-[#9fb2ca] bg-white text-[#0b1f3a] placeholder:text-[#94a3b8] focus-visible:border-[#3c6082] focus-visible:ring-[#6f95bd]/30'
+                />
+              ) : (
+                <p className='border-y border-[#d6dee8] py-4 text-sm text-[#475569] fade-in'>
+                  Please check your email for a login link
+                </p>
+              )}
+            </div>
+
+            <Button
+              disabled={submitting}
+              type='button'
+              onClick={handleLogin}
+              className='h-11 w-full rounded-sm border border-[#0b1f3a] bg-[#0b1f3a] font-semibold text-white shadow-none hover:bg-[#16375f] hover:border-[#16375f]'
+            >
+              {submitting && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+              Login
+            </Button>
+
+            <div className='flex items-center gap-3'>
+              <div className='h-px flex-1 bg-[#d6dee8]' />
+              <span className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]'>
+                Or
+              </span>
+              <div className='h-px flex-1 bg-[#d6dee8]' />
+            </div>
+
+            <Button
+              disabled={submitting}
+              type='button'
+              variant='outline'
+              className='h-11 w-full rounded-sm border-[#9fb2ca] bg-white font-semibold text-[#0b1f3a] shadow-none hover:border-[#3c6082] hover:bg-[#eef4fa] hover:text-[#0b1f3a]'
+            >
+              <Fingerprint className='w-4 h-4' />
+              Continue with passkey
+            </Button>
+          </div>
+
+          {/* Footer */}
+          <div className='mt-8 text-center text-xs leading-5 text-[#64748b]'>
+            <span>By clicking continue, you agree to our </span>
+            <a
+              href='https://github.com/Watts-Lab/atlas?tab=coc-ov-file'
+              className='font-medium text-[#0b1f3a] underline decoration-[#9fb2ca] underline-offset-4 hover:text-[#6f1d1b]'
+            >
+              Code of Conduct
+            </a>
+            <span> and </span>
+            <a
+              href='https://github.com/Watts-Lab/atlas?tab=AGPL-3.0-1-ov-file'
+              className='font-medium text-[#0b1f3a] underline decoration-[#9fb2ca] underline-offset-4 hover:text-[#6f1d1b]'
+            >
+              License
+            </a>
+            <span>.</span>
+          </div>
+
+          {/* Status Messages */}
+          {isLoggingIn && (
+            <p className='mt-6 border-t border-[#d6dee8] pt-5 text-center text-sm text-[#475569] fade-in'>
+              {loggingInMessage}
+            </p>
+          )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }

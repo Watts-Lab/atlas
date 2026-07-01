@@ -384,24 +384,27 @@ export function ScrollTree({ headerHidden = false }: { headerHidden?: boolean })
           style={{ top: tabsTop }}
         >
           <div className='pointer-events-auto flex flex-col items-center gap-3'>
-            <p className='text-[10px] uppercase tracking-[0.18em] text-white/25 font-semibold'>
+            <p className='text-[10px] uppercase tracking-[0.18em] text-[#64748b] font-semibold'>
               Document type
             </p>
 
-            <div className='flex p-1.5 gap-1 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]'>
+            <div className='flex p-1 gap-1 rounded-sm bg-white/85 backdrop-blur-xl border border-[#cbd5e1] shadow-[0_16px_40px_rgba(15,23,42,0.08)]'>
               {Object.entries(SCHEMAS).map(([key, s]) => (
                 <button
                   key={key}
                   onClick={() => handleSchemaChange(key)}
-                  className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-medium
                               transition-colors duration-200 select-none
-                              ${activeKey === key ? 'text-white' : 'text-white/35 hover:text-white/60'}`}
+                              ${
+                                activeKey === key
+                                  ? 'text-white'
+                                  : 'text-[#475569] hover:text-[#0b1f3a]'
+                              }`}
                 >
                   {activeKey === key && (
                     <motion.div
                       layoutId='schema-pill'
-                      className='absolute inset-0 rounded-xl bg-indigo-600/90 border border-indigo-400/30
-                                 shadow-[0_0_20px_rgba(99,102,241,0.45)]'
+                      className='absolute inset-0 rounded-sm bg-[#0b1f3a] border border-[#0b1f3a]'
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}
@@ -418,7 +421,7 @@ export function ScrollTree({ headerHidden = false }: { headerHidden?: boolean })
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.22 }}
-                className='text-[11px] text-white/30 text-center max-w-[300px] leading-relaxed'
+                className='text-[11px] text-[#64748b] text-center max-w-[300px] leading-relaxed'
               >
                 {schema.tagline}
               </motion.p>
@@ -498,8 +501,9 @@ function Branch({
     <motion.path
       d={d}
       fill='transparent'
-      stroke='rgba(165, 180, 252, 0.35)'
-      strokeWidth='2.5'
+      stroke='rgba(60, 96, 130, 0.34)'
+      strokeWidth='2'
+      strokeDasharray='8 10'
       style={{ pathLength }}
     />
   )
@@ -539,19 +543,19 @@ function Node({
             {/* card 3 — furthest back */}
             <div
               className='
-              absolute inset-0 rounded-2xl
-              border border-indigo-400/30 bg-indigo-950/60
+              absolute inset-0 rounded-sm
+              border border-[#b7c5d8] bg-[#e8eef5]/85
               translate-y-[18px] translate-x-[14px] scale-[0.91]
-              shadow-[0_0_12px_rgba(99,102,241,0.08)]
+              shadow-[0_10px_24px_rgba(15,23,42,0.05)]
             '
             />
             {/* card 2 — middle layer */}
             <div
               className='
-              absolute inset-0 rounded-2xl
-              border border-indigo-400/45 bg-indigo-950/75
+              absolute inset-0 rounded-sm
+              border border-[#9fb2ca] bg-[#f1f5f9]/95
               translate-y-[9px] translate-x-[7px] scale-[0.96]
-              shadow-[0_0_16px_rgba(99,102,241,0.12)]
+              shadow-[0_10px_24px_rgba(15,23,42,0.06)]
             '
             />
           </>
@@ -560,11 +564,11 @@ function Node({
         {/* Main card */}
         <div
           className='relative z-10 flex items-center gap-3 overflow-hidden
-                        bg-[#0a0f1c]/90 backdrop-blur-xl border border-indigo-500/40
-                        rounded-2xl px-4 py-[14px] text-white
-                        shadow-[0_0_30px_rgba(99,102,241,0.15)]
+                        bg-white/95 backdrop-blur-xl border border-[#9fb2ca]
+                        rounded-sm px-4 py-[14px] text-[#0b1f3a]
+                        shadow-[0_14px_32px_rgba(15,23,42,0.08)]
                         transition-all duration-300
-                        hover:border-indigo-400 hover:shadow-[0_0_40px_rgba(129,140,248,0.35)]'
+                        hover:border-[#3c6082] hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)]'
         >
           <AnimatePresence mode='wait'>
             <motion.div
@@ -576,12 +580,12 @@ function Node({
               className='flex items-center gap-3 w-full min-w-0'
             >
               <div
-                className='p-2.5 bg-indigo-500/20 rounded-xl shrink-0
-                              transition-colors duration-300 group-hover/node:bg-indigo-500/30'
+                className='p-2.5 bg-[#eef4fa] rounded-sm shrink-0 border border-[#d6dee8]
+                              transition-colors duration-300 group-hover/node:bg-[#dbe8f5]'
               >
                 <Icon
                   size={18}
-                  className='text-indigo-300 group-hover/node:text-indigo-200
+                  className='text-[#3c6082] group-hover/node:text-[#0b1f3a]
                                            transition-colors duration-300'
                 />
               </div>
@@ -591,8 +595,8 @@ function Node({
               {isArray && (
                 <span
                   className='shrink-0 font-mono text-md font-semibold tracking-wider
-                                 text-indigo-400/70 border border-indigo-500/25 rounded-full
-                                 px-2 py-0.5 bg-indigo-500/10'
+                                 text-[#6f1d1b] border border-[#cfa5a3] rounded-sm
+                                 px-2 py-0.5 bg-[#f8eded]'
                 >
                   1…N
                 </span>
@@ -610,7 +614,7 @@ function Node({
           <div
             className='mx-auto mb-0 w-0 h-0
                           border-l-[6px] border-r-[6px] border-b-[6px]
-                          border-l-transparent border-r-transparent border-b-indigo-500/30'
+                          border-l-transparent border-r-transparent border-b-[#9fb2ca]'
           />
           <AnimatePresence mode='wait'>
             <motion.div
@@ -619,9 +623,9 @@ function Node({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className='bg-[#0d1425]/95 border border-indigo-500/25 rounded-xl p-3
-                         text-[20px] text-indigo-100/60 leading-relaxed
-                         shadow-[0_8px_32px_rgba(0,0,0,0.5)]'
+              className='bg-white/98 border border-[#9fb2ca] rounded-sm p-3
+                         text-xs text-[#475569] leading-relaxed
+                         shadow-[0_14px_34px_rgba(15,23,42,0.14)]'
             >
               {description}
             </motion.div>

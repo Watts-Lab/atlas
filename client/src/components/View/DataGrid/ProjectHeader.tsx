@@ -317,7 +317,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 <Info className='w-4 h-4 mr-2' />
                 About Project
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.open('/docs', '_blank')}>
+              <DropdownMenuItem onClick={() => window.open('/docs/', '_blank')}>
                 <FileText className='w-4 h-4 mr-2' />
                 Documentation
               </DropdownMenuItem>

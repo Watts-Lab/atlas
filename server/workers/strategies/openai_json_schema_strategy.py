@@ -24,7 +24,6 @@ class OpenAIJSONSchemaStrategy(ExtractionStrategy):
     def extract(
         self,
         file_path: str,
-        temperature: float = 0.7,
         custom_prompt: Optional[str] = None,
         feature_ids: Optional[list[str]] = None,
         silent: bool = False,

@@ -25,9 +25,11 @@ export function NavMain({
     icon?: LucideIcon
     isActive?: boolean
     isDefaultOpen?: boolean
+    external?: boolean
     items?: {
       title: string
       url: string
+      external?: boolean
     }[]
   }[]
 }) {
@@ -65,9 +67,15 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link to={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </Link>
+                          {subItem.external ? (
+                            <a href={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </a>
+                          ) : (
+                            <Link to={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </Link>
+                          )}
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -78,10 +86,17 @@ export function NavMain({
           ) : (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild>
-                <Link to={item.url}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                </Link>
+                {item.external ? (
+                  <a href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </a>
+                ) : (
+                  <Link to={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </Link>
+                )}
               </SidebarMenuButton>
             </SidebarMenuItem>
           )

@@ -68,9 +68,7 @@ def get_project_detail(project_id: str):
     if not user_project:
         return None
 
-    project_dict = user_project.model_dump(
-        mode="json", exclude=["user"], serialize_as_any=True
-    )
+    project_dict = user_project.model_dump(mode="json", exclude=["user"])
     project_dict["slug"] = str(project_dict["slug"])
     project_dict["created_at"] = str(project_dict["created_at"])
     project_dict["updated_at"] = str(project_dict["updated_at"])
@@ -128,9 +126,7 @@ def update_project(
     user_project.updated_at = datetime.now()
 
     user_project.save()
-    project_dict = user_project.model_dump(
-        mode="json", exclude=["user"], serialize_as_any=True
-    )
+    project_dict = user_project.model_dump(mode="json", exclude=["user"])
     project_dict["slug"] = str(project_dict["slug"])
     project_dict["created_at"] = str(project_dict["created_at"])
     project_dict["updated_at"] = str(project_dict["updated_at"])

@@ -53,7 +53,15 @@ redis_result_backend = os.getenv("CELERY_RESULT_BACKEND")
 # For testing purposes if redis is not set
 mgr = None
 if redis_broker_url:
-    mgr = socketio.AsyncRedisManager(redis_broker_url)
+    # redis-py >=8 applies a socket read timeout to the blocking pub/sub
+    # listen() loop that AsyncRedisManager runs, which surfaces as a repeating
+    # "Cannot receive from redis... retrying" log (a TimeoutError swallowed by
+    # python-socketio). Disabling the read timeout lets the blocking listen
+    # wait indefinitely for messages, as intended.
+    mgr = socketio.AsyncRedisManager(
+        redis_broker_url,
+        redis_options={"socket_timeout": None},
+    )
 
 sio_kwargs = {
     "async_mode": "sanic",
