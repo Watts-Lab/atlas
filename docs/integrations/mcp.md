@@ -16,7 +16,7 @@ The MCP server is designed to sit behind nginx at:
 In production, that usually means:
 
 ```txt
-https://<your-atlas-domain>/mcp
+https://atlas.seas.upenn.edu/mcp
 ```
 
 ## Authentication
