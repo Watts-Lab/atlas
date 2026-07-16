@@ -20,6 +20,17 @@ class User(Document):
     magic_link_expiration_date: datetime
 
     # ------------------------------------------------------------------
+    # WebAuthn (passkey) user handle: a random, opaque, base64url token that
+    # identifies this user *to authenticators*. It is stored on the device and
+    # replayed on every passkey login, so per the WebAuthn spec it must contain
+    # NO personally identifiable information and must not be a guessable account
+    # identifier (never the email or Mongo id). It maps 1:1 to this User, so a
+    # passkey still resolves to exactly one account/email. Populated lazily the
+    # first time a user registers a passkey.
+    # ------------------------------------------------------------------
+    webauthn_user_handle: Optional[str] = None
+
+    # ------------------------------------------------------------------
     # Monthly usage budget in USD (only consumed when the user relies on
     # Atlas' platform LLM keys — bring-your-own keys are not metered).
     #

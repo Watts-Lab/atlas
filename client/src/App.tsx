@@ -10,6 +10,7 @@ import FeaturesPage from './pages/Features/Features'
 import Landing from './pages/Landing/Landing'
 import Team from './pages/Team/Team'
 import ApiKeysPage from './pages/Settings/ApiKeysPage'
+import PasskeysPage from './pages/Settings/PasskeysPage'
 import UsagePage from './pages/Settings/UsagePage'
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path='/ic2s2' element={<IC2S2 />} />
         <Route path='/team' element={<Team />} />
         <Route path='/settings/api-keys' element={<ApiKeysPage />} />
+        <Route path='/settings/passkeys' element={<PasskeysPage />} />
         <Route path='/settings/usage' element={<UsagePage />} />
       </Routes>
     </>

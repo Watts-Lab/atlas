@@ -11,6 +11,7 @@ from routes.v1.papers import paper_bp
 from routes.v1.projects import projects_bp
 from routes.v1.results import results_bp
 from routes.v1.users import users_bp
+from routes.v1.webauthn import webauthn_bp
 from sanic import Blueprint
 
 # from routes.v1.features import features_bp
@@ -36,5 +37,6 @@ v1_blueprint = Blueprint.group(
     results_bp,
     users_bp,
     api_keys_bp,
+    webauthn_bp,
     url_prefix="/v1",
 )

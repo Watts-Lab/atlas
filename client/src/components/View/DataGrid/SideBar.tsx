@@ -84,6 +84,10 @@ const data = {
           title: 'API Keys',
           url: '/settings/api-keys',
         },
+        {
+          title: 'Passkeys',
+          url: '/settings/passkeys',
+        },
       ],
     },
   ],

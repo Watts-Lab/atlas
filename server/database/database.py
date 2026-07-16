@@ -10,11 +10,13 @@ from database.models.features import Features
 from database.models.features_quality import FeaturesQuality
 from database.models.inclusion_criteria import InclusionCriteria
 from database.models.papers import Paper
+from database.models.passkeys import Passkey
 from database.models.project_paper_result import ProjectPaperResult
 from database.models.projects import Project
 from database.models.repeatability import RepeatabilityResult
 from database.models.results import Result
 from database.models.users import User
+from database.models.webauthn_challenge import WebAuthnChallenge
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
@@ -45,5 +47,7 @@ def init_db():
             FeaturesQuality,
             RepeatabilityResult,
             InclusionCriteria,
+            Passkey,
+            WebAuthnChallenge,
         ],
     )
