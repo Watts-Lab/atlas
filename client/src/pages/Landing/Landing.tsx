@@ -4,6 +4,7 @@ import { ScrollTree } from './ScrollTree'
 import { motion, useScroll, useMotionValueEvent } from 'motion/react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import SiteHeader from '../../components/SiteHeader'
 
 const Landing: React.FC = () => {
   const { scrollY } = useScroll()
@@ -18,72 +19,11 @@ const Landing: React.FC = () => {
     }
   })
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   return (
     <div className='bg-[#f8fafc] min-h-screen text-[#0b1f3a] font-sans selection:bg-[#6f95bd]/25 selection:text-[#06162b]'>
       <CartographicBackground />
 
-      <motion.header
-        className='fixed top-0 left-0 right-0 bg-[#f8fafc]/90 border-b border-[#d6dee8] z-[100] backdrop-blur-md'
-        animate={{
-          y: hidden ? -140 : 0,
-          opacity: hidden ? 0 : 1,
-        }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-      >
-        <div className='max-w-225 mx-auto h-15 flex items-center justify-between px-6'>
-          {/* Logo */}
-          <div className='flex items-center text-[#0b1f3a]'>
-            <button onClick={() => scrollTo('home')} className='flex items-center gap-3'>
-              <img src='/logo.svg' alt='' className='h-8 w-8' />
-              <h1 className='text-2xl font-semibold tracking-[0.08em] uppercase'>Atlas</h1>
-            </button>
-          </div>
-
-          {/* Nav */}
-          <nav className='flex items-center gap-8 max-[600px]:gap-5'>
-            <button
-              onClick={() => scrollTo('home')}
-              className='text-[#334155] text-sm hover:text-[#0b1f3a] transition-colors'
-            >
-              Home
-            </button>
-            <button
-              onClick={() => scrollTo('explore')}
-              className='text-[#334155] text-sm hover:text-[#0b1f3a] transition-colors'
-            >
-              Explore
-            </button>
-            <button
-              onClick={() => scrollTo('get-started')}
-              className='text-[#334155] text-sm hover:text-[#0b1f3a] transition-colors'
-            >
-              Get Started
-            </button>
-            <a
-              href='/docs/'
-              className='text-[#334155] text-sm hover:text-[#0b1f3a] transition-colors'
-            >
-              Documentation
-            </a>
-
-            <Link
-              to='/login'
-              className='
-      text-sm font-semibold px-4 py-1.5 rounded-sm
-      bg-[#0b1f3a] text-white border border-[#0b1f3a]
-      hover:bg-[#16375f] hover:border-[#16375f]
-      transition-colors duration-200
-    '
-            >
-              Login
-            </Link>
-          </nav>
-        </div>
-      </motion.header>
+      <SiteHeader hidden={hidden} />
 
       {/* Hero Section */}
       <section
