@@ -10,18 +10,18 @@
 -r requirements.txt
 
 # Testing
-pytest==9.1.0
+pytest==9.1.1
 pytest-asyncio==1.4.0
 pytest-cov==7.1.0
-coverage==7.14.1
+coverage==7.15.2
 sanic-testing==24.6.0
 
 # Linting
 pylint==4.0.6
-astroid==4.0.4
+astroid==4.1.2
 isort==8.0.1
 mccabe==0.7.0
 dill==0.4.1
-tomlkit==0.15.0
+tomlkit==0.15.1
 pluggy==1.6.0
 iniconfig==2.3.0
