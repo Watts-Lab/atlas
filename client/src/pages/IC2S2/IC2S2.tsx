@@ -164,7 +164,7 @@ const IC2S2 = () => {
                 <span className='font-semibold'>markew@seas.upenn.edu</span>
               </p>
               <p className='text-lg'>
-                Mark E. Whiting is the Chief Technology Officer of Pareto Inc and a visiting
+                Mark E. Whiting is the Chief Scientist of Pareto Inc and a visiting
                 scientist at the Computational Social Science Lab (CSSLab) at the University of
                 Pennsylvania. With postdoctoral experience with Duncan Watts at Penn and Michael S.
                 Bernstein at Stanford, Mark holds degrees in Design from RMIT and KAIST and a PhD in

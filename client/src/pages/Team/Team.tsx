@@ -18,10 +18,10 @@ type Member = {
 const team: Member[] = [
   {
     name: 'Mark Whiting',
-    role: 'CTO, Pareto · Visiting Scientist, CSSLab',
+    role: 'Chief Scientist, Pareto · Visiting Scientist, CSSLab',
     affiliation: 'University of Pennsylvania',
     link: 'https://whiting.me/',
-    bio: 'Mark E. Whiting is the Chief Technology Officer of Pareto Inc and a visiting scientist at the Computational Social Science Lab (CSSLab) at the University of Pennsylvania. With postdoctoral experience with Duncan Watts at Penn and Michael S. Bernstein at Stanford, Mark holds degrees in Design from RMIT and KAIST and a PhD in Engineering from CMU.',
+    bio: 'Mark E. Whiting is the Chief Scientist of Pareto Inc and a visiting scientist at the Computational Social Science Lab (CSSLab) at the University of Pennsylvania. With postdoctoral experience with Duncan Watts at Penn and Michael S. Bernstein at Stanford, Mark holds degrees in Design from RMIT and KAIST and a PhD in Engineering from CMU.',
   },
   {
     name: 'Amirhossein Nakhaei',
