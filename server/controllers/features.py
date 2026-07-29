@@ -24,6 +24,7 @@ def _format_validation_error(exc: ValidationError) -> list[dict]:
         details.append({"field": field, "message": err.get("msg", "invalid")})
     return details
 
+
 def list_all_features(user, project_id=None):
     """
     Get all the features for the user and public features, and optionally project features.
@@ -79,6 +80,7 @@ def list_all_features(user, project_id=None):
         "features": res,
     }
 
+
 def create_feature(user, json_data):
     """
     Create a new feature.
@@ -115,8 +117,16 @@ def create_feature(user, json_data):
             "feature_name": out["feature_name"],
             "feature_identifier": out["feature_identifier"],
             "feature_description": out["feature_description"],
+            "feature_type": out["feature_gpt_interface"].get("type", "string"),
+            "feature_prompt": out["feature_gpt_interface"].get(
+                "description", "No prompt found."
+            ),
+            "feature_enum_options": out["feature_gpt_interface"].get("enum", []),
+            "is_shared": out.get("is_shared", False),
+            "created_by": "user" if out.get("user") else "provider",
         },
     }
+
 
 def delete_feature_controller(user, feature_id):
     """
@@ -132,6 +142,7 @@ def delete_feature_controller(user, feature_id):
 
     feat.delete()
     return {"response": "success"}
+
 
 def update_feature_controller(user, feature_id, json_data):
     """
@@ -169,6 +180,7 @@ def update_feature_controller(user, feature_id, json_data):
 
     return {"response": "success", "version": feat.version}
 
+
 def get_project_features_controller(project_id):
     """
     Get the features of a project.
@@ -193,6 +205,7 @@ def get_project_features_controller(project_id):
 
     return {"message": "Project feature list.", "features": project_feature_list}
 
+
 def add_project_features_controller(project_id, feature_ids):
     """
     Add features to a project.
@@ -214,6 +227,7 @@ def add_project_features_controller(project_id, feature_ids):
     user_project.save()
 
     return {"message": "Feature updated."}
+
 
 def remove_project_features_controller(project_id, feature_ids_to_remove):
     """
