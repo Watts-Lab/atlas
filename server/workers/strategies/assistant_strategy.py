@@ -9,10 +9,9 @@ from typing import Any, Dict, Optional
 
 from gpt_assistant import (
     build_openai_feature_functions,
-    build_parent_objects,
+    build_top_level_schema,
     check_output_format,
     create_temporary_assistant,
-    enforce_additional_properties,
     get_all_features,
     update_assistant,
     upload_file_to_vector_store,
@@ -138,17 +137,7 @@ class AssistantAPIStrategy(ExtractionStrategy):
 
     def _build_json_schema(self, feature_list: list, feature_obj: dict) -> dict:
         """Build the JSON schema from features."""
-        properties = build_parent_objects(feature_list, feature_obj)
-
-        schema = {
-            "type": "object",
-            "properties": properties,
-            "required": ["paper"],
-            "additionalProperties": False,
-        }
-
-        # Ensure all objects have additionalProperties: False
-        return enforce_additional_properties(schema)
+        return build_top_level_schema(feature_list, feature_obj)
 
     def _cleanup(self, vector_store, assistant, thread):
         """Clean up resources."""

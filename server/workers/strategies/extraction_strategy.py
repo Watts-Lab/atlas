@@ -8,8 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from database.models.projects import Project
 from gpt_assistant import (
-    build_parent_objects,
-    enforce_additional_properties,
+    build_top_level_schema,
     get_all_features,
     get_features_by_ids,
 )
@@ -65,14 +64,7 @@ class ExtractionStrategy(ABC):
         if not feature_list:
             raise ValueError("No features found for extraction")
 
-        properties = build_parent_objects(feature_list, feature_obj)
-        schema = {
-            "type": "object",
-            "properties": properties,
-            "required": ["paper"],
-            "additionalProperties": False,
-        }
-        return enforce_additional_properties(schema)
+        return build_top_level_schema(feature_list, feature_obj)
 
     def _encode_file_to_base64(self, file_path: str) -> str:
         """Encode file content to base64."""

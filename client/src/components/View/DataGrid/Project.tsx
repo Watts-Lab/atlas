@@ -651,6 +651,9 @@ const Project: React.FC = () => {
 
         const taskId = response.data.task_id
         const toastId = toast.loading('Reprocessing paper...')
+        // Holder so the completion handler (defined below) can clear the timeout
+        // that is created after it.
+        const timeout: { id?: ReturnType<typeof setTimeout> } = {}
 
         const handleReprocessComplete = (data: {
           task_id: string
@@ -670,6 +673,9 @@ const Project: React.FC = () => {
 
             // Handle completion
             if (data.done) {
+              // Stop the timeout so it can't fire a spurious "timed out" toast
+              // after we've already finished.
+              if (timeout.id) clearTimeout(timeout.id)
               toast.dismiss(toastId)
 
               // Check status
@@ -712,7 +718,7 @@ const Project: React.FC = () => {
         socket?.on('status', handleReprocessComplete)
 
         // Cleanup timeout - also dismiss the toast
-        const timeoutId = setTimeout(() => {
+        timeout.id = setTimeout(() => {
           socket?.off('status', handleReprocessComplete)
           toast.dismiss(toastId)
           toast.error('Reprocessing timed out')
@@ -720,7 +726,7 @@ const Project: React.FC = () => {
 
         // Store cleanup function in case component unmounts
         return () => {
-          clearTimeout(timeoutId)
+          if (timeout.id) clearTimeout(timeout.id)
           socket?.off('status', handleReprocessComplete)
           toast.dismiss(toastId)
         }

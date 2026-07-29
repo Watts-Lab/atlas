@@ -252,13 +252,19 @@ def add_paper(
     original_filename: Optional[str] = None,
     paper_id: Optional[str] = None,  # For reprocessing existing papers
     staged_s3_key: Optional[str] = None,  # For curl/presigned uploads
+    emit_task_id: Optional[str] = None,  # Override the id used for socket events
 ):
     """
     Process the uploaded paper with S3 integration and run the assistant API.
     Always reprocesses the paper, creating a new version if needed.
     """
     task_id = self.request.id
-    emitter = SocketEmmiter(socket_id, task_id)
+    # Socket progress events are keyed by task id so the client can match them.
+    # When invoked via reprocess_paper (which spawns this task with a NEW id),
+    # the client is tracking the OUTER reprocess id, so emit under that instead
+    # of add_paper's own id — otherwise the client never sees "done" and its
+    # progress toast lingers until the timeout.
+    emitter = SocketEmmiter(socket_id, emit_task_id or task_id)
     temp_file_path = None
     processing_file_path = file_path
     result_obj = None
@@ -536,8 +542,11 @@ def reprocess_paper(
     if not paper:
         raise ValueError(f"Paper {paper_id} not found")
 
-    # Call add_paper directly instead of using apply_async
-    # This ensures the same task_id flows through
+    # Spawn add_paper to do the actual work. It gets its own Celery task id, but
+    # the client is tracking THIS task's id (returned by the controller), so we
+    # pass it as emit_task_id and add_paper emits its socket progress/done events
+    # under it. Without this the client never matches "done" and its reprocess
+    # toast hangs until the 2-minute timeout.
     return add_paper.apply_async(
         args=[""],  # Empty file path since we'll download from S3
         kwargs={
@@ -547,5 +556,6 @@ def reprocess_paper(
             "strategy_type": strategy_type,
             "original_filename": paper.original_filename,
             "paper_id": paper_id,
+            "emit_task_id": self.request.id,
         },
     )

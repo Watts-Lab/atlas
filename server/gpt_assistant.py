@@ -81,12 +81,25 @@ def get_features_by_ids(feature_ids: List[str]) -> Tuple[List[str], Dict]:
 
 
 def enforce_additional_properties(schema):
-    """
-    Recursively enforce that every object in the schema has "additionalProperties": False.
+    """Recursively enforce strict-mode JSON-schema rules on every object node.
+
+    Providers running in strict structured-output mode (OpenAI, and the strict
+    validators OpenRouter routes to: Azure/Anthropic/Bedrock) require that for
+    EVERY object schema:
+
+    * ``additionalProperties`` is ``False``, and
+    * ``required`` lists **every** key in ``properties`` (not just the leaves).
+
+    We therefore derive ``required`` from the object's own ``properties`` here,
+    which is far more robust than hand-tracking required keys while building the
+    nested tree (the source of the earlier "Missing 'property'" 400s).
     """
     if isinstance(schema, dict):
-        if schema.get("type") == "object" and "additionalProperties" not in schema:
-            schema["additionalProperties"] = False
+        if schema.get("type") == "object":
+            props = schema.get("properties")
+            if isinstance(props, dict):
+                schema["additionalProperties"] = False
+                schema["required"] = list(props.keys())
         for key, value in schema.items():
             schema[key] = enforce_additional_properties(value)
     elif isinstance(schema, list):
@@ -132,27 +145,29 @@ def build_parent_objects(feature_list: list[str], feature_object: dict) -> dict:
         # Set the final property from feature_object, it should be a schema dict.
         current_dict[keys[-1]] = feature_object[feature]
 
-    # Add required keys if necessary by traversing again
-    for feature in feature_list:
-        keys = feature.split(".")
-        current_section = nested_dict
-        for key in keys[:-1]:
-            if key in current_section:
-                current_section = current_section[key]["items"]
-            else:
-                if "required" not in current_section:
-                    current_section["required"] = []
-                if key not in current_section["required"]:
-                    current_section["required"].append(key)
-                current_section = current_section["properties"][key]["items"]
-        if "required" not in current_section:
-            current_section["required"] = []
-        current_section["required"].append(keys[-1])
-        current_section["additionalProperties"] = False
-
-    # Finally, run the entire built schema through the enforcement function
-    nested_dict = enforce_additional_properties(nested_dict)
+    # Note: required / additionalProperties are NOT set here. They are enforced
+    # recursively (on every object node, listing all property keys) by
+    # enforce_additional_properties in build_top_level_schema. Setting them here
+    # was both incomplete (missed intermediate containers) and error-prone.
     return nested_dict
+
+
+def build_top_level_schema(feature_list: list[str], feature_object: dict) -> dict:
+    """Build the complete, valid top-level JSON schema for extraction.
+
+    Returns an object schema whose ``required`` lists the actual top-level
+    properties (not a hardcoded ``["paper"]`` that may not exist), with
+    ``additionalProperties: False`` enforced recursively. This is the shape both
+    OpenAI and stricter providers (OpenRouter) accept.
+    """
+    properties = build_parent_objects(feature_list, feature_object)
+    schema = {
+        "type": "object",
+        "properties": properties,
+    }
+    # enforce_additional_properties fills in required (= all property keys) and
+    # additionalProperties=False on this object and every nested object.
+    return enforce_additional_properties(schema)
 
 
 def build_openai_feature_functions(
@@ -175,12 +190,7 @@ def build_openai_feature_functions(
         "name": "extract_features",
         "description": ("Extract features from a scientific paper. "),
         "strict": True,
-        "parameters": {
-            "type": "object",
-            "properties": build_parent_objects(feature_list, feature_object),
-            "additionalProperties": False,
-            "required": ["paper"],
-        },
+        "parameters": build_top_level_schema(feature_list, feature_object),
     }
 
     return openai_function_object
