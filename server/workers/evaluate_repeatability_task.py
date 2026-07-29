@@ -11,13 +11,13 @@ import polars as pl
 from database.models.features import Features
 from database.models.papers import Paper
 from database.models.repeatability import RepeatabilityResult
-from openai import OpenAI
+from services.llm.openai_service import OpenAIService
 from utils.flatten import flatten_object
 from utils.krippendorff import krippendorff_alpha
 from workers.celery_config import celery
 from workers.services.file_s3_service import FileService
 from workers.services.socket_emitter import SocketEmmiter
-from workers.strategies.openai_json_schema_strategy import OpenAIJSONSchemaStrategy
+from workers.strategies.json_schema_strategy import JSONSchemaExtractionStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -66,10 +66,11 @@ def evaluate_feature_repeatability(
         emitter.emit_status(message="Downloading paper from storage...", progress=5)
         temp_file_path = file_service.download_from_s3(paper.s3_key)
 
-        client = OpenAI()
+        # Repeatability always runs on the Atlas platform OpenAI key.
+        service = OpenAIService(os.getenv("OPENAI_API_KEY"))
         # Handle project_id that might be empty string or None
         safe_project_id = project_id if project_id and project_id.strip() else None
-        strategy = OpenAIJSONSchemaStrategy(client, safe_project_id, emitter)
+        strategy = JSONSchemaExtractionStrategy(service, safe_project_id, emitter)
 
         extractions = []
         for i in range(num_runs):

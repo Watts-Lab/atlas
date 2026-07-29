@@ -33,7 +33,7 @@ async def add_paper(request: Request):
         files = request.files.getlist("files[]")
         socket_id = request.form.get("sid")
         project_id = request.form.get("project_id")
-        strategy_type = request.form.get("strategy_type", "assistant_api")
+        strategy_type = request.form.get("strategy_type", "json_schema")
 
         result = add_paper_to_project_controller(
             user, files, socket_id, project_id, strategy_type
@@ -58,7 +58,7 @@ async def create_paper_upload(request: Request):
     data = request.json or {}
     filename = data.get("filename")
     project_id = data.get("project_id")
-    strategy_type = data.get("strategy_type", "assistant_api")
+    strategy_type = data.get("strategy_type", "json_schema")
 
     result = create_paper_upload_controller(user, filename, project_id, strategy_type)
     if "error" in result:
@@ -76,7 +76,7 @@ async def finalize_paper_upload(request: Request):
     data = request.json or {}
     upload_token = data.get("upload_token")
     project_id = data.get("project_id")
-    strategy_type = data.get("strategy_type", "assistant_api")
+    strategy_type = data.get("strategy_type", "json_schema")
     socket_id = data.get("sid")
 
     result = finalize_paper_upload_controller(
@@ -100,7 +100,7 @@ async def reprocess_paper(request: Request, paper_id: str):
     user = request.ctx.user
     data = request.json
     project_id = data.get("project_id")
-    strategy_type = data.get("strategy_type", "assistant_api")
+    strategy_type = data.get("strategy_type", "json_schema")
     socket_id = data.get("sid")
 
     result = reprocess_paper_controller(
@@ -123,7 +123,7 @@ async def reprocess_project(request: Request, project_id: str):
     """
     user = request.ctx.user
     data = request.json
-    strategy_type = data.get("strategy_type", "assistant_api")
+    strategy_type = data.get("strategy_type", "json_schema")
     socket_id = data.get("sid")
 
     result = reprocess_project_controller(user, project_id, strategy_type, socket_id)

@@ -4,11 +4,25 @@ This module contains the controller for the features.
 
 from bunnet import PydanticObjectId
 from bunnet.operators import In, Or
+from pydantic import ValidationError
 from sanic import json as json_response
 
 from database.models.features import Features
 from database.models.projects import Project
 from database.schemas.gpt_interface import FeatureCreate
+
+
+def _format_validation_error(exc: ValidationError) -> list[dict]:
+    """Turn a pydantic ValidationError into a compact, JSON-safe list.
+
+    Each entry names the offending field and the reason, so API/SDK callers get
+    an actionable 400 instead of an opaque 500.
+    """
+    details = []
+    for err in exc.errors():
+        field = ".".join(str(p) for p in err.get("loc", ())) or "(body)"
+        details.append({"field": field, "message": err.get("msg", "invalid")})
+    return details
 
 def list_all_features(user, project_id=None):
     """
@@ -69,7 +83,15 @@ def create_feature(user, json_data):
     """
     Create a new feature.
     """
-    payload = FeatureCreate(**json_data)
+    try:
+        payload = FeatureCreate(**(json_data or {}))
+    except ValidationError as exc:
+        # Return a 400 naming the offending field(s) instead of a blanket 500.
+        return {
+            "error": "Invalid feature payload.",
+            "details": _format_validation_error(exc),
+            "status": 400,
+        }
     # build the JSON-schema for GPT
     gpt_iface = payload.to_gpt_interface()
 
@@ -121,7 +143,14 @@ def update_feature_controller(user, feature_id, json_data):
     if feat.user != user:
         return {"error": "Forbidden.", "status": 403}
 
-    payload = FeatureCreate(**json_data)
+    try:
+        payload = FeatureCreate(**(json_data or {}))
+    except ValidationError as exc:
+        return {
+            "error": "Invalid feature payload.",
+            "details": _format_validation_error(exc),
+            "status": 400,
+        }
     new_gpt_iface = payload.to_gpt_interface()
 
     # Check if interface changed

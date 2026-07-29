@@ -7,14 +7,10 @@ import os
 import uuid
 from typing import Any, Dict
 
-from database.models.projects import Project
+from database.models.projects import Project, ProjectLLMConfig
 from database.models.users import User
-from openai import OpenAI
-from services.llm_credentials import (
-    LlmCredentials,
-    record_usage,
-    resolve_and_check,
-)
+from services.llm.resolver import ResolvedLLM, resolve_llm
+from services.llm_credentials import record_usage_micros
 from services.model_pricing import micros_to_usd
 from workers.services.socket_emitter import SocketEmmiter
 from workers.strategies.strategy_factory import ExtractionStrategyFactory
@@ -27,96 +23,87 @@ if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
 
-def _provider_for_strategy(strategy_type: str) -> str:
-    """Map an extraction strategy to the LLM provider it calls."""
-    return "anthropic" if strategy_type == "anthropic_json_schema" else "openai"
-
-
 def run_assistant_api(
     file_path: str,
     project_id: str,
     emitter: SocketEmmiter,
     user: User,
-    strategy_type: str = "assistant_api",
+    strategy_type: str = "json_schema",
 ) -> Dict[str, Any]:
     """
-    Runs the assistant API to extract features from a paper.
+    Runs feature extraction for a paper.
 
-    Credentials are resolved centrally: the user's own provider key is used when
-    present (and never metered), otherwise the Atlas platform key is used and the
-    resulting token usage is charged against the user's monthly budget. Budget is
-    verified *before* any provider call so an over-limit user fails fast.
+    The provider/model/strategy come from the project's ``llm`` config. The
+    :func:`resolve_llm` resolver builds the right backend (Atlas platform key or
+    the user's BYO OpenAI/Anthropic/OpenRouter key) and decides whether the call
+    is metered. Only platform-key calls consume the monthly budget; BYO calls are
+    billed by the provider directly. Budget is verified *before* any provider
+    call so an over-limit user fails fast.
 
-    Args:
-        file_path: Path to the uploaded file
-        project_id: ID of the project
-        emitter: Socket emitter for progress updates
-        user: The owner of the paper (for credential resolution + metering)
-        strategy_type: Type of extraction strategy to use
-
-    Returns:
-        Dictionary containing extraction results
+    The project's ``llm`` config is the single source of truth for provider,
+    model, and extraction approach. The legacy ``strategy_type`` argument is only
+    used as a fallback when a project has no config yet (it defaults to the
+    provider-agnostic ``json_schema`` approach).
     """
-    provider = _provider_for_strategy(strategy_type)
-    # Resolve the key + budget decision atomically, and fail before spending
-    # money if this is a metered (platform-key) call over the monthly limit.
-    credentials: LlmCredentials = resolve_and_check(user, provider)
+    # Load the project (for custom prompt + llm config).
+    project = None
+    custom_prompt = None
+    llm_config: ProjectLLMConfig = ProjectLLMConfig()
+    if project_id and project_id.strip():
+        try:
+            project = Project.get(project_id).run()
+            if project:
+                custom_prompt = (
+                    project.prompt
+                    if project.prompt and project.prompt.strip()
+                    else None
+                )
+                llm_config = project.llm or ProjectLLMConfig()
+        except Exception as e:
+            logger.warning(
+                "Failed to fetch project %s in run_assistant_api: %s", project_id, e
+            )
 
-    # The strategy factory always receives an OpenAI client built from the
-    # resolved key. OpenAI strategies use it directly; the Anthropic strategy
-    # ignores it and builds its own client from the same resolved key.
-    openai_key = (
-        credentials.api_key if provider == "openai" else os.getenv("OPENAI_API_KEY")
-    )
-    client = OpenAI(api_key=openai_key) if openai_key else OpenAI()
+    # The project's configured strategy is authoritative. We fall back to the
+    # caller-supplied strategy_type only when the project has no explicit config
+    # (e.g. very old projects), and that fallback itself defaults to json_schema.
+    approach = llm_config.strategy or strategy_type or "json_schema"
+
+    # Resolve the backend + metering decision. This raises (handled upstream) if
+    # a BYO provider is selected without a key, or the platform budget is spent.
+    resolved: ResolvedLLM = resolve_llm(user, llm_config)
 
     try:
-        # Get project for custom prompt - only if project_id is provided
-        project = None
-        custom_prompt = None
-        if project_id and project_id.strip():
-            try:
-                project = Project.get(project_id).run()
-                if project:
-                    custom_prompt = (
-                        project.prompt
-                        if project.prompt and project.prompt.strip()
-                        else None
-                    )
-            except Exception as e:
-                logger.warning(
-                    "Failed to fetch project %s in run_assistant_api: %s", project_id, e
-                )
-
-        # Create strategy - ensure strategy factory can handle None project_id if needed
-        # (Though we already refactored extraction strategy to allow Optional[str])
         strategy = ExtractionStrategyFactory.create_strategy(
-            strategy_type=strategy_type,
-            client=client,
+            strategy_type=approach,
+            service=resolved.service,
             project_id=project_id if project_id and project_id.strip() else None,
             emitter=emitter,
-            api_key=credentials.api_key,
         )
 
-        logger.info("Using extraction strategy: %s", strategy.get_strategy_name())
+        logger.info(
+            "Extraction: approach=%s provider=%s model=%s metered=%s",
+            strategy.get_strategy_name(),
+            resolved.service.name,
+            resolved.service.model,
+            resolved.metered,
+        )
 
-        # Execute extraction
         output = strategy.extract(
             file_path=file_path,
             custom_prompt=custom_prompt,
         )
 
-        # Meter the call's USD cost against the monthly budget — a no-op for BYO
-        # keys. Only reached on success, so failed/interrupted calls are never
-        # charged. Pricing uses the model the strategy actually called.
-        model = output.get("model") or ""
-        charged_micros = record_usage(
-            user,
-            credentials,
-            model=model,
-            prompt_tokens=output.get("prompt_tokens", 0) or 0,
-            completion_tokens=output.get("completion_tokens", 0) or 0,
-        )
+        # Meter the call's USD cost against the monthly budget — skipped for BYO.
+        # Only reached on success, so failed/interrupted calls are never charged.
+        charged_micros = 0
+        if resolved.metered:
+            charged_micros = record_usage_micros(
+                user,
+                model=output.get("model") or "",
+                prompt_tokens=output.get("prompt_tokens", 0) or 0,
+                completion_tokens=output.get("completion_tokens", 0) or 0,
+            )
 
         file_name = file_path.split("/")[-1]
 
@@ -124,7 +111,8 @@ def run_assistant_api(
             "file_name": file_name,
             "output": output,
             "strategy_used": strategy.get_strategy_name(),
-            "metered": not credentials.is_byo,
+            "provider": resolved.service.name,
+            "metered": resolved.metered,
             "usd_charged": micros_to_usd(charged_micros),
         }
 
@@ -296,11 +284,25 @@ def finalize_paper_upload_controller(
 def get_paper_task_status_controller(task_id):
     """
     Get the status of a paper processing task.
+
+    Returns a small status envelope rather than the bare Celery ``result`` (which
+    is ``None`` until the task finishes, or after the result backend expires it).
+    This lets SDK/API callers poll ``task_id`` and always get a meaningful state
+    instead of ``null``.
     """
     from workers.celery_config import add_paper
 
+    if not task_id:
+        return {"error": "task_id is required", "status": 400}
+
     task = add_paper.AsyncResult(task_id)
-    return task.result
+    return {
+        "task_id": task_id,
+        "state": task.state,  # PENDING / STARTED / RETRY / SUCCESS / FAILURE
+        "ready": task.ready(),
+        "successful": task.successful() if task.ready() else None,
+        "result": task.result if task.ready() and task.successful() else None,
+    }
 
 
 def reprocess_paper_controller(user, paper_id, project_id, strategy_type, socket_id):

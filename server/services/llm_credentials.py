@@ -247,7 +247,21 @@ def record_usage(
     """
     if credentials.is_byo:
         return 0
+    return record_usage_micros(user, model, prompt_tokens, completion_tokens)
 
+
+def record_usage_micros(
+    user: User,
+    model: str,
+    prompt_tokens: int,
+    completion_tokens: int,
+) -> int:
+    """Charge a (already known to be metered) platform call against the budget.
+
+    Unlike :func:`record_usage` this takes no credentials object — the caller has
+    already decided the call is metered (e.g. via the LLM resolver). Returns the
+    micro-dollars charged (0 for unknown model / zero usage).
+    """
     charge_micros = cost_micros(model, prompt_tokens, completion_tokens)
     if charge_micros <= 0:
         return 0

@@ -1,68 +1,82 @@
 """
 Strategy factory for creating extraction strategies.
+
+Two kinds of strategy exist:
+
+* ``json_schema`` — provider-agnostic. Runs against any injected
+  :class:`~services.llm.base.LLMService` (OpenAI / Anthropic / OpenRouter).
+* ``assistant_api`` — OpenAI-only, uses the Assistant API + vector stores. It
+  needs a real OpenAI client, so we build one from the resolved service when it
+  is OpenAI-backed.
 """
 
 from typing import Optional
 
-from openai import OpenAI
+from services.llm.base import LLMService
+from services.llm.openai_service import OpenAIService
 from workers.services.socket_emitter import SocketEmmiter
-from workers.strategies.anthropic_json_schema_strategy import (
-    AnthropicJSONSchemaStrategy,
-)
 from workers.strategies.assistant_strategy import AssistantAPIStrategy
 from workers.strategies.extraction_strategy import ExtractionStrategy
-from workers.strategies.openai_json_schema_strategy import OpenAIJSONSchemaStrategy
+from workers.strategies.json_schema_strategy import JSONSchemaExtractionStrategy
+
+# Approaches that use the unified, provider-agnostic strategy. The legacy
+# per-provider aliases map here too so old callers keep working.
+_JSON_SCHEMA_ALIASES = {
+    "json_schema",
+    "openai_json_schema",
+    "anthropic_json_schema",
+    "openrouter_json_schema",
+}
 
 
 class ExtractionStrategyFactory:
     """Factory for creating extraction strategies."""
 
-    _strategies = {
-        "assistant_api": AssistantAPIStrategy,
-        "openai_json_schema": OpenAIJSONSchemaStrategy,
-        "anthropic_json_schema": AnthropicJSONSchemaStrategy,
-        # Backwards-compatible alias for the original OpenAI JSON schema strategy.
-        "json_schema": OpenAIJSONSchemaStrategy,
-    }
-
     @classmethod
     def create_strategy(
         cls,
         strategy_type: str,
-        client: OpenAI,
-        project_id: str,
+        service: LLMService,
+        project_id: Optional[str],
         emitter: SocketEmmiter,
-        api_key: Optional[str] = None,
     ) -> ExtractionStrategy:
         """
-        Create an extraction strategy based on the specified type.
+        Create an extraction strategy.
 
         Args:
-            strategy_type: Type of strategy ('assistant_api', 'openai_json_schema',
-                or 'anthropic_json_schema')
-            client: OpenAI client (already built from the resolved key)
-            project_id: Project ID
-            emitter: Socket emitter for progress updates
-            api_key: The resolved provider key. Passed to strategies (e.g. the
-                Anthropic strategy) that build their own provider client so they
-                use the same credential the caller resolved, never an env default.
-
-        Returns:
-            ExtractionStrategy instance
+            strategy_type: "json_schema" (or a legacy per-provider alias) or
+                "assistant_api".
+            service: The resolved, provider-agnostic LLM service.
+            project_id: Project ID (or None).
+            emitter: Socket emitter for progress updates.
 
         Raises:
-            ValueError: If strategy type is not recognized
+            ValueError: If the strategy type is not recognized, or assistant_api
+                is requested with a non-OpenAI service.
         """
-        strategy_class = cls._strategies.get(strategy_type)
-        if not strategy_class:
-            raise ValueError(
-                f"Unknown strategy type: {strategy_type}. "
-                f"Available strategies: {list(cls._strategies.keys())}"
+        if strategy_type in _JSON_SCHEMA_ALIASES:
+            return JSONSchemaExtractionStrategy(service, project_id, emitter)
+
+        if strategy_type == "assistant_api":
+            # The Assistant API is OpenAI-specific and needs a real OpenAI client.
+            if not isinstance(service, OpenAIService):
+                raise ValueError(
+                    "The assistant_api strategy only supports OpenAI. Set the "
+                    "project provider to 'atlas' or 'openai', or use json_schema."
+                )
+            return AssistantAPIStrategy(
+                service._client,  # noqa: SLF001 - the strategy needs the raw client
+                project_id,
+                emitter,
+                api_key=None,
             )
 
-        return strategy_class(client, project_id, emitter, api_key=api_key)
+        raise ValueError(
+            f"Unknown strategy type: {strategy_type}. "
+            f"Available: {sorted(_JSON_SCHEMA_ALIASES)} + ['assistant_api']"
+        )
 
     @classmethod
     def get_available_strategies(cls) -> list[str]:
-        """Get list of available strategy types."""
-        return list(cls._strategies.keys())
+        """Get list of available strategy types (for request validation)."""
+        return sorted(_JSON_SCHEMA_ALIASES | {"assistant_api"})

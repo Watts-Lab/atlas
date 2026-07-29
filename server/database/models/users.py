@@ -53,6 +53,8 @@ class User(Document):
     openai_api_key_prefix: Optional[str] = None
     anthropic_api_key_encrypted: Optional[str] = None
     anthropic_api_key_prefix: Optional[str] = None
+    openrouter_api_key_encrypted: Optional[str] = None
+    openrouter_api_key_prefix: Optional[str] = None
 
     # A list of recently viewed projects with their view timestamps
     # format : [{"project_id": str, "viewed_at": datetime}]

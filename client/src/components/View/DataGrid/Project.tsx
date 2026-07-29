@@ -16,6 +16,12 @@ import InclusionCriteriaPanel from './InclusionCriteriaPanel'
 import { fetchCriteria } from './inclusionCriteria.service'
 import type { InclusionCriteria } from './inclusionCriteria.types'
 
+type ProjectLLM = {
+  provider: 'atlas' | 'openai' | 'anthropic' | 'openrouter'
+  model: string | null
+  strategy: 'json_schema' | 'assistant_api'
+}
+
 type ProjectDetails = {
   id: string
   name: string
@@ -23,7 +29,10 @@ type ProjectDetails = {
   prompt: string
   created_at: string
   updated_at: string
+  llm: ProjectLLM
 }
+
+const DEFAULT_LLM: ProjectLLM = { provider: 'atlas', model: null, strategy: 'json_schema' }
 
 type Params = {
   project_id?: string
@@ -55,6 +64,7 @@ const Project: React.FC = () => {
     prompt: '',
     created_at: '',
     updated_at: '',
+    llm: DEFAULT_LLM,
   })
   const [projectStats, setProjectStats] = useState<ProjectStats>({
     papersProcessed: 0,
@@ -191,7 +201,9 @@ const Project: React.FC = () => {
     }
     data.append('sid', socket?.id || '')
     data.append('project_id', params.project_id)
-    data.append('strategy_type', 'openai_json_schema') // 'openai_json_schema', 'anthropic_json_schema', or 'assistant_api' for backend processing
+    // Provider/model/strategy are governed by the project's Model & Provider
+    // config on the server; 'json_schema' is the provider-agnostic approach.
+    data.append('strategy_type', 'json_schema')
 
     try {
       toast.loading('Uploading files...')
@@ -513,6 +525,7 @@ const Project: React.FC = () => {
           prompt: projectData.prompt || defaultPrompt,
           created_at: projectData.created_at,
           updated_at: projectData.updated_at,
+          llm: projectData.llm || DEFAULT_LLM,
         })
 
         setProjectStats((prev) => ({
@@ -629,7 +642,7 @@ const Project: React.FC = () => {
     try {
       const response = await api.post(`/assistant/reprocess_paper/${paperId}`, {
         project_id: params.project_id,
-        strategy_type: 'openai_json_schema',
+        strategy_type: 'json_schema',
         sid: socket?.id || '',
       })
 
@@ -725,7 +738,7 @@ const Project: React.FC = () => {
 
     try {
       const response = await api.post(`/assistant/reprocess_project/${params.project_id}`, {
-        strategy_type: 'openai_json_schema',
+        strategy_type: 'json_schema',
         sid: socket?.id || '',
       })
 
@@ -802,6 +815,7 @@ const Project: React.FC = () => {
         availableFeatures={availableFeatures}
         selectableHeaders={selectableHeaders}
         onUpdateProject={updateProject}
+        onPatchProject={(patch) => setProject((prev) => ({ ...prev, ...patch }))}
         onUpdatePrompt={updateProjectPrompt}
         onUpdateFeatures={updateProjectFeatures}
         onFileUpload={handleFileUpload}

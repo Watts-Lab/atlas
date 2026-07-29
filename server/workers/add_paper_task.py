@@ -248,7 +248,7 @@ def add_paper(
     socket_id: str,
     user_email: str,
     project_id: str,
-    strategy_type: str = "assistant_api",
+    strategy_type: str = "json_schema",
     original_filename: Optional[str] = None,
     paper_id: Optional[str] = None,  # For reprocessing existing papers
     staged_s3_key: Optional[str] = None,  # For curl/presigned uploads
@@ -526,7 +526,7 @@ def reprocess_paper(
     socket_id: str,
     user_email: str,
     project_id: str,
-    strategy_type: str = "assistant_api",
+    strategy_type: str = "json_schema",
 ):
     """
     Reprocess an existing paper from S3.
