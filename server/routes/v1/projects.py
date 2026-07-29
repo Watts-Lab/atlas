@@ -175,13 +175,18 @@ async def project_detail(request: Request, project_id: str):
         project_name = request.json.get("project_name")
         project_description = request.json.get("project_description")
         project_prompt = request.json.get("project_prompt")
+        project_llm = request.json.get("project_llm")
 
-        updated = update_project(
-            project_id=project_id,
-            project_name=project_name,
-            project_description=project_description,
-            project_prompt=project_prompt,
-        )
+        try:
+            updated = update_project(
+                project_id=project_id,
+                project_name=project_name,
+                project_description=project_description,
+                project_prompt=project_prompt,
+                project_llm=project_llm,
+            )
+        except ValueError as exc:
+            return json_response({"error": str(exc)}, status=400)
         if not updated:
             return json_response({"error": "Project not found."}, status=404)
         return json_response({"message": "Project updated.", "project": updated})

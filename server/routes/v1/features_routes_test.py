@@ -69,6 +69,50 @@ def _feature(**overrides):
 
 
 # ---------------------------------------------------------------------------
+# POST /api/v1/features  (create)
+# ---------------------------------------------------------------------------
+
+
+async def test_create_feature_missing_prompt_returns_400(
+    client, auth_headers, patch_auth_user
+):
+    # Regression for #250: a missing required field (feature_prompt) must yield a
+    # 400 naming the field, not an opaque 500. Validation fails before any DB
+    # access, so no model mock is needed.
+    _, response = await client.post(
+        "/api/v1/features",
+        json={
+            "feature_name": "Overall d",
+            "feature_identifier": "d_overall",
+            "feature_type": "number",
+        },
+        headers=auth_headers(),
+    )
+    assert response.status_code == 400
+    assert response.json["error"] == "Invalid feature payload."
+    fields = [d["field"] for d in response.json["details"]]
+    assert "feature_prompt" in fields
+
+
+async def test_create_feature_invalid_type_returns_400(
+    client, auth_headers, patch_auth_user
+):
+    # An invalid feature_type (e.g. the internal 'string'/'integer') is a 400.
+    _, response = await client.post(
+        "/api/v1/features",
+        json={
+            "feature_name": "X",
+            "feature_identifier": "x",
+            "feature_prompt": "extract x",
+            "feature_type": "integer",
+        },
+        headers=auth_headers(),
+    )
+    assert response.status_code == 400
+    assert response.json["error"] == "Invalid feature payload."
+
+
+# ---------------------------------------------------------------------------
 # GET /api/v1/features
 # ---------------------------------------------------------------------------
 

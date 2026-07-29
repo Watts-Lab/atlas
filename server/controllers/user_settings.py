@@ -18,17 +18,18 @@ from typing import Literal
 
 from database.models.users import User
 from services.llm_credentials import get_usage
-from utils.crypto import encrypt_secret
+from utils.crypto import decrypt_secret, encrypt_secret
 
 logger = logging.getLogger(__name__)
 
-Provider = Literal["openai", "anthropic"]
+Provider = Literal["openai", "anthropic", "openrouter"]
 
 # Minimal, provider-specific sanity checks. We deliberately keep these loose —
 # providers change key formats over time and we don't want to reject valid keys.
 _PROVIDER_PREFIXES = {
     "openai": ("sk-",),
     "anthropic": ("sk-ant-", "sk-"),
+    "openrouter": ("sk-or-", "sk-"),
 }
 
 _MAX_KEY_LENGTH = 500
@@ -48,6 +49,8 @@ def _field_names(provider: Provider) -> tuple[str, str]:
         return "openai_api_key_encrypted", "openai_api_key_prefix"
     if provider == "anthropic":
         return "anthropic_api_key_encrypted", "anthropic_api_key_prefix"
+    if provider == "openrouter":
+        return "openrouter_api_key_encrypted", "openrouter_api_key_prefix"
     raise ValueError(f"Unknown provider: {provider!r}")
 
 
@@ -64,6 +67,12 @@ def get_settings(user: User) -> dict:
             "anthropic": {
                 "configured": bool(user.anthropic_api_key_encrypted),
                 "prefix": user.anthropic_api_key_prefix,
+            },
+            "openrouter": {
+                "configured": bool(
+                    getattr(user, "openrouter_api_key_encrypted", None)
+                ),
+                "prefix": getattr(user, "openrouter_api_key_prefix", None),
             },
         },
     }
@@ -104,6 +113,49 @@ def set_provider_key(user: User, provider: Provider, raw_key: str) -> dict:
         "configured": True,
         "prefix": prefix,
         "message": f"{provider.capitalize()} API key saved.",
+    }
+
+
+def test_provider_key(user: User, provider: Provider) -> dict:
+    """Verify the user's stored *provider* key actually works.
+
+    Decrypts the key exactly as extraction would, builds the relevant service,
+    and makes a tiny live call (``ping``). Returns ``{"ok": True}`` on success;
+    raises ``ValueError`` with a friendly message on any failure so the UI can
+    show it. Never returns the key itself.
+    """
+    if provider not in _PROVIDER_PREFIXES:
+        raise ValueError(f"Unsupported provider: {provider!r}")
+
+    enc_field, _ = _field_names(provider)
+    encrypted = getattr(user, enc_field, None)
+    if not encrypted:
+        raise ValueError(f"No {provider} key is configured.")
+
+    try:
+        raw_key = decrypt_secret(encrypted)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Failed to decrypt %s key for %s: %s", provider, user.email, exc)
+        raise ValueError(
+            "Stored key could not be decrypted. Try re-saving it."
+        ) from exc
+
+    from services.llm.resolver import build_test_service
+
+    try:
+        service = build_test_service(provider, raw_key)
+        service.ping()
+    except Exception as exc:  # noqa: BLE001 - surface a clean message to the UI
+        logger.info("Key test failed for %s (%s): %s", provider, user.email, exc)
+        raise ValueError(
+            f"The {provider} key was rejected by the provider. "
+            "Check that it is active and has access."
+        ) from exc
+
+    return {
+        "provider": provider,
+        "ok": True,
+        "message": f"{provider.capitalize()} key is valid.",
     }
 
 

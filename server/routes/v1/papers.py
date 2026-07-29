@@ -32,7 +32,7 @@ async def update_paper_results(request: Request, paper_id: str):
     try:
         data = request.json
         project_id = data.get("project_id")
-        strategy_type = data.get("strategy_type", "assistant_api")
+        strategy_type = data.get("strategy_type", "json_schema")
         socket_id = data.get("sid", f"update_{paper_id}")
 
         if not project_id:
@@ -90,7 +90,7 @@ async def batch_update_papers(request: Request):
         data = request.json
         project_id = data.get("project_id")
         paper_ids = data.get("paper_ids", [])
-        strategy_type = data.get("strategy_type", "assistant_api")
+        strategy_type = data.get("strategy_type", "json_schema")
 
         if not project_id:
             return json_response({"error": "project_id is required"}, status=400)

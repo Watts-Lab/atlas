@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { KeyRound, Trash2, Sparkles, Bot } from 'lucide-react'
+import { KeyRound, Trash2, Sparkles, Bot, Network, CheckCircle2, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import MainPage from '@/components/View/DataGrid/MainPage'
@@ -34,10 +34,11 @@ type Settings = {
   provider_keys: {
     openai: ProviderKey
     anthropic: ProviderKey
+    openrouter: ProviderKey
   }
 }
 
-type Provider = 'openai' | 'anthropic'
+type Provider = 'openai' | 'anthropic' | 'openrouter'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ const PROVIDER_META: Record<
 > = {
   openai: { label: 'OpenAI', icon: Sparkles, placeholder: 'sk-...' },
   anthropic: { label: 'Anthropic', icon: Bot, placeholder: 'sk-ant-...' },
+  openrouter: { label: 'OpenRouter', icon: Network, placeholder: 'sk-or-...' },
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -61,9 +63,14 @@ export default function UsagePage() {
   const [isLoading, setIsLoading] = useState(true)
 
   // Per-provider input + saving state
-  const [inputs, setInputs] = useState<Record<Provider, string>>({ openai: '', anthropic: '' })
+  const [inputs, setInputs] = useState<Record<Provider, string>>({
+    openai: '',
+    anthropic: '',
+    openrouter: '',
+  })
   const [savingProvider, setSavingProvider] = useState<Provider | null>(null)
   const [removingProvider, setRemovingProvider] = useState<Provider | null>(null)
+  const [testingProvider, setTestingProvider] = useState<Provider | null>(null)
 
   // ── Fetch ───────────────────────────────────────────────────────────────────
 
@@ -104,6 +111,25 @@ export default function UsagePage() {
       toast.error(message)
     } finally {
       setSavingProvider(null)
+    }
+  }
+
+  const handleTest = async (provider: Provider) => {
+    setTestingProvider(provider)
+    try {
+      const { data } = await api.post<{ ok: boolean; message: string }>(
+        `/user/provider-keys/${provider}/test`,
+      )
+      if (data.ok) {
+        toast.success(`${PROVIDER_META[provider].label} key is valid`)
+      }
+    } catch (err) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        'Key test failed'
+      toast.error(message)
+    } finally {
+      setTestingProvider(null)
     }
   }
 
@@ -249,6 +275,22 @@ export default function UsagePage() {
                         variant='outline'
                         size='icon'
                         className='shrink-0'
+                        onClick={() => handleTest(provider)}
+                        disabled={testingProvider === provider}
+                        title={`Test ${meta.label} key`}
+                      >
+                        {testingProvider === provider ? (
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                        ) : (
+                          <CheckCircle2 className='h-4 w-4' />
+                        )}
+                      </Button>
+                    )}
+                    {configured && (
+                      <Button
+                        variant='outline'
+                        size='icon'
+                        className='shrink-0'
                         onClick={() => handleRemove(provider)}
                         disabled={removingProvider === provider}
                         title={`Remove ${meta.label} key`}
@@ -264,7 +306,8 @@ export default function UsagePage() {
 
           {!isLoading &&
             !settings?.provider_keys?.openai.configured &&
-            !settings?.provider_keys?.anthropic.configured && (
+            !settings?.provider_keys?.anthropic.configured &&
+            !settings?.provider_keys?.openrouter.configured && (
               <div className='mt-6 flex items-center gap-2 text-xs text-muted-foreground'>
                 <KeyRound className='h-3.5 w-3.5' />
                 No provider keys configured — extractions use your monthly Atlas budget.

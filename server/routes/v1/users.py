@@ -8,6 +8,7 @@ from controllers.user_settings import (
     delete_provider_key,
     get_settings,
     set_provider_key,
+    test_provider_key,
 )
 from routes.auth import require_jwt, require_session
 from routes.error_handler import error_handler
@@ -17,7 +18,7 @@ from sanic.response import json as json_response
 
 users_bp = Blueprint("users", url_prefix="/user")
 
-_VALID_PROVIDERS = ("openai", "anthropic")
+_VALID_PROVIDERS = ("openai", "anthropic", "openrouter")
 
 
 @users_bp.route("/papers", methods=["GET"], name="user_papers")
@@ -77,3 +78,25 @@ async def user_provider_keys(request: Request, provider: str):
         except ValueError as exc:
             return json_response({"error": True, "message": str(exc)}, status=400)
         return json_response(result, status=200)
+
+
+@users_bp.route(
+    "/provider-keys/<provider>/test", methods=["POST"], name="user_provider_key_test"
+)
+@require_session
+@error_handler
+async def user_provider_key_test(request: Request, provider: str):
+    """Make a barebones live call to verify the user's stored *provider* key."""
+    user = request.ctx.user
+
+    if provider not in _VALID_PROVIDERS:
+        return json_response(
+            {"error": True, "message": f"Unsupported provider: {provider!r}."},
+            status=400,
+        )
+
+    try:
+        result = test_provider_key(user, provider)
+    except ValueError as exc:
+        return json_response({"error": True, "message": str(exc)}, status=400)
+    return json_response(result, status=200)

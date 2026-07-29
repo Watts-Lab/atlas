@@ -39,6 +39,7 @@ import {
 } from 'lucide-react'
 import { Feature, NewFeature } from './feature.types'
 import PromptEditorModal from './PromptEditorModal'
+import ProjectLLMSettings, { type ProjectLLM } from './ProjectLLMSettings'
 import { toast } from 'sonner'
 
 type ProjectDetails = {
@@ -48,6 +49,7 @@ type ProjectDetails = {
   prompt: string
   created_at: string
   updated_at: string
+  llm: ProjectLLM
 }
 
 type ProjectStats = {
@@ -62,6 +64,7 @@ interface ProjectHeaderProps {
   availableFeatures: Feature[]
   selectableHeaders: string[]
   onUpdateProject: (project: Partial<ProjectDetails>) => void
+  onPatchProject: (patch: Partial<ProjectDetails>) => void
   onUpdatePrompt: (prompt: string) => Promise<void>
   onUpdateFeatures: () => Promise<void>
   onFileUpload: () => void
@@ -87,6 +90,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   availableFeatures,
   selectableHeaders,
   onUpdateProject,
+  onPatchProject,
   onUpdatePrompt,
   onUpdateFeatures,
   onFileUpload,
@@ -107,6 +111,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   const [groundTruthDialogOpen, setGroundTruthDialogOpen] = useState(false)
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false)
   const [promptDialogOpen, setPromptDialogOpen] = useState(false)
+  const [llmDialogOpen, setLlmDialogOpen] = useState(false)
 
   // Local form state
   const [tempProject, setTempProject] = useState<ProjectDetails>(project)
@@ -241,6 +246,10 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <DropdownMenuItem onClick={() => setPromptDialogOpen(true)}>
                 <Settings className='w-4 h-4 mr-2' />
                 Assistant Prompt
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLlmDialogOpen(true)}>
+                <Layers className='w-4 h-4 mr-2' />
+                Model & Provider
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -436,6 +445,15 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ————— Model & Provider Dialog ————— */}
+      <ProjectLLMSettings
+        open={llmDialogOpen}
+        onOpenChange={setLlmDialogOpen}
+        projectId={project.id}
+        value={project.llm}
+        onSaved={(llm) => onPatchProject({ llm })}
+      />
 
       {/* ————— Manage Features Dialog ————— */}
       <Dialog open={manageFeaturesDialogOpen} onOpenChange={setManageFeaturesDialogOpen}>

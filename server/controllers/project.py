@@ -7,8 +7,12 @@ from datetime import datetime
 from bunnet import PydanticObjectId
 from bunnet.operators import In
 from database.models.features import Features
-from database.models.projects import Project
+from database.models.projects import Project, ProjectLLMConfig
 from database.models.users import User
+
+# Allowed values for the per-project LLM config, validated on update.
+_VALID_PROVIDERS = {"atlas", "openai", "anthropic", "openrouter"}
+_VALID_STRATEGIES = {"json_schema", "assistant_api"}
 
 
 def create_project(
@@ -86,7 +90,11 @@ def get_project_detail(project_id: str):
 
 
 def update_project(
-    project_id: str, project_name: str, project_description: str, project_prompt: str
+    project_id: str,
+    project_name: str,
+    project_description: str,
+    project_prompt: str,
+    project_llm: dict | None = None,
 ):
     """Update the project name.
     We should also update the project description and features in the future.
@@ -122,6 +130,21 @@ def update_project(
 
     if project_prompt is not None:
         user_project.prompt = project_prompt
+
+    if project_llm is not None:
+        current = user_project.llm or ProjectLLMConfig()
+        provider = project_llm.get("provider", current.provider)
+        strategy = project_llm.get("strategy", current.strategy)
+        if provider not in _VALID_PROVIDERS:
+            raise ValueError(f"Unsupported provider: {provider!r}")
+        if strategy not in _VALID_STRATEGIES:
+            raise ValueError(f"Unsupported strategy: {strategy!r}")
+        # model may be None ("use provider default") or a string.
+        model = project_llm.get("model", current.model)
+        model = model.strip() if isinstance(model, str) and model.strip() else None
+        user_project.llm = ProjectLLMConfig(
+            provider=provider, model=model, strategy=strategy
+        )
 
     user_project.updated_at = datetime.now()
 

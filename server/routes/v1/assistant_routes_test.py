@@ -40,10 +40,16 @@ async def test_add_paper_rejects_missing_files(client, auth_headers, patch_auth_
 # ---------------------------------------------------------------------------
 
 
-async def test_add_paper_get_returns_task_result(
+async def test_add_paper_get_returns_task_status_envelope(
     client, auth_headers, patch_auth_user, monkeypatch
 ):
-    fake_task = SimpleNamespace(result={"status": "done"})
+    # A finished, successful task returns a status envelope with the result.
+    fake_task = SimpleNamespace(
+        state="SUCCESS",
+        result={"status": "success"},
+        ready=lambda: True,
+        successful=lambda: True,
+    )
     monkeypatch.setattr(
         "workers.celery_config.add_paper.AsyncResult", lambda task_id: fake_task
     )
@@ -52,7 +58,34 @@ async def test_add_paper_get_returns_task_result(
         "/api/v1/assistant/add_paper?task_id=abc", headers=auth_headers()
     )
     assert response.status_code == 200
-    assert response.json["status"] == "done"
+    assert response.json["task_id"] == "abc"
+    assert response.json["state"] == "SUCCESS"
+    assert response.json["ready"] is True
+    assert response.json["result"] == {"status": "success"}
+
+
+async def test_add_paper_get_pending_task_has_no_result(
+    client, auth_headers, patch_auth_user, monkeypatch
+):
+    # A not-yet-finished task returns a PENDING state and null result (not a bare
+    # null response) so callers can poll meaningfully. Regression for #251.
+    fake_task = SimpleNamespace(
+        state="PENDING",
+        result=None,
+        ready=lambda: False,
+        successful=lambda: False,
+    )
+    monkeypatch.setattr(
+        "workers.celery_config.add_paper.AsyncResult", lambda task_id: fake_task
+    )
+
+    _, response = await client.get(
+        "/api/v1/assistant/add_paper?task_id=abc", headers=auth_headers()
+    )
+    assert response.status_code == 200
+    assert response.json["state"] == "PENDING"
+    assert response.json["ready"] is False
+    assert response.json["result"] is None
 
 
 # ---------------------------------------------------------------------------

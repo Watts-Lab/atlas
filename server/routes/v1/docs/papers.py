@@ -12,7 +12,7 @@ from routes.v1.docs.common import (
 
 _STRATEGY = {
     "type": "string",
-    "description": "Extraction strategy. Defaults to `assistant_api`.",
+    "description": "Extraction approach. Defaults to `json_schema`.",
 }
 
 __getattr__ = make_getattr(

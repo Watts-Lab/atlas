@@ -34,7 +34,8 @@ async def features_list(request: Request):
 
     if request.method == "POST":
         result = create_feature(user, request.json)
-        return json_response(result, status=201)
+        status = result.pop("status", 201)
+        return json_response(result, status=status)
 
 
 @features_bp.route(

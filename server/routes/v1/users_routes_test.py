@@ -60,3 +60,66 @@ async def test_user_papers_requires_auth(client):
     # No cookie / API key -> rejected by require_jwt.
     _, response = await client.get("/api/v1/user/papers")
     assert response.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# Provider key management (openrouter + test endpoint)
+# ---------------------------------------------------------------------------
+
+
+async def test_set_openrouter_key(client, auth_headers, patch_auth_user, monkeypatch):
+    captured = {}
+    monkeypatch.setattr(
+        "routes.v1.users.set_provider_key",
+        lambda user, provider, raw_key: captured.update(
+            provider=provider, key=raw_key
+        )
+        or {"provider": provider, "configured": True, "prefix": "sk-...abcd"},
+    )
+
+    _, response = await client.put(
+        "/api/v1/user/provider-keys/openrouter",
+        json={"api_key": "sk-or-abc123"},
+        headers=auth_headers(),
+    )
+
+    assert response.status_code == 200
+    assert captured["provider"] == "openrouter"
+    assert response.json["configured"] is True
+
+
+async def test_test_provider_key_success(
+    client, auth_headers, patch_auth_user, monkeypatch
+):
+    monkeypatch.setattr(
+        "routes.v1.users.test_provider_key",
+        lambda user, provider: {"provider": provider, "ok": True, "message": "ok"},
+    )
+    _, response = await client.post(
+        "/api/v1/user/provider-keys/openai/test", headers=auth_headers()
+    )
+    assert response.status_code == 200
+    assert response.json["ok"] is True
+
+
+async def test_test_provider_key_invalid(
+    client, auth_headers, patch_auth_user, monkeypatch
+):
+    def _raise(user, provider):
+        raise ValueError("The openai key was rejected by the provider.")
+
+    monkeypatch.setattr("routes.v1.users.test_provider_key", _raise)
+    _, response = await client.post(
+        "/api/v1/user/provider-keys/openai/test", headers=auth_headers()
+    )
+    assert response.status_code == 400
+    assert response.json["error"] is True
+
+
+async def test_test_provider_key_rejects_unknown_provider(
+    client, auth_headers, patch_auth_user
+):
+    _, response = await client.post(
+        "/api/v1/user/provider-keys/bogus/test", headers=auth_headers()
+    )
+    assert response.status_code == 400

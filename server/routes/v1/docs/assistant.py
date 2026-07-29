@@ -14,8 +14,9 @@ from routes.v1.docs.common import (
 _STRATEGY = {
     "type": "string",
     "description": (
-        "Extraction strategy. One of `assistant_api`, `openai_json_schema`, or "
-        "`anthropic_json_schema`. Defaults to `assistant_api`."
+        "Extraction approach. `json_schema` (recommended, provider-agnostic) or "
+        "`assistant_api` (OpenAI Assistant API, legacy). The project's own model "
+        "& provider config takes precedence. Defaults to `json_schema`."
     ),
 }
 _SID = {
