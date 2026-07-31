@@ -72,11 +72,30 @@ def get_project_detail(project_id: str):
     if not user_project:
         return None
 
-    project_dict = user_project.model_dump(mode="json", exclude=["user"])
+    # IMPORTANT: exclude nested link documents. With fetch_links=True the linked
+    # `features` (and their `user`) and `papers` resolve to full ORM documents;
+    # dumping them would leak the feature creator's User document — including
+    # magic_link, encrypted API keys, and billing fields. Exclude them here and
+    # re-add safe, explicitly allow-listed shapes below.
+    project_dict = user_project.model_dump(
+        mode="json", exclude={"user", "features", "papers"}
+    )
     project_dict["slug"] = str(project_dict["slug"])
     project_dict["created_at"] = str(project_dict["created_at"])
     project_dict["updated_at"] = str(project_dict["updated_at"])
     project_dict["papers"] = [str(pap.id) for pap in user_project.papers]
+
+    # Allow-listed feature fields only — never the nested `user` document.
+    project_dict["features"] = [
+        {
+            "id": str(f.id),
+            "feature_name": f.feature_name,
+            "feature_identifier": f.feature_identifier,
+            "feature_description": f.feature_description,
+            "created_by": "user" if f.user else "provider",
+        }
+        for f in user_project.features
+    ]
 
     papers = [
         {
@@ -149,7 +168,12 @@ def update_project(
     user_project.updated_at = datetime.now()
 
     user_project.save()
-    project_dict = user_project.model_dump(mode="json", exclude=["user"])
+    # Exclude linked documents (user/features/papers) so no nested User document
+    # (magic_link, encrypted keys, billing) can leak. This endpoint is fetched
+    # without links, but exclude defensively regardless.
+    project_dict = user_project.model_dump(
+        mode="json", exclude={"user", "features", "papers"}
+    )
     project_dict["slug"] = str(project_dict["slug"])
     project_dict["created_at"] = str(project_dict["created_at"])
     project_dict["updated_at"] = str(project_dict["updated_at"])
