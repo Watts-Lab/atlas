@@ -1,9 +1,59 @@
 import { useEffect, useRef } from 'react'
 
+import { useIsDarkMode } from '@/hooks/use-dark-mode'
+
+const LIGHT_PALETTE = {
+  base: '#f8fafc',
+  wash: ['rgba(111, 149, 189, 0.16)', 'rgba(248, 250, 252, 0.68)', 'rgba(248, 250, 252, 0)'],
+  galaxy: [
+    'rgba(11, 31, 58, 0.11)',
+    'rgba(111, 149, 189, 0.1)',
+    'rgba(248, 250, 252, 0.02)',
+    'rgba(248, 250, 252, 0)',
+  ],
+  gridMajor: 'rgba(51, 65, 85, 0.1)',
+  gridMinor: 'rgba(51, 65, 85, 0.045)',
+  arcWarm: 'rgba(111, 29, 27, 0.16)',
+  arcCool: 'rgba(11, 31, 58, 0.12)',
+  ellipse: 'rgba(60, 96, 130, 0.08)',
+  dust: '60, 96, 130',
+  starWarm: '111, 29, 27',
+  starCool: '60, 96, 130',
+  starBase: '11, 31, 58',
+  link: 'rgba(11, 31, 58, 0.07)',
+  trailHead: '11, 31, 58',
+  trailTail: '60, 96, 130',
+}
+
+const DARK_PALETTE: typeof LIGHT_PALETTE = {
+  base: '#0b1220',
+  wash: ['rgba(111, 149, 189, 0.1)', 'rgba(11, 18, 32, 0.68)', 'rgba(11, 18, 32, 0)'],
+  galaxy: [
+    'rgba(159, 178, 202, 0.1)',
+    'rgba(111, 149, 189, 0.1)',
+    'rgba(11, 18, 32, 0.02)',
+    'rgba(11, 18, 32, 0)',
+  ],
+  gridMajor: 'rgba(148, 163, 184, 0.1)',
+  gridMinor: 'rgba(148, 163, 184, 0.045)',
+  arcWarm: 'rgba(207, 165, 163, 0.14)',
+  arcCool: 'rgba(159, 178, 202, 0.12)',
+  ellipse: 'rgba(143, 179, 212, 0.08)',
+  dust: '143, 179, 212',
+  starWarm: '229, 169, 166',
+  starCool: '143, 179, 212',
+  starBase: '220, 230, 242',
+  link: 'rgba(220, 230, 242, 0.07)',
+  trailHead: '220, 230, 242',
+  trailTail: '143, 179, 212',
+}
+
 export function CartographicBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const isDarkMode = useIsDarkMode()
 
   useEffect(() => {
+    const palette = isDarkMode ? DARK_PALETTE : LIGHT_PALETTE
     if (navigator.userAgent.includes('jsdom')) return
 
     const canvas = canvasRef.current
@@ -70,7 +120,7 @@ export function CartographicBackground() {
           speed: Math.random() * 0.000017 + 0.000011,
           parallax: Math.random() * 18 + 6,
           alpha: Math.random() * 0.42 + 0.2,
-          color: warmAccent ? '111, 29, 27' : coolAccent ? '60, 96, 130' : '11, 31, 58',
+          color: warmAccent ? palette.starWarm : coolAccent ? palette.starCool : palette.starBase,
         }
       })
 
@@ -121,7 +171,7 @@ export function CartographicBackground() {
       const delta = lastTime === 0 ? 0 : Math.min((time - lastTime) / 1000, 0.04)
       lastTime = time
 
-      ctx.fillStyle = '#f8fafc'
+      ctx.fillStyle = palette.base
       ctx.fillRect(0, 0, width, height)
 
       const wash = ctx.createRadialGradient(
@@ -132,9 +182,9 @@ export function CartographicBackground() {
         height * 0.15,
         Math.max(width, height) * 0.9,
       )
-      wash.addColorStop(0, 'rgba(111, 149, 189, 0.16)')
-      wash.addColorStop(0.48, 'rgba(248, 250, 252, 0.68)')
-      wash.addColorStop(1, 'rgba(248, 250, 252, 0)')
+      wash.addColorStop(0, palette.wash[0])
+      wash.addColorStop(0.48, palette.wash[1])
+      wash.addColorStop(1, palette.wash[2])
       ctx.fillStyle = wash
       ctx.fillRect(0, 0, width, height)
 
@@ -146,10 +196,10 @@ export function CartographicBackground() {
         height * 0.34,
         Math.max(width, height) * 0.58,
       )
-      galaxy.addColorStop(0, 'rgba(11, 31, 58, 0.11)')
-      galaxy.addColorStop(0.36, 'rgba(111, 149, 189, 0.1)')
-      galaxy.addColorStop(0.72, 'rgba(248, 250, 252, 0.02)')
-      galaxy.addColorStop(1, 'rgba(248, 250, 252, 0)')
+      galaxy.addColorStop(0, palette.galaxy[0])
+      galaxy.addColorStop(0.36, palette.galaxy[1])
+      galaxy.addColorStop(0.72, palette.galaxy[2])
+      galaxy.addColorStop(1, palette.galaxy[3])
       ctx.fillStyle = galaxy
       ctx.fillRect(0, 0, width, height)
 
@@ -158,24 +208,24 @@ export function CartographicBackground() {
         ctx.beginPath()
         ctx.moveTo(x, 0)
         ctx.lineTo(x, height)
-        ctx.strokeStyle = x % 240 === 0 ? 'rgba(51, 65, 85, 0.1)' : 'rgba(51, 65, 85, 0.045)'
+        ctx.strokeStyle = x % 240 === 0 ? palette.gridMajor : palette.gridMinor
         ctx.stroke()
       }
       for (let y = 0; y < height; y += 48) {
         ctx.beginPath()
         ctx.moveTo(0, y)
         ctx.lineTo(width, y)
-        ctx.strokeStyle = y % 240 === 0 ? 'rgba(51, 65, 85, 0.1)' : 'rgba(51, 65, 85, 0.045)'
+        ctx.strokeStyle = y % 240 === 0 ? palette.gridMajor : palette.gridMinor
         ctx.stroke()
       }
 
-      ctx.strokeStyle = 'rgba(111, 29, 27, 0.16)'
+      ctx.strokeStyle = palette.arcWarm
       ctx.lineWidth = 1.2
       ctx.beginPath()
       ctx.arc(width * 0.12, height * 0.24, Math.min(width, height) * 0.18, 0.35, 1.65)
       ctx.stroke()
 
-      ctx.strokeStyle = 'rgba(11, 31, 58, 0.12)'
+      ctx.strokeStyle = palette.arcCool
       ctx.lineWidth = 1
       ctx.beginPath()
       ctx.arc(width * 0.82, height * 0.72, Math.min(width, height) * 0.32, 3.85, 5.95)
@@ -184,7 +234,7 @@ export function CartographicBackground() {
       ctx.save()
       ctx.translate(width * 0.58, height * 0.34)
       ctx.rotate(-0.16)
-      ctx.strokeStyle = 'rgba(60, 96, 130, 0.08)'
+      ctx.strokeStyle = palette.ellipse
       ctx.lineWidth = 1
       for (let i = 0; i < 4; i += 1) {
         ctx.beginPath()
@@ -204,7 +254,7 @@ export function CartographicBackground() {
       dust.forEach((point) => {
         ctx.beginPath()
         ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(60, 96, 130, ${point.alpha})`
+        ctx.fillStyle = `rgba(${palette.dust}, ${point.alpha})`
         ctx.fill()
       })
 
@@ -241,7 +291,7 @@ export function CartographicBackground() {
             ctx.beginPath()
             ctx.moveTo(x, y)
             ctx.lineTo(nextX, nextY)
-            ctx.strokeStyle = 'rgba(11, 31, 58, 0.07)'
+            ctx.strokeStyle = palette.link
             ctx.lineWidth = 1
             ctx.stroke()
           }
@@ -274,9 +324,9 @@ export function CartographicBackground() {
         const tailX = star.x - star.length * direction
         const tailY = star.y - star.length * 0.14
         const gradient = ctx.createLinearGradient(star.x, star.y, tailX, tailY)
-        gradient.addColorStop(0, `rgba(11, 31, 58, ${alpha})`)
-        gradient.addColorStop(0.3, `rgba(60, 96, 130, ${alpha * 0.54})`)
-        gradient.addColorStop(1, 'rgba(60, 96, 130, 0)')
+        gradient.addColorStop(0, `rgba(${palette.trailHead}, ${alpha})`)
+        gradient.addColorStop(0.3, `rgba(${palette.trailTail}, ${alpha * 0.54})`)
+        gradient.addColorStop(1, `rgba(${palette.trailTail}, 0)`)
 
         ctx.beginPath()
         ctx.moveTo(star.x, star.y)
@@ -287,7 +337,7 @@ export function CartographicBackground() {
 
         ctx.beginPath()
         ctx.arc(star.x, star.y, 2.2, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(11, 31, 58, ${alpha})`
+        ctx.fillStyle = `rgba(${palette.trailHead}, ${alpha})`
         ctx.fill()
 
         return true
@@ -304,7 +354,7 @@ export function CartographicBackground() {
       window.removeEventListener('resize', resize)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [])
+  }, [isDarkMode])
 
   return <canvas ref={canvasRef} className='fixed inset-0 w-full h-full z-0 pointer-events-none' />
 }

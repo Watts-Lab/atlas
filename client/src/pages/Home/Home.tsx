@@ -129,7 +129,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
   }
 
   return (
-    <div className='fixed inset-0 overflow-auto bg-[#f8fafc] text-[#0b1f3a] selection:bg-[#6f95bd]/25 selection:text-[#06162b]'>
+    <div className='fixed inset-0 overflow-auto bg-[#f8fafc] dark:bg-[#0b1220] text-[#0b1f3a] dark:text-[#dce6f2] selection:bg-[#6f95bd]/25 dark:selection:bg-[#6f95bd]/40 selection:text-[#06162b] dark:selection:text-[#e8eef5]'>
       <CartographicBackground />
 
       <main className='relative z-10 flex min-h-screen items-center justify-center px-6 py-12'>
@@ -137,10 +137,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
           {/* Header Section */}
           <div className='text-center space-y-5'>
             <div className='flex justify-center'>
-              <img src='/logo.svg' alt='Atlas Logo' className='h-32 w-32' />
+              <img src='/logo.svg' alt='Atlas Logo' className='h-32 w-32 dark:invert' />
             </div>
             <div>
-              <h1 className='text-3xl font-semibold tracking-tight text-[#071a33]'>
+              <h1 className='text-3xl font-semibold tracking-tight text-[#071a33] dark:text-[#e2eaf4]'>
                 Welcome to Atlas
               </h1>
             </div>
@@ -149,12 +149,12 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
           {/* Post-login passkey enrolment prompt */}
           {showAddPasskey ? (
             <div className='mt-8 space-y-5 fade-in'>
-              <div className='rounded-md border border-[#d6dee8] bg-white/70 p-5 text-center'>
-                <Fingerprint className='mx-auto h-8 w-8 text-[#16375f]' />
-                <h2 className='mt-3 text-lg font-semibold text-[#071a33]'>
+              <div className='rounded-md border border-[#d6dee8] dark:border-[#243350] bg-white/70 dark:bg-white/5 p-5 text-center'>
+                <Fingerprint className='mx-auto h-8 w-8 text-[#16375f] dark:text-[#b6cbe4]' />
+                <h2 className='mt-3 text-lg font-semibold text-[#071a33] dark:text-[#e2eaf4]'>
                   Add a passkey to this device?
                 </h2>
-                <p className='mt-2 text-sm text-[#475569]'>
+                <p className='mt-2 text-sm text-[#475569] dark:text-[#a8b6c8]'>
                   Next time you can sign in instantly with Touch ID, Face ID, or Windows Hello — no
                   email link needed.
                 </p>
@@ -163,7 +163,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
                 disabled={passkeyBusy}
                 type='button'
                 onClick={handleAddPasskey}
-                className='h-11 w-full rounded-sm border border-[#0b1f3a] bg-[#0b1f3a] font-semibold text-white shadow-none hover:bg-[#16375f] hover:border-[#16375f]'
+                className='h-11 w-full rounded-sm border border-[#0b1f3a] dark:border-[#4c6f9c] bg-[#0b1f3a] dark:bg-[#2e4d77] font-semibold text-white shadow-none hover:bg-[#16375f] dark:hover:bg-[#3c6082] hover:border-[#16375f] dark:hover:border-[#6f95bd]'
               >
                 {passkeyBusy ? (
                   <Loader2 className='w-4 h-4 mr-2 animate-spin' />
@@ -177,7 +177,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
                 type='button'
                 variant='ghost'
                 onClick={() => navigate('/dashboard')}
-                className='h-11 w-full rounded-sm font-semibold text-[#475569] hover:bg-[#eef4fa] hover:text-[#0b1f3a]'
+                className='h-11 w-full rounded-sm font-semibold text-[#475569] dark:text-[#a8b6c8] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5]'
               >
                 Maybe later
               </Button>
@@ -186,7 +186,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
             /* Login Form */
             <div className='mt-8 space-y-5'>
               <div className='space-y-2'>
-                <Label htmlFor='email' className='text-sm font-semibold text-[#0b1f3a]'>
+                <Label
+                  htmlFor='email'
+                  className='text-sm font-semibold text-[#0b1f3a] dark:text-[#dce6f2]'
+                >
                   Email
                 </Label>
                 {!submitting ? (
@@ -198,10 +201,10 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
                     type='email'
                     placeholder='example@scaledhumanity.org'
                     required
-                    className='h-11 rounded-sm border-[#9fb2ca] bg-white text-[#0b1f3a] placeholder:text-[#94a3b8] focus-visible:border-[#3c6082] focus-visible:ring-[#6f95bd]/30'
+                    className='h-11 rounded-sm border-[#9fb2ca] dark:border-[#3a4f6e] bg-white dark:bg-[#101c30] text-[#0b1f3a] dark:text-[#dce6f2] placeholder:text-[#94a3b8] focus-visible:border-[#3c6082] focus-visible:ring-[#6f95bd]/30'
                   />
                 ) : (
-                  <p className='border-y border-[#d6dee8] py-4 text-sm text-[#475569] fade-in'>
+                  <p className='border-y border-[#d6dee8] dark:border-[#243350] py-4 text-sm text-[#475569] dark:text-[#a8b6c8] fade-in'>
                     Please check your email for a login link
                   </p>
                 )}
@@ -211,18 +214,18 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
                 disabled={submitting}
                 type='button'
                 onClick={handleLogin}
-                className='h-11 w-full rounded-sm border border-[#0b1f3a] bg-[#0b1f3a] font-semibold text-white shadow-none hover:bg-[#16375f] hover:border-[#16375f]'
+                className='h-11 w-full rounded-sm border border-[#0b1f3a] dark:border-[#4c6f9c] bg-[#0b1f3a] dark:bg-[#2e4d77] font-semibold text-white shadow-none hover:bg-[#16375f] dark:hover:bg-[#3c6082] hover:border-[#16375f] dark:hover:border-[#6f95bd]'
               >
                 {submitting && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
                 Login
               </Button>
 
               <div className='flex items-center gap-3'>
-                <div className='h-px flex-1 bg-[#d6dee8]' />
-                <span className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]'>
+                <div className='h-px flex-1 bg-[#d6dee8] dark:bg-[#243350]' />
+                <span className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b] dark:text-[#8fa0b4]'>
                   Or
                 </span>
-                <div className='h-px flex-1 bg-[#d6dee8]' />
+                <div className='h-px flex-1 bg-[#d6dee8] dark:bg-[#243350]' />
               </div>
 
               <Button
@@ -230,7 +233,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
                 type='button'
                 variant='outline'
                 onClick={handlePasskeyLogin}
-                className='h-11 w-full rounded-sm border-[#9fb2ca] bg-white font-semibold text-[#0b1f3a] shadow-none hover:border-[#3c6082] hover:bg-[#eef4fa] hover:text-[#0b1f3a]'
+                className='h-11 w-full rounded-sm border-[#9fb2ca] dark:border-[#3a4f6e] bg-white dark:bg-[#101c30] font-semibold text-[#0b1f3a] dark:text-[#dce6f2] shadow-none hover:border-[#3c6082] dark:hover:border-[#6f95bd] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5]'
               >
                 {passkeyBusy ? (
                   <Loader2 className='w-4 h-4 mr-2 animate-spin' />
@@ -240,7 +243,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
                 Continue with passkey
               </Button>
               {!supportsPasskeys && (
-                <p className='text-center text-xs text-[#64748b]'>
+                <p className='text-center text-xs text-[#64748b] dark:text-[#8fa0b4]'>
                   Passkeys aren&apos;t supported in this browser. Use the email login above.
                 </p>
               )}
@@ -248,18 +251,18 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
           )}
 
           {/* Footer */}
-          <div className='mt-8 text-center text-xs leading-5 text-[#64748b]'>
+          <div className='mt-8 text-center text-xs leading-5 text-[#64748b] dark:text-[#8fa0b4]'>
             <span>By clicking continue, you agree to our </span>
             <a
               href='https://github.com/Watts-Lab/atlas?tab=coc-ov-file'
-              className='font-medium text-[#0b1f3a] underline decoration-[#9fb2ca] underline-offset-4 hover:text-[#6f1d1b]'
+              className='font-medium text-[#0b1f3a] dark:text-[#dce6f2] underline decoration-[#9fb2ca] underline-offset-4 hover:text-[#6f1d1b] dark:hover:text-[#e5a9a6]'
             >
               Code of Conduct
             </a>
             <span> and </span>
             <a
               href='https://github.com/Watts-Lab/atlas?tab=AGPL-3.0-1-ov-file'
-              className='font-medium text-[#0b1f3a] underline decoration-[#9fb2ca] underline-offset-4 hover:text-[#6f1d1b]'
+              className='font-medium text-[#0b1f3a] dark:text-[#dce6f2] underline decoration-[#9fb2ca] underline-offset-4 hover:text-[#6f1d1b] dark:hover:text-[#e5a9a6]'
             >
               License
             </a>
@@ -268,7 +271,7 @@ const Home = ({ loggingIn }: { loggingIn?: boolean }) => {
 
           {/* Status Messages */}
           {isLoggingIn && (
-            <p className='mt-6 border-t border-[#d6dee8] pt-5 text-center text-sm text-[#475569] fade-in'>
+            <p className='mt-6 border-t border-[#d6dee8] dark:border-[#243350] pt-5 text-center text-sm text-[#475569] dark:text-[#a8b6c8] fade-in'>
               {loggingInMessage}
             </p>
           )}

@@ -27,23 +27,26 @@ export default function MainPage({
   rightSidebar,
 }: PageProps) {
   return (
-    <SidebarProvider className='h-svh overflow-hidden bg-[#f8fafc] text-[#0b1f3a]'>
+    <SidebarProvider className='h-svh overflow-hidden bg-[#f8fafc] dark:bg-[#0b1220] text-[#0b1f3a] dark:text-[#dce6f2]'>
       <AppSidebar sidebarOpen={sidebarOpen} />
-      <SidebarInset className='min-w-0 bg-[#f8fafc] bg-[linear-gradient(rgba(51,65,85,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(51,65,85,0.035)_1px,transparent_1px)] bg-[size:48px_48px]'>
-        <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 bg-[#f8fafc]/90 backdrop-blur-md transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
+      <SidebarInset className='min-w-0 bg-[#f8fafc] dark:bg-[#0b1220] bg-[linear-gradient(rgba(51,65,85,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(51,65,85,0.035)_1px,transparent_1px)] bg-[size:48px_48px]'>
+        <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 bg-[#f8fafc]/90 dark:bg-[#0b1220]/90 backdrop-blur-md transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
           <div className='flex items-center gap-2 px-4'>
-            <SidebarTrigger className='-ml-1 rounded-sm text-[#334155] hover:bg-[#eef4fa] hover:text-[#0b1f3a]' />
+            <SidebarTrigger className='-ml-1 rounded-sm text-[#334155] dark:text-[#b8c4d4] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5]' />
             {breadcrumbs.length > 0 && (
               <>
-                <Separator orientation='vertical' className='mr-2 h-4 bg-[#d6dee8]' />
+                <Separator
+                  orientation='vertical'
+                  className='mr-2 h-4 bg-[#d6dee8] dark:bg-[#243350]'
+                />
                 <Breadcrumb>
-                  <BreadcrumbList className='text-[#64748b]'>
+                  <BreadcrumbList className='text-[#64748b] dark:text-[#8fa0b4]'>
                     {breadcrumbs.map((breadcrumb, index) => (
                       <Fragment key={index}>
                         <BreadcrumbItem>
                           <BreadcrumbLink
                             href={breadcrumb.url}
-                            className='font-medium hover:text-[#0b1f3a]'
+                            className='font-medium hover:text-[#0b1f3a] dark:hover:text-[#e8eef5]'
                           >
                             {breadcrumb.title}
                           </BreadcrumbLink>

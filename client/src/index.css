@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
 table-hover td,
 .table-hover th {
   position: relative;
@@ -10,19 +17,10 @@ table-hover td,
 }
 
 .table-hover td.hover-column,
-.table-hover th.hover-column {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
-}
-
-.table-hover .hover-column-first {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
-}
-
+.table-hover th.hover-column,
+.table-hover .hover-column-first,
 .table-hover .hover-column-last {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity)) /* #f3f4f6 */;
+  background-color: var(--muted);
 }
 
 .container-gradient {

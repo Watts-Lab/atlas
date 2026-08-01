@@ -94,7 +94,7 @@ const Team: React.FC = () => {
   })
 
   return (
-    <div className='bg-[#f8fafc] min-h-screen text-[#0b1f3a] font-sans selection:bg-[#6f95bd]/25 selection:text-[#06162b]'>
+    <div className='bg-[#f8fafc] dark:bg-[#0b1220] min-h-screen text-[#0b1f3a] dark:text-[#dce6f2] font-sans selection:bg-[#6f95bd]/25 dark:selection:bg-[#6f95bd]/40 selection:text-[#06162b] dark:selection:text-[#e8eef5]'>
       <CartographicBackground />
 
       <SiteHeader hidden={hidden} />
@@ -106,11 +106,13 @@ const Team: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          <p className='text-sm uppercase tracking-[0.3em] text-[#64748b] mb-4'>Who We Are</p>
-          <h1 className='text-5xl md:text-7xl font-semibold tracking-[0.01em] mb-6 text-[#071a33]'>
+          <p className='text-sm uppercase tracking-[0.3em] text-[#64748b] dark:text-[#8fa0b4] mb-4'>
+            Who We Are
+          </p>
+          <h1 className='text-5xl md:text-7xl font-semibold tracking-[0.01em] mb-6 text-[#071a33] dark:text-[#e2eaf4]'>
             The Atlas Team
           </h1>
-          <p className='text-lg md:text-xl text-[#334155] max-w-2xl mx-auto font-light leading-relaxed'>
+          <p className='text-lg md:text-xl text-[#334155] dark:text-[#b8c4d4] max-w-2xl mx-auto font-light leading-relaxed'>
             A collaboration at the Computational Social Science Lab building tools to map the
             structure of knowledge hidden within scientific papers.
           </p>
@@ -120,8 +122,10 @@ const Team: React.FC = () => {
       {/* Team */}
       <section id='team' className='relative z-10 max-w-5xl mx-auto px-6 py-16'>
         <div className='flex items-center gap-4 mb-10'>
-          <h2 className='text-3xl md:text-4xl font-semibold tracking-tight text-[#071a33]'>Team</h2>
-          <div className='flex-1 h-px bg-[#d6dee8]' />
+          <h2 className='text-3xl md:text-4xl font-semibold tracking-tight text-[#071a33] dark:text-[#e2eaf4]'>
+            Team
+          </h2>
+          <div className='flex-1 h-px bg-[#d6dee8] dark:bg-[#243350]' />
         </div>
 
         <div className='grid gap-6 md:grid-cols-2'>
@@ -132,13 +136,17 @@ const Team: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className='rounded-md border border-[#d6dee8] bg-white/70 backdrop-blur-sm p-6 shadow-sm hover:shadow-md hover:border-[#6f95bd]/60 transition-all'
+              className='rounded-md border border-[#d6dee8] dark:border-[#243350] bg-white/70 dark:bg-white/5 backdrop-blur-sm p-6 shadow-sm hover:shadow-md hover:border-[#6f95bd]/60 transition-all'
             >
               <div className='flex items-start justify-between gap-3'>
                 <div>
-                  <h3 className='text-xl font-semibold text-[#071a33]'>{member.name}</h3>
-                  <p className='mt-1 text-sm font-medium text-[#16375f]'>{member.role}</p>
-                  <p className='text-sm text-[#64748b]'>{member.affiliation}</p>
+                  <h3 className='text-xl font-semibold text-[#071a33] dark:text-[#e2eaf4]'>
+                    {member.name}
+                  </h3>
+                  <p className='mt-1 text-sm font-medium text-[#16375f] dark:text-[#b6cbe4]'>
+                    {member.role}
+                  </p>
+                  <p className='text-sm text-[#64748b] dark:text-[#8fa0b4]'>{member.affiliation}</p>
                 </div>
                 {member.link && (
                   <a
@@ -146,13 +154,15 @@ const Team: React.FC = () => {
                     target='_blank'
                     rel='noreferrer'
                     aria-label={`${member.name} personal website`}
-                    className='shrink-0 rounded-full border border-[#d6dee8] p-2 text-[#3c6082] hover:text-[#0b1f3a] hover:border-[#6f95bd] transition-colors'
+                    className='shrink-0 rounded-full border border-[#d6dee8] dark:border-[#243350] p-2 text-[#3c6082] dark:text-[#8fb3d4] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] hover:border-[#6f95bd] transition-colors'
                   >
                     <Globe className='h-4 w-4' />
                   </a>
                 )}
               </div>
-              <p className='mt-4 text-sm leading-relaxed text-[#334155]'>{member.bio}</p>
+              <p className='mt-4 text-sm leading-relaxed text-[#334155] dark:text-[#b8c4d4]'>
+                {member.bio}
+              </p>
             </motion.article>
           ))}
         </div>
@@ -161,12 +171,12 @@ const Team: React.FC = () => {
       {/* Appearances */}
       <section id='appearances' className='relative z-10 max-w-5xl mx-auto px-6 py-16'>
         <div className='flex items-center gap-4 mb-4'>
-          <h2 className='text-3xl md:text-4xl font-semibold tracking-tight text-[#071a33]'>
+          <h2 className='text-3xl md:text-4xl font-semibold tracking-tight text-[#071a33] dark:text-[#e2eaf4]'>
             Where We&apos;ve Been
           </h2>
-          <div className='flex-1 h-px bg-[#d6dee8]' />
+          <div className='flex-1 h-px bg-[#d6dee8] dark:bg-[#243350]' />
         </div>
-        <p className='text-[#475569] max-w-2xl mb-10'>
+        <p className='text-[#475569] dark:text-[#a8b6c8] max-w-2xl mb-10'>
           Atlas has been presented through posters and workshops at leading computational and social
           science venues.
         </p>
@@ -179,26 +189,28 @@ const Team: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: i * 0.08 }}
-              className='flex flex-col gap-3 sm:flex-row sm:items-center rounded-md border border-[#d6dee8] bg-white/70 backdrop-blur-sm p-5'
+              className='flex flex-col gap-3 sm:flex-row sm:items-center rounded-md border border-[#d6dee8] dark:border-[#243350] bg-white/70 dark:bg-white/5 backdrop-blur-sm p-5'
             >
-              <div className='flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-sm bg-[#0b1f3a] text-white'>
+              <div className='flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-sm bg-[#0b1f3a] dark:bg-[#2e4d77] text-white'>
                 <span className='text-lg font-semibold leading-none'>{item.year}</span>
               </div>
               <div className='flex-1'>
                 <div className='flex flex-wrap items-center gap-2'>
-                  <span className='text-base font-semibold text-[#071a33]'>{item.venue}</span>
+                  <span className='text-base font-semibold text-[#071a33] dark:text-[#e2eaf4]'>
+                    {item.venue}
+                  </span>
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       item.kind === 'Workshop'
-                        ? 'bg-[#6f1d1b]/10 text-[#6f1d1b]'
-                        : 'bg-[#3c6082]/12 text-[#16375f]'
+                        ? 'bg-[#6f1d1b]/10 dark:bg-[#6f1d1b]/30 text-[#6f1d1b] dark:text-[#e5a9a6]'
+                        : 'bg-[#3c6082]/12 dark:bg-[#3c6082]/30 text-[#16375f] dark:text-[#b6cbe4]'
                     }`}
                   >
                     {item.kind}
                   </span>
                 </div>
-                <p className='mt-1 text-sm text-[#334155]'>{item.title}</p>
-                <p className='text-sm text-[#64748b]'>{item.location}</p>
+                <p className='mt-1 text-sm text-[#334155] dark:text-[#b8c4d4]'>{item.title}</p>
+                <p className='text-sm text-[#64748b] dark:text-[#8fa0b4]'>{item.location}</p>
               </div>
             </motion.div>
           ))}
@@ -213,16 +225,16 @@ const Team: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className='text-3xl md:text-4xl font-semibold mb-6 tracking-tight text-[#071a33]'>
+          <h2 className='text-3xl md:text-4xl font-semibold mb-6 tracking-tight text-[#071a33] dark:text-[#e2eaf4]'>
             Want to explore Atlas?
           </h2>
-          <p className='text-lg text-[#475569] mb-10 max-w-xl mx-auto'>
+          <p className='text-lg text-[#475569] dark:text-[#a8b6c8] mb-10 max-w-xl mx-auto'>
             Turn research papers into quantitative maps and structure the experiments, conditions,
             and results hidden inside them.
           </p>
           <Link
             to='/login'
-            className='inline-block px-8 py-4 bg-[#0b1f3a] text-white rounded-sm font-semibold border border-[#0b1f3a] hover:bg-[#16375f] hover:border-[#16375f] transition-colors'
+            className='inline-block px-8 py-4 bg-[#0b1f3a] dark:bg-[#2e4d77] text-white rounded-sm font-semibold border border-[#0b1f3a] dark:border-[#4c6f9c] hover:bg-[#16375f] dark:hover:bg-[#3c6082] hover:border-[#16375f] dark:hover:border-[#6f95bd] transition-colors'
           >
             Get Started with Atlas
           </Link>

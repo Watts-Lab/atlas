@@ -131,7 +131,7 @@ export const FeatureDefineForm: React.FC<FeatureDefineFormProps> = ({
           className='w-full'
           disabled={!!editingFeatureId || isCopying}
         />
-        <p className='text-sm text-gray-500'>
+        <p className='text-sm text-muted-foreground'>
           Will generate identifier:{' '}
           <code>{name.toLowerCase().trim().replace(/\s+/g, '_')}</code>
         </p>

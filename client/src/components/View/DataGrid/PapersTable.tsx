@@ -195,8 +195,8 @@ export default function PapersTable({ papers, isLoading }: PapersTableProps) {
               <TableRow>
                 <TableCell colSpan={columns.length} className='text-center py-10'>
                   <div className='flex flex-col items-center justify-center'>
-                    <Loader2 className='h-6 w-6 animate-spin text-gray-500' />
-                    <p className='mt-2 text-gray-500'>Loading Projects...</p>
+                    <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+                    <p className='mt-2 text-muted-foreground'>Loading Projects...</p>
                   </div>
                 </TableCell>
               </TableRow>

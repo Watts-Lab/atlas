@@ -193,9 +193,9 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   }, [])
 
   return (
-    <div className='w-full border-b border-gray-200 bg-white shadow-sm'>
+    <div className='w-full border-b bg-background shadow-sm'>
       {/* Top Menu */}
-      <div className='bg-gray-50 border-b px-4 py-0.5'>
+      <div className='bg-muted/50 border-b px-4 py-0.5'>
         <div className='flex items-center space-x-1'>
           {/* File */}
           <DropdownMenu>
@@ -203,7 +203,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+                className='h-8 px-3 text-sm font-medium hover:bg-muted'
                 disabled={isLoading}
               >
                 File <ChevronDown className='w-3 h-3 ml-1' />
@@ -232,7 +232,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+                className='h-8 px-3 text-sm font-medium hover:bg-muted'
                 disabled={isLoading}
               >
                 Edit <ChevronDown className='w-3 h-3 ml-1' />
@@ -260,7 +260,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+                className='h-8 px-3 text-sm font-medium hover:bg-muted'
                 disabled={isLoading}
               >
                 Features <ChevronDown className='w-3 h-3 ml-1' />
@@ -289,7 +289,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+                className='h-8 px-3 text-sm font-medium hover:bg-muted'
                 disabled={isLoading || bulkReprocessing}
               >
                 Processing <ChevronDown className='w-3 h-3 ml-1' />
@@ -316,7 +316,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+                className='h-8 px-3 text-sm font-medium hover:bg-muted'
               >
                 Help <ChevronDown className='w-3 h-3 ml-1' />
               </Button>
@@ -337,7 +337,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           <Button
             variant='ghost'
             size='sm'
-            className='h-8 px-3 text-sm font-medium hover:bg-gray-100'
+            className='h-8 px-3 text-sm font-medium hover:bg-muted'
             onClick={onOpenInclusionCriteria}
             disabled={isLoading}
           >
@@ -348,22 +348,24 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       </div>
 
       {/* Project Info */}
-      <div className='bg-white px-4 py-3'>
+      <div className='bg-background px-4 py-3'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-3'>
-            <h1 className='text-xl font-semibold text-gray-900'>{project.name}</h1>
-            {isLoading && <Loader2 className='w-4 h-4 animate-spin text-gray-500' />}
-            <span className='text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded font-mono'>
+            <h1 className='text-xl font-semibold text-foreground'>{project.name}</h1>
+            {isLoading && <Loader2 className='w-4 h-4 animate-spin text-muted-foreground' />}
+            <span className='text-xs text-muted-foreground bg-muted px-2 py-1 rounded font-mono'>
               {project.id}
             </span>
           </div>
-          <div className='flex items-center space-x-4 text-sm text-gray-600'>
+          <div className='flex items-center space-x-4 text-sm text-muted-foreground'>
             <span>Papers: {projectStats.papersProcessed}</span>
             <span>Features: {projectStats.featuresExtracted}</span>
             <span>Updated: {projectStats.lastUpdated}</span>
           </div>
         </div>
-        {project.description && <p className='text-sm text-gray-600 mt-2'>{project.description}</p>}
+        {project.description && (
+          <p className='text-sm text-muted-foreground mt-2'>{project.description}</p>
+        )}
       </div>
 
       {/* ————— Reprocess Confirmation Dialog ————— */}
@@ -418,7 +420,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             </div>
             <div className='space-y-2'>
               <Label htmlFor='proj-id'>Project ID</Label>
-              <Input id='proj-id' value={tempProject.id} disabled className='bg-gray-50' />
+              <Input id='proj-id' value={tempProject.id} disabled className='bg-muted' />
             </div>
             <div className='space-y-2'>
               <Label htmlFor='proj-desc'>Description</Label>
@@ -469,7 +471,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 className={`p-4 border rounded-lg cursor-pointer ${
                   f.selected
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-border hover:border-muted-foreground/40'
                 }`}
                 onClick={() => handleFeatureToggle(f.id)}
               >
@@ -483,7 +485,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                   <div>
                     <h4 className='font-medium'>{f.feature_name}</h4>
                     {f.feature_description && (
-                      <p className='text-sm text-gray-600'>{f.feature_description}</p>
+                      <p className='text-sm text-muted-foreground'>{f.feature_description}</p>
                     )}
                   </div>
                 </div>
@@ -545,7 +547,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
 
           <div className='space-y-2'>
             <div className='font-semibold'>Import Ground Truth</div>
-            <p className='text-sm text-gray-500'>
+            <p className='text-sm text-muted-foreground'>
               Upload your modified ground truth CSV to score your features.
             </p>
             <Input type='file' accept='.csv' onChange={handleTruthFileChange} />
@@ -573,35 +575,35 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           <div className='space-y-4'>
             <div className='flex justify-between'>
               <span className='font-medium'>Project ID:</span>
-              <span className='font-mono text-gray-600'>{project.id}</span>
+              <span className='font-mono text-muted-foreground'>{project.id}</span>
             </div>
             <div className='flex justify-between'>
               <span className='font-medium'>Created:</span>
-              <span className='text-gray-600'>
+              <span className='text-muted-foreground'>
                 {new Date(project.created_at).toLocaleDateString()}
               </span>
             </div>
             <div className='flex justify-between'>
               <span className='font-medium'>Papers Processed:</span>
-              <span className='text-gray-600'>{projectStats.papersProcessed}</span>
+              <span className='text-muted-foreground'>{projectStats.papersProcessed}</span>
             </div>
             <div className='flex justify-between'>
               <span className='font-medium'>Features Extracted:</span>
-              <span className='text-gray-600'>{projectStats.featuresExtracted}</span>
+              <span className='text-muted-foreground'>{projectStats.featuresExtracted}</span>
             </div>
 
             <Separator className='my-4' />
 
             <div className='space-y-2'>
               <div className='font-medium'>Share Project</div>
-              <p className='text-sm text-gray-500'>
+              <p className='text-sm text-muted-foreground'>
                 Share this project with others using the link below.
               </p>
               <div className='flex space-x-2'>
                 <Input
                   value={`${window.location.origin}/project/${project.id}`}
                   readOnly
-                  className='bg-gray-50'
+                  className='bg-muted'
                 />
                 <Button variant='outline' size='sm' onClick={handleCopyShareLink}>
                   <Share2 className='w-4 h-4 mr-2' />
