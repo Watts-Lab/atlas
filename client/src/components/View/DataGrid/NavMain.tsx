@@ -77,7 +77,7 @@ export function NavMain({
                   <SidebarMenuButton
                     tooltip={item.title}
                     isActive={itemIsActive}
-                    className='rounded-sm text-[#334155] dark:text-[#b8c4d4] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] data-[active=true]:bg-[#0b1f3a] data-[active=true]:text-white'
+                    className='rounded-sm text-[#334155] dark:text-[#b8c4d4] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] data-[active=true]:bg-[#0b1f3a] dark:data-[active=true]:bg-[#2e4d77] data-[active=true]:text-white'
                   >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
@@ -94,7 +94,7 @@ export function NavMain({
                           <SidebarMenuSubButton
                             asChild
                             isActive={subItemIsActive}
-                            className='rounded-sm text-[#475569] dark:text-[#a8b6c8] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] data-[active=true]:bg-[#eef4fa] data-[active=true]:font-medium data-[active=true]:text-[#0b1f3a]'
+                            className='rounded-sm text-[#475569] dark:text-[#a8b6c8] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] data-[active=true]:bg-[#eef4fa] dark:data-[active=true]:bg-[#16233a] data-[active=true]:font-medium data-[active=true]:text-[#0b1f3a] dark:data-[active=true]:text-[#e8eef5]'
                           >
                             {subItem.external ? (
                               <a href={subItem.url}>
@@ -119,7 +119,7 @@ export function NavMain({
                 tooltip={item.title}
                 asChild
                 isActive={itemIsActive}
-                className='rounded-sm text-[#334155] dark:text-[#b8c4d4] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] data-[active=true]:bg-[#0b1f3a] data-[active=true]:text-white'
+                className='rounded-sm text-[#334155] dark:text-[#b8c4d4] hover:bg-[#eef4fa] dark:hover:bg-[#16233a] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5] data-[active=true]:bg-[#0b1f3a] dark:data-[active=true]:bg-[#2e4d77] data-[active=true]:text-white'
               >
                 {item.external ? (
                   <a href={item.url}>

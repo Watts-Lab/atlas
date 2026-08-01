@@ -5,13 +5,17 @@
     <script>
       // Follow the OS color scheme: toggles the `dark` class (Tailwind/shadcn)
       // and `data-theme` (daisyUI) before first paint, and tracks live changes.
-      const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      const applyColorScheme = () => {
-        document.documentElement.classList.toggle('dark', darkQuery.matches)
-        document.documentElement.dataset.theme = darkQuery.matches ? 'dark' : 'light'
+      if (typeof window.matchMedia === 'function') {
+        const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
+        const applyColorScheme = () => {
+          document.documentElement.classList.toggle('dark', darkQuery.matches)
+          document.documentElement.dataset.theme = darkQuery.matches ? 'dark' : 'light'
+        }
+        applyColorScheme()
+        if (typeof darkQuery.addEventListener === 'function') {
+          darkQuery.addEventListener('change', applyColorScheme)
+        }
       }
-      applyColorScheme()
-      darkQuery.addEventListener('change', applyColorScheme)
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
