@@ -74,7 +74,7 @@ const SortableHeader = ({ column, title }: { column: any; title: string }) => {
   return (
     <button
       onClick={() => column.toggleSorting()}
-      className='flex items-center gap-2 cursor-pointer select-none hover:text-gray-600'
+      className='flex items-center gap-2 cursor-pointer select-none hover:text-muted-foreground'
     >
       {title}
       {sortDirection === 'asc' && <ArrowUp className='h-4 w-4' />}
@@ -146,9 +146,9 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
       cell: ({ row }) => (
         <div className='capitalize'>
           {row.getValue('is_owner') ? (
-            <span className='text-gray-400'>You</span>
+            <span className='text-muted-foreground'>You</span>
           ) : (
-            <span className='text-gray-600'>Collaborator</span>
+            <span className='text-muted-foreground'>Collaborator</span>
           )}
         </div>
       ),
@@ -162,7 +162,7 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
       cell: ({ row }) => {
         const date = row.getValue('last_viewed')
         return (
-          <div className='text-sm text-gray-500'>
+          <div className='text-sm text-muted-foreground'>
             {date ? format(new Date(date as string), 'MMM dd, yyyy') : '-'}
           </div>
         )
@@ -321,8 +321,8 @@ export default function ProjectsTable({ projects, isLoading, refetchProjects }: 
               <TableRow>
                 <TableCell colSpan={columns.length} className='text-center py-10'>
                   <div className='flex flex-col items-center justify-center'>
-                    <Loader2 className='h-6 w-6 animate-spin text-gray-500' />
-                    <p className='mt-2 text-gray-500'>Loading Projects...</p>
+                    <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+                    <p className='mt-2 text-muted-foreground'>Loading Projects...</p>
                   </div>
                 </TableCell>
               </TableRow>

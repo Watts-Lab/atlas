@@ -139,7 +139,7 @@ const ProjectFeatureMapDialog = ({
             A visual representation of the project&apos;s features and their relationships.
           </DialogDescription>
         </DialogHeader>
-        <div className='flex-1 w-full relative min-h-0 bg-gray-50/50 flex flex-col items-center justify-center'>
+        <div className='flex-1 w-full relative min-h-0 bg-muted/30 flex flex-col items-center justify-center'>
           {isLoading ? (
             <div className='flex flex-col items-center gap-2 text-muted-foreground'>
               <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />

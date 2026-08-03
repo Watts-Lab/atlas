@@ -59,21 +59,23 @@ const Overview = () => {
       ]}
       sidebarOpen={true}
     >
-      <div className='flex flex-1 flex-col gap-4 p-4 pt-0 min-w-0 text-[#0b1f3a]'>
+      <div className='flex flex-1 flex-col gap-4 p-4 pt-0 min-w-0 text-[#0b1f3a] dark:text-[#dce6f2]'>
         <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
           {stats.map((stat) => (
             <Card
               key={stat.title}
-              className='gap-2 rounded-sm border-[#d6dee8] bg-white/90 p-4 shadow-sm backdrop-blur-sm'
+              className='gap-2 rounded-sm border-[#d6dee8] dark:border-[#243350] bg-white/90 dark:bg-white/5 p-4 shadow-sm backdrop-blur-sm'
             >
               <div className='flex items-center justify-between gap-3'>
-                <h2 className='text-sm font-semibold text-[#334155]'>{stat.title}</h2>
-                <div className='flex h-7 w-7 items-center justify-center rounded-sm border border-[#d6dee8] bg-[#eef4fa] text-[#3c6082]'>
+                <h2 className='text-sm font-semibold text-[#334155] dark:text-[#b8c4d4]'>
+                  {stat.title}
+                </h2>
+                <div className='flex h-7 w-7 items-center justify-center rounded-sm border border-[#d6dee8] dark:border-[#243350] bg-[#eef4fa] dark:bg-[#16233a] text-[#3c6082] dark:text-[#8fb3d4]'>
                   <stat.icon className='h-4 w-4' />
                 </div>
               </div>
-              <p className='text-sm text-[#64748b]'>
-                <span className='mr-1 text-xl font-semibold tracking-tight text-[#071a33]'>
+              <p className='text-sm text-[#64748b] dark:text-[#8fa0b4]'>
+                <span className='mr-1 text-xl font-semibold tracking-tight text-[#071a33] dark:text-[#e2eaf4]'>
                   {stat.value}
                 </span>
                 {stat.detail}

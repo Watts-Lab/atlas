@@ -20,7 +20,7 @@ const Landing: React.FC = () => {
   })
 
   return (
-    <div className='bg-[#f8fafc] min-h-screen text-[#0b1f3a] font-sans selection:bg-[#6f95bd]/25 selection:text-[#06162b]'>
+    <div className='bg-[#f8fafc] dark:bg-[#0b1220] min-h-screen text-[#0b1f3a] dark:text-[#dce6f2] font-sans selection:bg-[#6f95bd]/25 dark:selection:bg-[#6f95bd]/40 selection:text-[#06162b] dark:selection:text-[#e8eef5]'>
       <CartographicBackground />
 
       <SiteHeader hidden={hidden} />
@@ -35,15 +35,17 @@ const Landing: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          <img src='/logo.svg' alt='' className='mx-auto mb-5 h-32 w-32' />
-          <h1 className='text-6xl md:text-8xl font-semibold tracking-[0.01em] mb-6 text-[#071a33]'>
+          <img src='/logo.svg' alt='' className='mx-auto mb-5 h-32 w-32 dark:invert' />
+          <h1 className='text-6xl md:text-8xl font-semibold tracking-[0.01em] mb-6 text-[#071a33] dark:text-[#e2eaf4]'>
             Atlas
           </h1>
-          <p className='text-xl md:text-2xl text-[#334155] max-w-2xl mx-auto font-light leading-relaxed'>
+          <p className='text-xl md:text-2xl text-[#334155] dark:text-[#b8c4d4] max-w-2xl mx-auto font-light leading-relaxed'>
             Extract the structure of knowledge hidden within scientific papers.
           </p>
           <div className='mt-12'>
-            <p className='text-sm uppercase tracking-widest text-[#64748b]'>Scroll to explore</p>
+            <p className='text-sm uppercase tracking-widest text-[#64748b] dark:text-[#8fa0b4]'>
+              Scroll to explore
+            </p>
             <div className='w-px h-12 bg-[#8aa3bf] mx-auto mt-4' />
           </div>
         </motion.div>
@@ -65,16 +67,16 @@ const Landing: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className='text-4xl md:text-5xl font-semibold mb-6 tracking-tight text-[#071a33]'>
+          <h2 className='text-4xl md:text-5xl font-semibold mb-6 tracking-tight text-[#071a33] dark:text-[#e2eaf4]'>
             Ready to map your data?
           </h2>
-          <p className='text-lg text-[#475569] mb-10 max-w-xl mx-auto'>
+          <p className='text-lg text-[#475569] dark:text-[#a8b6c8] mb-10 max-w-xl mx-auto'>
             Upload your PDFs and let Atlas automatically structure the experiments, conditions, and
             results into a clean, queryable format.
           </p>
           <Link
             to='/login'
-            className='inline-block px-8 py-4 bg-[#0b1f3a] text-white rounded-sm font-semibold border border-[#0b1f3a] hover:bg-[#16375f] hover:border-[#16375f] transition-colors'
+            className='inline-block px-8 py-4 bg-[#0b1f3a] dark:bg-[#2e4d77] text-white rounded-sm font-semibold border border-[#0b1f3a] dark:border-[#4c6f9c] hover:bg-[#16375f] dark:hover:bg-[#3c6082] hover:border-[#16375f] dark:hover:border-[#6f95bd] transition-colors'
           >
             Get Started with Atlas
           </Link>

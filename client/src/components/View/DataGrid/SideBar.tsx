@@ -116,7 +116,7 @@ export function AppSidebar({
   }, [refreshUser, user.email])
 
   return (
-    <Sidebar collapsible='icon' className='border-[#d6dee8]' {...props}>
+    <Sidebar collapsible='icon' className='border-[#d6dee8] dark:border-[#243350]' {...props}>
       <SidebarContent className='px-1 py-2'>
         <NavMain label='Atlas v0.1.4 [Alpha Release]' items={data.navMain} />
       </SidebarContent>

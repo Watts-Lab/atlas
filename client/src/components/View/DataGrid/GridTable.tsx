@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useIsDarkMode } from '@/hooks/use-dark-mode'
 import { evaluateCriteria } from './criteriaEvaluator'
 import type { EvalResult, InclusionCriteria as ICriteria } from './inclusionCriteria.types'
 
@@ -80,7 +81,11 @@ function formatBreakdown(result: EvalResult, depth: number): string {
 const ICCellRenderer = (props: ICellRendererParams) => {
   const evalResult = props.value as EvalResult | undefined
   if (evalResult === undefined || evalResult === null) {
-    return <span className='text-gray-400 text-xs flex items-center justify-center h-full'>—</span>
+    return (
+      <span className='text-muted-foreground text-xs flex items-center justify-center h-full'>
+        —
+      </span>
+    )
   }
   const icon = evalResult.passes === true ? '✅' : evalResult.passes === false ? '❌' : '⚠️'
   const breakdown = formatBreakdown(evalResult, 0)
@@ -93,7 +98,7 @@ const ICCellRenderer = (props: ICellRendererParams) => {
         </div>
       </TooltipTrigger>
       <TooltipContent
-        className='max-w-sm bg-white text-gray-800 border border-gray-200 shadow-xl p-3 z-[9999]'
+        className='max-w-sm bg-popover text-popover-foreground border shadow-xl p-3 z-[9999]'
         side='left'
       >
         <div className='font-semibold text-xs mb-2'>
@@ -152,6 +157,7 @@ const GridTable = ({
   reprocessPaper,
   inclusionCriteria,
 }: GridTableProps) => {
+  const isDarkMode = useIsDarkMode()
   const [expanded, setExpanded] = useState<string[]>([])
   const [available, setAvailable] = useState<string[]>([])
   const [rowData, setRowData] = useState<Record<string, unknown>[]>([])
@@ -249,7 +255,7 @@ const GridTable = ({
         versionColor = ''
       } else if (sortedVersions.length > 1 && version === sortedVersions[1]) {
         // Second highest version - specific blue
-        versionColor = 'bg-blue-200'
+        versionColor = 'bg-blue-200 dark:bg-blue-950'
       } else {
         // All other older versions - gradient
         const versionIndex = sortedVersions.indexOf(version)
@@ -258,9 +264,9 @@ const GridTable = ({
           const relativeIndex = versionIndex - 2 // Position among older versions
           const normalized = relativeIndex / Math.max(olderCount - 1, 1)
 
-          if (normalized <= 0.33) versionColor = 'bg-blue-300'
-          else if (normalized <= 0.66) versionColor = 'bg-blue-400'
-          else versionColor = 'bg-blue-500'
+          if (normalized <= 0.33) versionColor = 'bg-blue-300 dark:bg-blue-900'
+          else if (normalized <= 0.66) versionColor = 'bg-blue-400 dark:bg-blue-800'
+          else versionColor = 'bg-blue-500 dark:bg-blue-700'
         }
       }
 
@@ -367,7 +373,7 @@ const GridTable = ({
             const classes = []
 
             if (!params.data._is_latest) {
-              classes.push('text-gray-500 italic')
+              classes.push('text-muted-foreground italic')
             }
 
             if (showVersions && params.data._versionColor) {
@@ -548,10 +554,10 @@ const GridTable = ({
 
       {/* Array visibility controls */}
       {available.length > 0 && (
-        <div className='p-4 bg-gray-50 border-b border-gray-200'>
+        <div className='p-4 bg-muted/50 border-b'>
           <div className='flex items-center  mb-2'>
             <h3 className='text-sm font-medium'>Array feature visibility</h3>
-            <div className='text-xs text-gray-500 ml-4'>
+            <div className='text-xs text-muted-foreground ml-4'>
               💡 Click to expand arrays and show all items, or keep collapsed to show summary counts
             </div>
           </div>
@@ -562,8 +568,8 @@ const GridTable = ({
                 onClick={() => toggle(k)}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   expanded.includes(k)
-                    ? 'bg-orange-100 text-orange-800 border border-orange-300'
-                    : 'bg-green-100  text-green-800  border border-green-300 hover:bg-green-200'
+                    ? 'bg-orange-100 text-orange-800 border border-orange-300 dark:bg-orange-950 dark:text-orange-200 dark:border-orange-800'
+                    : 'bg-green-100  text-green-800  border border-green-300 hover:bg-green-200 dark:bg-green-950 dark:text-green-200 dark:border-green-800 dark:hover:bg-green-900'
                 }`}
               >
                 {expanded.includes(k) ? '📁' : '📂'} {nice(k)}
@@ -576,7 +582,7 @@ const GridTable = ({
         </div>
       )}
 
-      <div className='ag-theme-balham flex-1'>
+      <div className={`${isDarkMode ? 'ag-theme-balham-dark' : 'ag-theme-balham'} flex-1`}>
         <AgGridReact
           rowData={rowData}
           columnDefs={colDefs}

@@ -207,7 +207,7 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
           {/* <select
             id='countries'
             defaultValue={'gpt'}
-            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+            className='bg-gray-50 border border-gray-300 text-foreground text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
           >
             <option value='gpt'>GPT-4o</option>
             <option value='claude'>Claude 3.5</option>
@@ -241,7 +241,9 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
               {/* <h3 className='font-bold text-md mb-2'>Select Features to Add</h3> */}
               <div className='flex justify-between items-center mb-2'>
                 <h3 className='font-bold text-md'>Select Features to Add</h3>
-                <span className='text-xs text-gray-500'>hover feature for more details</span>
+                <span className='text-xs text-muted-foreground'>
+                  hover feature for more details
+                </span>
               </div>
 
               {/* Search Box */}
@@ -271,7 +273,7 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
                   >
                     <div className='flex-grow'>
                       <p className='font-semibold'>{feature.name}</p>
-                      <p className='text-sm text-gray-500'>{feature.trail}</p>
+                      <p className='text-sm text-muted-foreground'>{feature.trail}</p>
                     </div>
                     <div className='flex items-center'>
                       <input
@@ -313,13 +315,17 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
               {rows.headersGroup.map((header, index) => (
                 <th
                   key={`${index}-group`}
-                  className={index % 2 === 0 ? 'bg-slate-300' : 'bg-gray-300'}
+                  className={
+                    index % 2 === 0
+                      ? 'bg-slate-300 dark:bg-slate-700'
+                      : 'bg-gray-300 dark:bg-gray-800'
+                  }
                   colSpan={header.span}
                 >
                   {header.name}
                 </th>
               ))}
-              <th className='bg-slate-300'>
+              <th className='bg-slate-300 dark:bg-slate-700'>
                 <button className='btn btn-xs' onClick={() => setIsFeatureModalOpen(true)}>
                   +
                 </button>
@@ -343,7 +349,7 @@ const ArrageTable = ({ result, handleBackend }: ArrageTableProps) => {
               row ? (
                 <tr
                   key={rowIndex}
-                  className={`hover:bg-gray-100 ${row.status === 'inprogress' ? 'skeleton' : ''}`}
+                  className={`hover:bg-muted ${row.status === 'inprogress' ? 'skeleton' : ''}`}
                 >
                   {Object.entries(row).map((value, colIndex) => {
                     if (value[0] === 'status') return

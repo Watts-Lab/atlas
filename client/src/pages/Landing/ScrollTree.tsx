@@ -384,11 +384,11 @@ export function ScrollTree({ headerHidden = false }: { headerHidden?: boolean })
           style={{ top: tabsTop }}
         >
           <div className='pointer-events-auto flex flex-col items-center gap-3'>
-            <p className='text-[10px] uppercase tracking-[0.18em] text-[#64748b] font-semibold'>
+            <p className='text-[10px] uppercase tracking-[0.18em] text-[#64748b] dark:text-[#8fa0b4] font-semibold'>
               Document type
             </p>
 
-            <div className='flex p-1 gap-1 rounded-sm bg-white/85 backdrop-blur-xl border border-[#cbd5e1] shadow-[0_16px_40px_rgba(15,23,42,0.08)]'>
+            <div className='flex p-1 gap-1 rounded-sm bg-white/85 dark:bg-[#0f1a2e]/85 backdrop-blur-xl border border-[#cbd5e1] dark:border-[#2b3a52] shadow-[0_16px_40px_rgba(15,23,42,0.08)]'>
               {Object.entries(SCHEMAS).map(([key, s]) => (
                 <button
                   key={key}
@@ -398,13 +398,13 @@ export function ScrollTree({ headerHidden = false }: { headerHidden?: boolean })
                               ${
                                 activeKey === key
                                   ? 'text-white'
-                                  : 'text-[#475569] hover:text-[#0b1f3a]'
+                                  : 'text-[#475569] dark:text-[#a8b6c8] hover:text-[#0b1f3a] dark:hover:text-[#e8eef5]'
                               }`}
                 >
                   {activeKey === key && (
                     <motion.div
                       layoutId='schema-pill'
-                      className='absolute inset-0 rounded-sm bg-[#0b1f3a] border border-[#0b1f3a]'
+                      className='absolute inset-0 rounded-sm bg-[#0b1f3a] dark:bg-[#2e4d77] border border-[#0b1f3a] dark:border-[#4c6f9c]'
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}
@@ -421,7 +421,7 @@ export function ScrollTree({ headerHidden = false }: { headerHidden?: boolean })
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.22 }}
-                className='text-[11px] text-[#64748b] text-center max-w-[300px] leading-relaxed'
+                className='text-[11px] text-[#64748b] dark:text-[#8fa0b4] text-center max-w-[300px] leading-relaxed'
               >
                 {schema.tagline}
               </motion.p>
@@ -544,7 +544,7 @@ function Node({
             <div
               className='
               absolute inset-0 rounded-sm
-              border border-[#b7c5d8] bg-[#e8eef5]/85
+              border border-[#b7c5d8] dark:border-[#31415c] bg-[#e8eef5]/85 dark:bg-[#141f33]/85
               translate-y-[18px] translate-x-[14px] scale-[0.91]
               shadow-[0_10px_24px_rgba(15,23,42,0.05)]
             '
@@ -553,7 +553,7 @@ function Node({
             <div
               className='
               absolute inset-0 rounded-sm
-              border border-[#9fb2ca] bg-[#f1f5f9]/95
+              border border-[#9fb2ca] dark:border-[#3a4f6e] bg-[#f1f5f9]/95 dark:bg-[#111c30]/95
               translate-y-[9px] translate-x-[7px] scale-[0.96]
               shadow-[0_10px_24px_rgba(15,23,42,0.06)]
             '
@@ -564,11 +564,11 @@ function Node({
         {/* Main card */}
         <div
           className='relative z-10 flex items-center gap-3 overflow-hidden
-                        bg-white/95 backdrop-blur-xl border border-[#9fb2ca]
-                        rounded-sm px-4 py-[14px] text-[#0b1f3a]
+                        bg-white/95 dark:bg-[#0f1a2e]/95 backdrop-blur-xl border border-[#9fb2ca] dark:border-[#3a4f6e]
+                        rounded-sm px-4 py-[14px] text-[#0b1f3a] dark:text-[#dce6f2]
                         shadow-[0_14px_32px_rgba(15,23,42,0.08)]
                         transition-all duration-300
-                        hover:border-[#3c6082] hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)]'
+                        hover:border-[#3c6082] dark:hover:border-[#6f95bd] hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)]'
         >
           <AnimatePresence mode='wait'>
             <motion.div
@@ -580,12 +580,12 @@ function Node({
               className='flex items-center gap-3 w-full min-w-0'
             >
               <div
-                className='p-2.5 bg-[#eef4fa] rounded-sm shrink-0 border border-[#d6dee8]
-                              transition-colors duration-300 group-hover/node:bg-[#dbe8f5]'
+                className='p-2.5 bg-[#eef4fa] dark:bg-[#16233a] rounded-sm shrink-0 border border-[#d6dee8] dark:border-[#243350]
+                              transition-colors duration-300 group-hover/node:bg-[#dbe8f5] dark:group-hover/node:bg-[#1c2d4a]'
               >
                 <Icon
                   size={18}
-                  className='text-[#3c6082] group-hover/node:text-[#0b1f3a]
+                  className='text-[#3c6082] dark:text-[#8fb3d4] group-hover/node:text-[#0b1f3a] dark:group-hover/node:text-[#dce6f2]
                                            transition-colors duration-300'
                 />
               </div>
@@ -595,8 +595,8 @@ function Node({
               {isArray && (
                 <span
                   className='shrink-0 font-mono text-md font-semibold tracking-wider
-                                 text-[#6f1d1b] border border-[#cfa5a3] rounded-sm
-                                 px-2 py-0.5 bg-[#f8eded]'
+                                 text-[#6f1d1b] dark:text-[#e5a9a6] border border-[#cfa5a3] dark:border-[#5c2f2d] rounded-sm
+                                 px-2 py-0.5 bg-[#f8eded] dark:bg-[#2a1414]'
                 >
                   1…N
                 </span>
@@ -614,7 +614,7 @@ function Node({
           <div
             className='mx-auto mb-0 w-0 h-0
                           border-l-[6px] border-r-[6px] border-b-[6px]
-                          border-l-transparent border-r-transparent border-b-[#9fb2ca]'
+                          border-l-transparent border-r-transparent border-b-[#9fb2ca] dark:border-b-[#3a4f6e]'
           />
           <AnimatePresence mode='wait'>
             <motion.div
@@ -623,8 +623,8 @@ function Node({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className='bg-white/98 border border-[#9fb2ca] rounded-sm p-3
-                         text-xs text-[#475569] leading-relaxed
+              className='bg-white/98 dark:bg-[#0f1a2e]/98 border border-[#9fb2ca] dark:border-[#3a4f6e] rounded-sm p-3
+                         text-xs text-[#475569] dark:text-[#a8b6c8] leading-relaxed
                          shadow-[0_14px_34px_rgba(15,23,42,0.14)]'
             >
               {description}

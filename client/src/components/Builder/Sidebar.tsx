@@ -35,7 +35,7 @@ const Sidebar = ({ selectedNode, setNodes }: SidebarProps) => {
   }, [selectedNode])
 
   return (
-    <aside className='lg:w-2/6 border-l border-gray-300 p-4 bg-white'>
+    <aside className='lg:w-2/6 border-l p-4 bg-background'>
       <div className='flex flex-col w-full'>
         <div className='divider !my-1'>Extractors</div>
       </div>
