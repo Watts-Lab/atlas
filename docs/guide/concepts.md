@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: The product concepts behind Atlas projects, papers, features, results, inclusion criteria, repeatability, and API keys.
+description: The product concepts behind Atlas projects, papers, features, results, inclusion criteria, repeatability, API keys, and provider keys.
 ---
 
 # Concepts
@@ -82,3 +82,9 @@ If a feature produces different answers across repeated extractions, the feature
 An API key allows programmatic access to Atlas. API keys are used by scripts, SDK-like integrations, and the MCP server.
 
 Create API keys in the web app under **Settings → API Keys**. Treat raw keys as secrets; Atlas only shows the raw key once when it is created.
+
+## Provider Key & Budget
+
+Atlas runs extractions through an LLM provider. By default it uses Atlas' shared key, which draws down a monthly usage budget shown under **Settings → Usage & Keys**.
+
+You can instead bring your own provider key (OpenAI, Anthropic, or OpenRouter). Extractions then bill directly to that provider and don't count against your Atlas budget. Only one bring-your-own key can be active at a time — remove the current key to switch providers.

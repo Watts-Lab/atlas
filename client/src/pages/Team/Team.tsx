@@ -25,10 +25,10 @@ const team: Member[] = [
   },
   {
     name: 'Amirhossein Nakhaei',
-    role: 'Software Engineer · Visiting Researcher, CSSLab',
-    affiliation: 'University of Pennsylvania',
+    role: 'Software Engineer',
+    affiliation: 'RWTH Aachen University',
     link: 'https://nakhaei.me/',
-    bio: 'Amirhossein Nakhaei is a visiting researcher at the CSSLab at Penn. Holding a master’s in Computational Social Science from RWTH Aachen University, he currently applies his expertise as a software engineer in Berlin.',
+    bio: 'Amirhossein Nakhaei is a Software Engineer. Holding a master’s in Computational Social Science from RWTH Aachen University, he currently applies his expertise as a software engineer in Berlin.',
   },
   {
     name: 'Linnea Gandhi',

@@ -122,6 +122,27 @@ task_id = next(iter(upload.values()))
 status = client.check_task_status(task_id)
 ```
 
+### Polling for completion
+
+Each result row returned by `get_project_results` carries an explicit `_status`
+field — one of `processing`, `completed`, or `failed` — plus `_error` (the
+failure message when `_status` is `failed`, otherwise `null`). Poll `_status`
+rather than inferring state from whether a `paper` key is present, since a
+completed row omits the `paper` marker entirely.
+
+```python
+import time
+
+while True:
+    rows = client.get_project_results(project_id)["results"]
+    row = next(r for r in rows if r["_paper_id"] == paper_id)
+    if row["_status"] == "completed":
+        break
+    if row["_status"] == "failed":
+        raise RuntimeError(row["_error"])
+    time.sleep(5)
+```
+
 After changing feature prompts or project settings, reprocess existing material:
 
 ```python

@@ -112,6 +112,11 @@ async def get_project(project_id: str) -> dict:
 async def get_project_results(project_id: str) -> dict:
     """Get the extraction results (feature scores) for every paper in a project.
 
+    Each result row carries an explicit `_status` field (`processing`,
+    `completed`, or `failed`) plus `_error` (the failure message when failed,
+    otherwise null). Poll `_status` to determine completion rather than checking
+    the row shape — a completed row omits the `paper` marker entirely.
+
     Args:
         project_id: The id of the project (obtain it from `list_projects`).
     """

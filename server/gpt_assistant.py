@@ -152,6 +152,36 @@ def build_parent_objects(feature_list: list[str], feature_object: dict) -> dict:
     return nested_dict
 
 
+def make_value_leaves_nullable(schema):
+    """Allow every scalar *value* leaf to be ``null``.
+
+    Strict structured-output mode requires every property to be ``required`` and
+    forbids extra keys, so a field can never simply be omitted. That means a
+    numeric feature with no legal way to say "not reported" forces the model to
+    FABRICATE a value (observed: 0.0, 33.0, 1000000.0 for papers that report no
+    such quantity) — catastrophic for meta-analysis, where a fake 0.0 effect
+    size is indistinguishable from a genuine null.
+
+    The escape hatch strict mode *does* allow is a nullable type union. We keep
+    the key required but make its value type ``[<type>, "null"]`` for every
+    scalar leaf (string / number / integer), and add ``null`` as an allowed enum
+    member. Structural containers (``object`` / ``array``) are left unchanged —
+    a parent with no children is naturally an empty array/object.
+    """
+    if isinstance(schema, dict):
+        node_type = schema.get("type")
+        if isinstance(node_type, str) and node_type not in ("object", "array"):
+            schema["type"] = [node_type, "null"]
+            enum = schema.get("enum")
+            if isinstance(enum, list) and None not in enum:
+                schema["enum"] = [*enum, None]
+        for key, value in schema.items():
+            schema[key] = make_value_leaves_nullable(value)
+    elif isinstance(schema, list):
+        schema = [make_value_leaves_nullable(item) for item in schema]
+    return schema
+
+
 def build_top_level_schema(feature_list: list[str], feature_object: dict) -> dict:
     """Build the complete, valid top-level JSON schema for extraction.
 
@@ -159,6 +189,10 @@ def build_top_level_schema(feature_list: list[str], feature_object: dict) -> dic
     properties (not a hardcoded ``["paper"]`` that may not exist), with
     ``additionalProperties: False`` enforced recursively. This is the shape both
     OpenAI and stricter providers (OpenRouter) accept.
+
+    Scalar value leaves are made nullable so the model can honestly return
+    ``null`` for a feature that does not apply to a paper, instead of
+    fabricating a value.
     """
     properties = build_parent_objects(feature_list, feature_object)
     schema = {
@@ -167,7 +201,10 @@ def build_top_level_schema(feature_list: list[str], feature_object: dict) -> dic
     }
     # enforce_additional_properties fills in required (= all property keys) and
     # additionalProperties=False on this object and every nested object.
-    return enforce_additional_properties(schema)
+    schema = enforce_additional_properties(schema)
+    # Then allow scalar leaves to be null ("not reported") — must run after the
+    # required/additionalProperties pass, which only cares about object nodes.
+    return make_value_leaves_nullable(schema)
 
 
 def build_openai_feature_functions(

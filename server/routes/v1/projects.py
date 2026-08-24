@@ -32,6 +32,27 @@ logger = logging.getLogger(__name__)
 projects_bp = Blueprint("projects", url_prefix="/projects")
 
 
+def _result_status(result: Result) -> tuple[str, str | None]:
+    """Derive an explicit extraction status for a result row.
+
+    Returns a ``(status, error)`` tuple where ``status`` is one of
+    ``"processing"``, ``"failed"``, or ``"completed"``. Historically the state
+    was only observable implicitly from the row shape (a ``"paper": "failed"``
+    marker on failure, feature keys on success), which made polling ambiguous.
+    This surfaces it explicitly.
+    """
+    response = getattr(result, "json_response", None) or {}
+
+    # Failures are persisted as finished results carrying a failure marker.
+    if response.get("paper") == "failed" or "error" in response:
+        return "failed", response.get("error")
+
+    if not getattr(result, "finished", False):
+        return "processing", None
+
+    return "completed", None
+
+
 @projects_bp.route("/", methods=["GET", "POST"], name="projects")
 @docs.project
 @require_jwt
@@ -244,6 +265,7 @@ async def project_results(request: Request, project_id: str):
         project_json_responses = []
         project_response_ids = []
         for r in project_result:
+            status, error = _result_status(r)
             response_data = {
                 **r.json_response,
                 "created_at": (
@@ -253,6 +275,10 @@ async def project_results(request: Request, project_id: str):
                 "_is_latest": getattr(r, "is_latest", True),
                 "_result_id": str(r.id),
                 "_paper_id": str(r.paper.id) if r.paper else None,
+                # Explicit, always-present extraction state so clients can poll
+                # reliably without inferring it from the row shape.
+                "_status": status,
+                "_error": error,
             }
             project_json_responses.append(response_data)
             project_response_ids.append(str(r.id))

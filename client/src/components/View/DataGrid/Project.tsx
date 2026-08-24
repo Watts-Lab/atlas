@@ -616,6 +616,8 @@ const Project: React.FC = () => {
       '_is_latest',
       '_result_id',
       '_paper_id',
+      '_status',
+      '_error',
     ]
     const allKeys = new Set<string>()
 

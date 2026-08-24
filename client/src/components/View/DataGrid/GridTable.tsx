@@ -309,7 +309,7 @@ const GridTable = ({
     // Filter out version metadata fields and IC fields from column display
     const filteredKeys = keys.filter(
       (k) =>
-        !['_version', '_is_latest', '_result_id', '_paper_id', '_versionColor'].includes(k) &&
+        !['_version', '_is_latest', '_result_id', '_paper_id', '_versionColor', '_status', '_error'].includes(k) &&
         !k.startsWith('_ic_'),
     )
 

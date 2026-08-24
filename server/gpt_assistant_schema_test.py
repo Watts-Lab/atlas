@@ -134,3 +134,65 @@ def test_paper_container_required_includes_all_keys(monkeypatch):
     paper_items = schema["properties"]["paper"]["items"]
     assert set(paper_items["required"]) == {"property", "parties", "paper_title"}
     _assert_strict_mode_valid(schema)
+
+
+def test_scalar_leaves_are_nullable_so_model_can_say_not_reported():
+    # Regression for the fabricated-number bug: a feature that doesn't apply must
+    # be answerable with null, not an invented value. Strict mode keeps the key
+    # required, so nullability is expressed via a [<type>, "null"] union.
+    feats = ["effect_size_d", "source", "design"]
+    obj = {
+        "effect_size_d": {"type": "number", "description": "Cohen's d"},
+        "source": {"type": "string", "description": "quote or 'not applicable'"},
+        "design": {
+            "type": "string",
+            "description": "pick one",
+            "enum": ["RCT", "Cohort"],
+        },
+    }
+    schema = g.build_top_level_schema(feats, obj)
+    props = schema["properties"]
+
+    # Scalar value leaves accept null...
+    assert props["effect_size_d"]["type"] == ["number", "null"]
+    assert props["source"]["type"] == ["string", "null"]
+    # ...enums gain null as a member too.
+    assert None in props["design"]["enum"]
+    # ...but the keys are still required (strict mode).
+    assert set(schema["required"]) == {"effect_size_d", "source", "design"}
+
+
+def test_containers_are_not_made_nullable(monkeypatch):
+    # Object/array structural nodes must stay non-nullable (an empty array/object
+    # already expresses "nothing here"); only scalar leaves become nullable.
+    class _Q:
+        def run(self):
+            return None
+
+    class _Field:
+        def __eq__(self, other):
+            return ("eq", other)
+
+    monkeypatch.setattr(
+        g,
+        "Features",
+        type(
+            "F",
+            (),
+            {
+                "find_one": staticmethod(lambda *a, **k: _Q()),
+                "feature_identifier": _Field(),
+            },
+        ),
+    )
+
+    feats = sorted(["paper.n", "paper.title"], key=lambda s: s.count("."))
+    obj = {
+        "paper.n": {"type": "number", "description": "n"},
+        "paper.title": {"type": "string", "description": "t"},
+    }
+    schema = g.build_top_level_schema(feats, obj)
+    paper = schema["properties"]["paper"]
+    assert paper["type"] == "array"  # not ["array", "null"]
+    assert paper["items"]["type"] == "object"  # not nullable
+    assert paper["items"]["properties"]["n"]["type"] == ["number", "null"]

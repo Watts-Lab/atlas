@@ -21,6 +21,9 @@ class FakeQuery:
     def run(self):
         return self._value
 
+    def sort(self, *_args, **_kwargs):
+        return self
+
     def to_list(self):
         return self._value
 
@@ -177,6 +180,64 @@ async def test_project_results_not_found(
     )
     assert response.status_code == 404
     assert response.json["error"] == "Project not found."
+
+
+async def test_project_results_get_includes_explicit_status(
+    client, auth_headers, patch_auth_user, monkeypatch
+):
+    """GET should surface an explicit `_status` (and `_error`) per result row."""
+    fake_user = patch_auth_user
+    project = SimpleNamespace(id="p1", user=SimpleNamespace(id=fake_user.id))
+    monkeypatch.setattr(
+        "routes.v1.projects.Project.get", lambda *a, **k: FakeQuery(project)
+    )
+
+    completed = SimpleNamespace(
+        id="r-done",
+        json_response={"paper_title": "Attention Is All You Need"},
+        finished=True,
+        version=1,
+        is_latest=True,
+        created_at=datetime(2024, 1, 1, 0, 0, 0),
+        paper=SimpleNamespace(id="paper-done"),
+    )
+    failed = SimpleNamespace(
+        id="r-fail",
+        json_response={"paper": "failed", "error": "boom"},
+        finished=True,
+        version=1,
+        is_latest=True,
+        created_at=datetime(2024, 1, 1, 0, 0, 0),
+        paper=SimpleNamespace(id="paper-fail"),
+    )
+    processing = SimpleNamespace(
+        id="r-run",
+        json_response={},
+        finished=False,
+        version=1,
+        is_latest=True,
+        created_at=datetime(2024, 1, 1, 0, 0, 0),
+        paper=SimpleNamespace(id="paper-run"),
+    )
+    fake_result_model = SimpleNamespace(
+        project=SimpleNamespace(id="project.id"),
+        is_latest="is_latest",
+        find=lambda *a, **k: FakeQuery([completed, failed, processing]),
+    )
+    monkeypatch.setattr("routes.v1.projects.Result", fake_result_model)
+
+    _, response = await client.get(
+        "/api/v1/projects/p1/results", headers=auth_headers()
+    )
+    assert response.status_code == 200
+    rows = {row["_result_id"]: row for row in response.json["results"]}
+
+    assert rows["r-done"]["_status"] == "completed"
+    assert rows["r-done"]["_error"] is None
+    assert rows["r-fail"]["_status"] == "failed"
+    assert rows["r-fail"]["_error"] == "boom"
+    assert rows["r-run"]["_status"] == "processing"
+    assert rows["r-run"]["_error"] is None
 
 
 async def test_project_results_delete_requires_ids(

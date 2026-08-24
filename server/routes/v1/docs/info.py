@@ -54,7 +54,9 @@ IDs. A typical end-to-end flow:
      `POST /api/v1/assistant/upload_complete` to start extraction.
    Both return a `task_id` for the background extraction job.
 4. **Track processing**: poll `GET /api/v1/assistant/add_paper?task_id=...`, or
-   subscribe to live progress over the WebSocket (see below).
+   subscribe to live progress over the WebSocket (see below). You can also poll
+   `GET /api/v1/projects/{project_id}/results` and read each row's `_status`
+   (`processing` / `completed` / `failed`).
 5. **Read results**: `GET /api/v1/projects/{project_id}/results`. Re-run
    extraction after schema/prompt changes with
    `POST /api/v1/assistant/reprocess_paper/{paper_id}` or

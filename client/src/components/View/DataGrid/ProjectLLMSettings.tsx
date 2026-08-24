@@ -77,6 +77,20 @@ const PROVIDER_LABELS: Record<Provider, string> = {
   openrouter: 'OpenRouter (your key)',
 }
 
+// Providers that require the user to have saved their own key. 'atlas' uses the
+// shared platform key and is always available.
+type BYOKProvider = Exclude<Provider, 'atlas'>
+
+type UserSettings = {
+  provider_keys: Record<BYOKProvider, { configured: boolean; prefix: string | null }>
+  usage: {
+    currency: string
+    limit_usd: number
+    used_usd: number
+    remaining_usd: number
+  }
+}
+
 const STRATEGY_LABELS: Record<Strategy, string> = {
   json_schema: 'JSON Schema (recommended)',
   assistant_api: 'Assistant API (OpenAI only)',
@@ -96,6 +110,11 @@ export default function ProjectLLMSettings({
   const [strategy, setStrategy] = useState<Strategy>(value.strategy)
   const [saving, setSaving] = useState(false)
 
+  // Which BYOK providers have a saved key. `null` while we're still loading.
+  const [configuredKeys, setConfiguredKeys] = useState<Record<BYOKProvider, boolean> | null>(null)
+  // Remaining Atlas monthly budget, in USD. `null` until loaded.
+  const [atlasRemaining, setAtlasRemaining] = useState<number | null>(null)
+
   // Re-sync when the dialog is (re)opened with fresh values.
   useEffect(() => {
     if (open) {
@@ -104,6 +123,44 @@ export default function ProjectLLMSettings({
       setStrategy(value.strategy)
     }
   }, [open, value])
+
+  // Fetch the user's provider keys so we can disable providers they can't use.
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+    api
+      .get<UserSettings>('/user/settings')
+      .then(({ data }) => {
+        if (cancelled) return
+        setConfiguredKeys({
+          openai: !!data.provider_keys?.openai?.configured,
+          anthropic: !!data.provider_keys?.anthropic?.configured,
+          openrouter: !!data.provider_keys?.openrouter?.configured,
+        })
+        setAtlasRemaining(
+          typeof data.usage?.remaining_usd === 'number' ? data.usage.remaining_usd : null,
+        )
+      })
+      .catch(() => {
+        // On failure, don't block the user — leave availability unknown.
+        if (!cancelled) {
+          setConfiguredKeys(null)
+          setAtlasRemaining(null)
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open])
+
+  // 'atlas' is always available; other providers need a saved key. While the
+  // keys are still loading we optimistically treat providers as available so we
+  // don't briefly disable an already-selected provider.
+  const isProviderAvailable = (p: Provider) =>
+    p === 'atlas' || configuredKeys === null || configuredKeys[p]
+
+  const fmtUsd = (n: number) =>
+    n.toLocaleString(undefined, { style: 'currency', currency: 'USD' })
 
   // The Assistant API is OpenAI-only; force json_schema for other providers.
   const assistantAllowed = provider === 'atlas' || provider === 'openai'
@@ -155,11 +212,21 @@ export default function ProjectLLMSettings({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(PROVIDER_LABELS) as Provider[]).map((p) => (
-                  <SelectItem key={p} value={p}>
-                    {PROVIDER_LABELS[p]}
-                  </SelectItem>
-                ))}
+                {(Object.keys(PROVIDER_LABELS) as Provider[]).map((p) => {
+                  const available = isProviderAvailable(p)
+                  return (
+                    <SelectItem key={p} value={p} disabled={!available}>
+                      {PROVIDER_LABELS[p]}
+                      {p === 'atlas' && atlasRemaining !== null && (
+                        <span className='text-muted-foreground'>
+                          {' '}
+                          — {fmtUsd(atlasRemaining)} left
+                        </span>
+                      )}
+                      {!available && ' — no key saved'}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
             {provider !== 'atlas' && (
@@ -171,7 +238,7 @@ export default function ProjectLLMSettings({
 
           <div className='space-y-2'>
             <Label>Model</Label>
-            <Select value={model} onValueChange={setModel}>
+            <Select value={model} onValueChange={setModel} disabled={!isProviderAvailable(provider)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -183,6 +250,11 @@ export default function ProjectLLMSettings({
                 ))}
               </SelectContent>
             </Select>
+            {!isProviderAvailable(provider) && (
+              <p className='text-xs text-muted-foreground'>
+                Save a {provider} key in Settings → Usage & Keys to choose a model.
+              </p>
+            )}
           </div>
 
           <div className='space-y-2'>
@@ -215,7 +287,7 @@ export default function ProjectLLMSettings({
           <Button variant='outline' onClick={() => onOpenChange(false)} disabled={saving}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving}>
+          <Button onClick={handleSave} disabled={saving || !isProviderAvailable(provider)}>
             {saving ? (
               <Loader2 className='w-4 h-4 mr-2 animate-spin' />
             ) : (

@@ -33,6 +33,12 @@ Good prompts are:
 
 Feature-specific details belong in feature prompts, not the project prompt.
 
+## Model & Provider
+
+Each project chooses which provider and model run its extractions (**Project menu → Model & Provider**). Providers without a saved key are disabled in the selector, and the Atlas option shows your remaining monthly budget.
+
+See [Provider Key & Budget](./concepts#provider-key-budget) for how keys and the monthly budget work.
+
 ## Reprocessing
 
 Reprocess papers when you change:

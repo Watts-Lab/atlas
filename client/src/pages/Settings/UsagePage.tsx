@@ -166,6 +166,13 @@ export default function UsagePage() {
     })
   }
 
+  // Only one BYO provider key may be active at a time. Find the configured one
+  // (if any) so we can disable adding keys for the other providers.
+  const activeProvider =
+    (Object.keys(PROVIDER_META) as Provider[]).find(
+      (p) => settings?.provider_keys?.[p]?.configured,
+    ) ?? null
+
   const usage = settings?.usage
   const usedPct =
     usage && usage.limit_usd > 0
@@ -227,6 +234,9 @@ export default function UsagePage() {
             When a key is set, your extractions use it directly and are billed by the provider — not
             against your Atlas budget. Keys are encrypted and never shown again after saving.
           </p>
+          <p className='text-sm text-muted-foreground mt-1'>
+            You can only bring one provider key at a time. Remove the current key to switch providers.
+          </p>
 
           <div className='mt-5 space-y-6'>
             {(Object.keys(PROVIDER_META) as Provider[]).map((provider) => {
@@ -234,6 +244,9 @@ export default function UsagePage() {
               const Icon = meta.icon
               const pk = settings?.provider_keys?.[provider]
               const configured = pk?.configured
+              // Lock this provider out when another provider already holds the
+              // single allowed BYO key.
+              const lockedOut = !!activeProvider && activeProvider !== provider
               return (
                 <div key={provider} className='space-y-2'>
                   <div className='flex items-center gap-2'>
@@ -244,6 +257,10 @@ export default function UsagePage() {
                     ) : configured ? (
                       <Badge variant='secondary' className='font-mono text-xs'>
                         {pk?.prefix ?? 'configured'}
+                      </Badge>
+                    ) : lockedOut ? (
+                      <Badge variant='outline' className='text-xs text-muted-foreground'>
+                        Unavailable
                       </Badge>
                     ) : (
                       <Badge variant='outline' className='text-xs text-muted-foreground'>
@@ -256,16 +273,22 @@ export default function UsagePage() {
                     <Input
                       type='password'
                       autoComplete='off'
-                      placeholder={configured ? 'Enter a new key to replace' : meta.placeholder}
+                      placeholder={
+                        lockedOut
+                          ? `Remove your ${PROVIDER_META[activeProvider].label} key to use ${meta.label}`
+                          : configured
+                            ? 'Enter a new key to replace'
+                            : meta.placeholder
+                      }
                       value={inputs[provider]}
                       onChange={(e) =>
                         setInputs((prev) => ({ ...prev, [provider]: e.target.value }))
                       }
-                      disabled={savingProvider === provider}
+                      disabled={savingProvider === provider || lockedOut}
                     />
                     <Button
                       onClick={() => handleSave(provider)}
-                      disabled={savingProvider === provider || !inputs[provider].trim()}
+                      disabled={savingProvider === provider || lockedOut || !inputs[provider].trim()}
                       className='shrink-0'
                     >
                       {savingProvider === provider ? 'Saving…' : configured ? 'Replace' : 'Save'}

@@ -164,11 +164,11 @@ const IC2S2 = () => {
                 <span className='font-semibold'>markew@seas.upenn.edu</span>
               </p>
               <p className='text-lg'>
-                Mark E. Whiting is the Chief Scientist of Pareto Inc and a visiting
-                scientist at the Computational Social Science Lab (CSSLab) at the University of
-                Pennsylvania. With postdoctoral experience with Duncan Watts at Penn and Michael S.
-                Bernstein at Stanford, Mark holds degrees in Design from RMIT and KAIST and a PhD in
-                Engineering from CMU. Learn more about him at{' '}
+                Mark E. Whiting is the Chief Scientist of Pareto Inc and a visiting scientist at the
+                Computational Social Science Lab (CSSLab) at the University of Pennsylvania. With
+                postdoctoral experience with Duncan Watts at Penn and Michael S. Bernstein at
+                Stanford, Mark holds degrees in Design from RMIT and KAIST and a PhD in Engineering
+                from CMU. Learn more about him at{' '}
                 <a
                   className='underline text-blue-300 hover:text-blue-500'
                   href='https://whiting.me'
@@ -189,10 +189,9 @@ const IC2S2 = () => {
                 <span className='font-semibold'>amirhossein.nakhaei@rwth-aachen.de</span>
               </p>
               <p className='text-lg'>
-                Amirhossein Nakhaei is an incoming PhD student in Data Science at Boston University
-                and a visiting researcher at CSSLab at Penn. Holding a master’s in Computational
-                Social Science from RWTH Aachen University, he currently applies his expertise as a
-                software engineer in Berlin.
+                Amirhossein Nakhaei is an incoming PhD student in Data Science at Boston University.
+                Holding a master’s in Computational Social Science from RWTH Aachen University, he
+                currently applies his expertise as a software engineer in Berlin.
               </p>
             </div>
 
