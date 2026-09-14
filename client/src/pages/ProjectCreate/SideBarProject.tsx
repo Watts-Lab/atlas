@@ -49,7 +49,6 @@ export function SidebarRight(props: ComponentProps<typeof Sidebar>) {
   const createNodeData = useCallback(
     (feat: Feature) => ({
       name: feat.feature_name,
-      measurement: 'GPT-o1',
       prompt: feat.feature_description,
       maxLength: 60,
     }),

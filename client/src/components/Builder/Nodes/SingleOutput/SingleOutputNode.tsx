@@ -9,7 +9,7 @@ type SingleOutputNodeProps = {
   selected?: boolean
   data: {
     name: string
-    measurement: string
+    measurement?: string
     prompt: string
     maxLength: number
   }
@@ -35,7 +35,7 @@ function SingleOutputNode({ isConnectable, selected, data }: SingleOutputNodePro
         <CardHeader className='px-2 pt-1.5'>
           <div className='flex justify-between items-center'>
             <CardTitle className='text-sm font-bold truncate'>{name}</CardTitle>
-            {measurement !== 'Choose an option' && (
+            {measurement && measurement !== 'Choose an option' && (
               <Badge variant='secondary' className='truncate'>
                 {measurement}
               </Badge>
