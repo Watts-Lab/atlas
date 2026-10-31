@@ -41,12 +41,12 @@ joblib==1.6.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 kombu==5.6.2
-lazy-model==0.2.0
+lazy-model==0.4.0
 markdown-it-py==4.2.0
 MarkupSafe==3.0.4
 mdurl==0.1.2
 motor==3.7.1
-multidict==6.7.1
+multidict==7.2.1
 narwhals==2.28.0
 numpy==2.5.4
 openai==3.42.0
@@ -65,7 +65,7 @@ Pygments==2.21.0
 PyJWT==2.15.1
 pyOpenSSL==26.4.0
 pymongo==4.19.0
-python-dateutil==2.9.0.post0
+python-dateutil==3.0.0
 python-dotenv==1.2.4
 python-engineio==4.15.1
 python-socketio==5.17.1
