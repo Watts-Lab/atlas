@@ -10,8 +10,8 @@
 -r requirements.txt
 
 # Testing
-pytest==9.1.0
-pytest-asyncio==1.4.0
+pytest==9.2.0
+pytest-asyncio==1.4.1
 pytest-cov==7.1.0
 coverage==7.14.1
 sanic-testing==24.6.0
