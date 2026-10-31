@@ -46,7 +46,7 @@ markdown-it-py==4.2.0
 MarkupSafe==3.0.4
 mdurl==0.1.2
 motor==3.7.1
-multidict==6.7.1
+multidict==6.9.1
 narwhals==2.28.0
 numpy==2.5.4
 openai==3.42.0
